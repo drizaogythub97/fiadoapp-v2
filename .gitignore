@@ -1,0 +1,20 @@
+# deps / build
+node_modules/
+.next/
+out/
+coverage/
+
+# env — NUNCA versionar
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+# testes
+playwright-report/
+test-results/
+
+# ide/os
+.DS_Store
+*.tsbuildinfo
