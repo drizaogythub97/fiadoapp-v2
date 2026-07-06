@@ -11,7 +11,7 @@ erros genéricos, rate limit no cadastro, senha mínima, libs self-hosted em
 `/vendor/`), documentos pessoais removidos do repo e do servidor.
 Descoberta: a Hostinger sobrescreve o header CSP no servidor.
 
-## F1 — Fundação do Fiado v2 ⏳ EM ANDAMENTO
+## F1 — Fundação do Fiado v2 ✅ CONCLUÍDA (2026-07-06)
 
 - [x] 🤖 Repo `fiado` + esta documentação
 - [x] 🤖 Scaffold espelhando o Gaveta (TS, Tailwind 4, App Router) + shadcn/ui + Vitest + Playwright + ESLint
@@ -27,7 +27,9 @@ Descoberta: a Hostinger sobrescreve o header CSP no servidor.
 - [x] 🤖 Login/logout + layout base (header, navegação) usando Supabase Auth
       — escopo F1: SEM cadastro/recuperação de senha (a conta é a mesma do Gaveta;
       esses fluxos entram junto com a página de privacidade em fase posterior)
-- [ ] 👤 Validar no Preview: login com a conta existente do Gaveta funciona + direção visual
+- [x] 👤 Validado pelo dono ("ficou ótimo visualmente") → PR #1 mesclado (squash) em 2026-07-06.
+      Pós-merge: repo renomeado para `fiadoapp-v2`, projeto Vercel para `fiadoapp`,
+      produção em `https://fiadoapp-v2.vercel.app`
 
 ## F2 — Modelo de dados + RLS
 
