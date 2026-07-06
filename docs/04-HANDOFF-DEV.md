@@ -9,8 +9,14 @@ apenas onde encontrá-los.
   `export PATH="$PATH:/c/Program Files/GitHub CLI"`), autenticado como
   `drizaogythub97`.
 - **vercel CLI**: instalado (`vercel.cmd` no PowerShell; no Bash adicionar
-  `/c/Users/adria/AppData/Roaming/npm` ao PATH). Conta já logada (linkada ao
-  projeto do Gaveta; este repo será linkado ao projeto novo na F1).
+  `/c/Users/adria/AppData/Roaming/npm` ao PATH). Conta já logada.
+- **Repo GitHub**: `drizaogythub97/fiadoapp-v2` (renomeado de `fiado` em
+  2026-07-06; `fiadoapp` puro colide com o repo antigo `FiadoApp` — nomes são
+  case-insensitive no GitHub). **Projeto Vercel**: `fiadoapp` (team
+  `adriano-cardoso-org`), git integration ativa, produção em
+  `https://fiadoapp-v2.vercel.app` (`fiadoapp.vercel.app` pertence a terceiros;
+  a URL definitiva será `fiadoapp.net` no cutover da F5). Previews têm
+  Deployment Protection (302 → SSO Vercel para anônimos).
 - **Supabase**: mesmo projeto do Gaveta. Copiar do
   `../erp-simples/.env.local`: `NEXT_PUBLIC_SUPABASE_URL`,
   `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SECRET_KEY` (nome pode variar —

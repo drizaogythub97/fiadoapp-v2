@@ -21,3 +21,5 @@ next-env.d.ts
 # ide/os
 .DS_Store
 *.tsbuildinfo
+
+.vercel

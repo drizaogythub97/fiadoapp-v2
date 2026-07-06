@@ -53,7 +53,11 @@ Descoberta: a Hostinger sobrescreve o header CSP no servidor.
       exclusão + Quitações (total/selecionadas/parcial) com o modelo novo
 - [ ] 🤖 4c. Inadimplentes + WhatsApp + comprovantes (rota de impressão + Web Share)
       + histórico do cliente
-- [ ] 🤖 4d. Relatórios (filtros, CSV, print) + Analytics + Preferências (limites)
+- [ ] 🤖 4d. Relatórios (filtros, CSV, print) + Analytics + Preferências (limites
+      + **tema claro** via toggle — infra pronta desde a F1 + **personalização do
+      header** com nome/logo da loja; 👤 decidir: reusar a marca já configurada no
+      Gaveta (mesma tabela `profiles`, leitura apenas) ou marca própria do Fiado)
+      + fluxos de cadastro/recuperação de senha com a página de privacidade
 
 ## F5 — PWA + cutover
 
