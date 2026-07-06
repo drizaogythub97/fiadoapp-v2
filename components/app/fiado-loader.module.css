@@ -1,0 +1,139 @@
+/* Animações do loader de marca "FiadoApp" (conceitos portados do Gaveta).
+   DECISÃO (herdada do Gaveta, do dono do produto): o loader é um estado de
+   carregamento breve e transitório, então a animação roda SEMPRE — inclusive
+   quando o sistema está com "reduzir movimento" ligado (override intencional).
+   As transições de página (template.tsx) continuam respeitando
+   prefers-reduced-motion (ficam instantâneas). */
+
+.breathe {
+  animation: breathe 2.4s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.07);
+  }
+}
+
+.float {
+  animation: float 3s ease-in-out infinite;
+}
+.delay05 {
+  animation-delay: 0.5s;
+}
+.delay1 {
+  animation-delay: 1s;
+}
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+.spin {
+  animation: spin 2.4s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rise {
+  opacity: 0;
+  animation: rise 3s ease-in infinite;
+}
+@keyframes rise {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-120px);
+    opacity: 0;
+  }
+}
+
+/* Opacidade suave — mantida também no modo "reduzir movimento". */
+.pulseOpacity {
+  animation: pulseOpacity 2.2s ease-in-out infinite;
+}
+@keyframes pulseOpacity {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.dots span {
+  animation: blink 1.4s infinite both;
+}
+.dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@keyframes blink {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+/* Exceção intencional de redução de movimento: o loader anima SEMPRE (decisão
+   de produto). O override global em globals.css usa `*` com !important, então
+   reafirmamos aqui com !important e maior especificidade (classe > universal)
+   para que as animações mantenham a duração/contagem reais — sem isto, o loader
+   herdava `animation-duration: 0.01ms` + loop infinito e piscava acelerado.
+   As durações abaixo espelham as definições normais acima. */
+@media (prefers-reduced-motion: reduce) {
+  .breathe {
+    animation: breathe 2.4s ease-in-out infinite !important;
+  }
+  .float {
+    animation: float 3s ease-in-out infinite !important;
+  }
+  .spin {
+    animation: spin 2.4s linear infinite !important;
+  }
+  .rise {
+    animation: rise 3s ease-in infinite !important;
+  }
+  .pulseOpacity {
+    animation: pulseOpacity 2.2s ease-in-out infinite !important;
+  }
+  .dots span {
+    animation: blink 1.4s infinite both !important;
+  }
+  /* Reafirma os delays depois dos shorthands (o shorthand zera o delay). */
+  .delay05 {
+    animation-delay: 0.5s !important;
+  }
+  .delay1 {
+    animation-delay: 1s !important;
+  }
+  .dots span:nth-child(2) {
+    animation-delay: 0.2s !important;
+  }
+  .dots span:nth-child(3) {
+    animation-delay: 0.4s !important;
+  }
+}

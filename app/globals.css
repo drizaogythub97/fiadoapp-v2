@@ -1,0 +1,135 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: var(--font-inter), system-ui, Arial, sans-serif;
+  --font-heading: var(--font-sans);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+}
+
+:root {
+  /* Marca FiadoApp: coral #E8624A sobre a estrutura de tokens do Gaveta.
+     O tema claro usa o coral escurecido (#C9503A) como primário para manter
+     contraste AA sobre fundo branco. */
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+  --primary: #c9503a;
+  --primary-foreground: #ffffff;
+  --secondary: #f7f5f4;
+  --secondary-foreground: #1a1a1a;
+  --muted: #f7f5f4;
+  --muted-foreground: #4b5563;
+  --accent: #f7f5f4;
+  --accent-foreground: #1a1a1a;
+  --destructive: #b91c1c;
+  --destructive-foreground: #ffffff;
+  --success: #15803d;
+  --success-foreground: #ffffff;
+  --warning: #b45309;
+  --warning-foreground: #ffffff;
+  --border: #d6d3d1;
+  --input: #d6d3d1;
+  --ring: #c9503a;
+  --radius: 0.75rem;
+}
+
+.dark {
+  /* Tema escuro (PADRÃO do FiadoApp — herdado do v1): superfícies em azul-
+     -arroxeado escuro (#13131A/#19192A/#1E1E2E) e o coral pleno da marca. */
+  --background: #13131a;
+  --foreground: #f0f0f8;
+  --card: #19192a;
+  --card-foreground: #f0f0f8;
+  --popover: #1e1e2e;
+  --popover-foreground: #f0f0f8;
+  --primary: #e8624a;
+  --primary-foreground: #ffffff;
+  --secondary: #1e1e2e;
+  --secondary-foreground: #f0f0f8;
+  --muted: #1e1e2e;
+  --muted-foreground: #aeaece;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --accent: #1e1e2e;
+  --accent-foreground: #f0f0f8;
+  --success: #22c55e;
+  --success-foreground: #0a0c10;
+  --warning: #f59e0b;
+  --warning-foreground: #0a0c10;
+  --border: #2a2a3d;
+  --input: #2a2a3d;
+  --ring: #e8624a;
+}
+
+html {
+  /* Base 18px respeitando o zoom do usuario (1rem = 18px quando padrao do browser e 16px). */
+  font-size: 112.5%;
+}
+
+body {
+  font-family: var(--font-sans);
+  line-height: 1.5;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    /* Sem animation-iteration-count: 1, animações `infinite` ficavam em loop a
+       cada 0.01ms (efeito "ultra acelerado"). Capar a 1 iteração as encerra de
+       fato. O loader de marca é exceção intencional e se reativa no seu módulo. */
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
