@@ -14,15 +14,19 @@ Descoberta: a Hostinger sobrescreve o header CSP no servidor.
 ## F1 — Fundação do Fiado v2 ⏳ EM ANDAMENTO
 
 - [x] 🤖 Repo `fiado` + esta documentação
-- [ ] 🤖 Scaffold: `create-next-app` (TS, Tailwind, App Router) + shadcn/ui + Vitest + Playwright + ESLint
-- [ ] 🤖 Portar do Gaveta (`../erp-simples/`): `lib/security/csp.ts`, middleware/proxy de auth,
-      rate limiting (Upstash), clients Supabase (`lib/supabase/`), padrão de validações Zod,
-      `next.config.ts` (headers), estrutura de pastas
-- [ ] 🤖 Design system: tokens do Gaveta re-tematizados para a marca FiadoApp
-      (coral `#E8624A`, tema escuro, Inter), loader de marca, transições motion-safe
-- [ ] 🤖 `.env.local` (copiar valores do `../erp-simples/.env.local` — mesmo Supabase/Upstash)
-- [ ] 🤖 Projeto Vercel `fiado` linkado + envs no painel
-- [ ] 🤖 Login/logout + layout base (header, navegação) usando Supabase Auth
+- [x] 🤖 Scaffold espelhando o Gaveta (TS, Tailwind 4, App Router) + shadcn/ui + Vitest + Playwright + ESLint
+- [x] 🤖 Portar do Gaveta (`../erp-simples/`): `lib/security/csp.ts`, middleware/proxy de auth,
+      rate limiting (Upstash, prefixo `fiado:`), clients Supabase (`lib/supabase/`), padrão de
+      validações Zod, `next.config.ts` (headers), estrutura de pastas
+- [x] 🤖 Design system: tokens do Gaveta re-tematizados para a marca FiadoApp
+      (coral `#E8624A`, tema ESCURO por padrão, Inter), loader de marca, transições motion-safe
+- [x] 🤖 `.env.local` (copiado do `../erp-simples/.env.local` — mesmo Supabase/Upstash)
+- [x] 🤖 Projeto Vercel `fiado` linkado (git integration) + envs prod/preview no painel
+      (gotcha: o `vercel link` definiu a branch de produção como a branch local corrente;
+      `vercel git disconnect` + `connect` redetectou a `main`)
+- [x] 🤖 Login/logout + layout base (header, navegação) usando Supabase Auth
+      — escopo F1: SEM cadastro/recuperação de senha (a conta é a mesma do Gaveta;
+      esses fluxos entram junto com a página de privacidade em fase posterior)
 - [ ] 👤 Validar no Preview: login com a conta existente do Gaveta funciona + direção visual
 
 ## F2 — Modelo de dados + RLS
