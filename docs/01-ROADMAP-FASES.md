@@ -47,11 +47,20 @@ Descoberta: a Hostinger sobrescreve o header CSP no servidor.
 
 ## F3 — Migração de dados (dados reais — ver `docs/03`)
 
-- [ ] 👤 Habilitar Remote MySQL no hPanel + fornecer credenciais do banco
-- [ ] 👤 Confirmar o e-mail de login do FiadoApp (se = conta Gaveta, remapeia direto)
-- [ ] 🤖 Script de migração MySQL→Postgres com dry-run + relatório de validação
-      (contagens, soma "a receber" batendo com o dashboard antigo, spot-checks)
+- [x] 👤 Remote MySQL habilitado (2026-07-07) — credenciais no `.env.local`
+      (host = IP do servidor; banco/usuário `u879355098_fiadoapp_*`)
+- [x] 👤 E-mail do FiadoApp confirmado: `ademir.cardoso65@outlook.com` →
+      migra para a conta Gaveta `adriano.cardoso97@gmail.com` (`--conta`).
+      Decisão do dono: migrar SÓ o usuário Rações Cardoso; as demais contas
+      do MySQL são teste (Arthur, 1 venda, reavaliar no cutover da F5 —
+      snapshot completo guardado)
+- [x] 🤖 Script `scripts/migracao/migrar.mjs` (snapshot → anomalias → wipe por
+      `legacy_id` → migração transacional → relatório). Dry-run de 2026-07-07:
+      61 clientes, 247 vendas, 371 itens, 187 pagamentos sintéticos —
+      **zero divergência**, "A Receber" R$ 3.340,00 idêntico à fórmula do v1
 - [ ] 👤 Conferir o relatório de validação
+      (`..\fiado-migracao\relatorio-validacao-2026-07-07-14-19.md`) e o card
+      "A Receber" do app antigo
 
 ## F4 — Features (uma branch/Preview por bloco; 👤 valida cada uma)
 
