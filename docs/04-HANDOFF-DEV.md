@@ -42,18 +42,18 @@ apenas onde encontrá-los.
 
 ## O que portar do Gaveta (ler em `../erp-simples/`)
 
-| Origem (Gaveta) | Destino (Fiado) | Status |
-|---|---|---|
-| `lib/security/csp.ts` + headers no `next.config.ts` | idem | ✅ F1 |
-| `proxy.ts`/middleware de auth + `lib/supabase/{server,client,middleware}` | idem | ✅ F1 |
-| Rate limiting Upstash (`lib/` + uso nas actions) | prefixo de chave `fiado:` | ✅ F1 |
-| `lib/validations/*` (padrão Zod) | novos schemas do domínio fiado | ✅ base F1; domínio na F2+ |
-| Design tokens/`globals.css` | re-tematizado coral #E8624A, escuro padrão | ✅ F1 |
-| Loader de marca (`gaveta-loader*`) | `components/app/fiado-loader*` (2 variantes) | ✅ F1 |
-| Rota `/comprovante/[id]` (print CSS + auto-print + Web Share) | comprovante de quitação/pagamento | F4c |
-| `tests/` (estrutura Vitest/Playwright/RLS) | Vitest+configs ✅ F1; suíte RLS | F2 |
-| Fluxos signup/recover/reset + `/privacidade` | adiados intencionalmente | F4d |
-| `.github/workflows/backup-db.yml` | NÃO duplicar — o backup do Gaveta já cobre o banco todo | — |
+| Origem (Gaveta)                                                           | Destino (Fiado)                                         | Status                     |
+| ------------------------------------------------------------------------- | ------------------------------------------------------- | -------------------------- |
+| `lib/security/csp.ts` + headers no `next.config.ts`                       | idem                                                    | ✅ F1                      |
+| `proxy.ts`/middleware de auth + `lib/supabase/{server,client,middleware}` | idem                                                    | ✅ F1                      |
+| Rate limiting Upstash (`lib/` + uso nas actions)                          | prefixo de chave `fiado:`                               | ✅ F1                      |
+| `lib/validations/*` (padrão Zod)                                          | novos schemas do domínio fiado                          | ✅ base F1; domínio na F2+ |
+| Design tokens/`globals.css`                                               | re-tematizado coral #E8624A, escuro padrão              | ✅ F1                      |
+| Loader de marca (`gaveta-loader*`)                                        | `components/app/fiado-loader*` (2 variantes)            | ✅ F1                      |
+| Rota `/comprovante/[id]` (print CSS + auto-print + Web Share)             | comprovante de quitação/pagamento                       | F4c                        |
+| `tests/` (estrutura Vitest/Playwright/RLS)                                | Vitest+configs ✅ F1; suíte RLS ✅ F2 (17 testes)       | ✅ F2                      |
+| Fluxos signup/recover/reset + `/privacidade`                              | adiados intencionalmente                                | F4d                        |
+| `.github/workflows/backup-db.yml`                                         | NÃO duplicar — o backup do Gaveta já cobre o banco todo | —                          |
 
 ## Estado da sessão encerrada em 2026-07-06 (F1 concluída)
 
