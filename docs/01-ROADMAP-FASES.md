@@ -58,9 +58,10 @@ Descoberta: a Hostinger sobrescreve o header CSP no servidor.
       `legacy_id` → migração transacional → relatório). Dry-run de 2026-07-07:
       61 clientes, 247 vendas, 371 itens, 187 pagamentos sintéticos —
       **zero divergência**, "A Receber" R$ 3.340,00 idêntico à fórmula do v1
-- [ ] 👤 Conferir o relatório de validação
-      (`..\fiado-migracao\relatorio-validacao-2026-07-07-14-19.md`) e o card
-      "A Receber" do app antigo
+- [x] 👤 Relatório de validação conferido (2026-07-07): card "A Receber" do
+      app antigo confere com os R$ 3.340,00 migrados → PR #3 mesclado.
+      **F3 ✅ CONCLUÍDA** (migração final re-roda na janela de congelamento
+      da F5 com o mesmo script)
 
 ## F4 — Features (uma branch/Preview por bloco; 👤 valida cada uma)
 
