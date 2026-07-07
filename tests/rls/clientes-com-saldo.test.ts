@@ -1,0 +1,83 @@
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+
+import {
+  createCliente,
+  createTestUser,
+  deleteTestUser,
+  userClient,
+  type TestUser,
+} from "./helpers";
+
+let alice: TestUser;
+let bob: TestUser;
+
+beforeAll(async () => {
+  alice = await createTestUser("saldo-alice");
+  bob = await createTestUser("saldo-bob");
+}, 60_000);
+
+afterAll(async () => {
+  if (alice) await deleteTestUser({ id: alice.id });
+  if (bob) await deleteTestUser({ id: bob.id });
+});
+
+describe("RPC fiado_clientes_com_saldo", () => {
+  it("agrega saldo, contagens e flags por cliente do próprio usuário", async () => {
+    const aliceApp = userClient(alice.accessToken);
+
+    // Devedor acima do limite e inadimplente: limite 50, deve 80, vencida
+    const { data: devedorId } = await aliceApp
+      .from("fiado_clientes")
+      .insert({
+        user_id: alice.id,
+        nome: "Devedor",
+        limite_credito: 50,
+      })
+      .select("id")
+      .single();
+    await aliceApp.rpc("fiado_registrar_venda", {
+      p_itens: [{ descricao: "Compra", quantidade: 1, valor_unitario: 80 }],
+      p_cliente_id: devedorId!.id,
+      p_data_vencimento: "2020-01-01",
+    });
+
+    // Em dia: 1 venda paga, nada em aberto
+    const emDiaId = await createCliente(alice.accessToken, alice.id, "Em Dia");
+    await aliceApp.rpc("fiado_registrar_venda", {
+      p_itens: [{ descricao: "Compra", quantidade: 1, valor_unitario: 30 }],
+      p_cliente_id: emDiaId,
+    });
+    await aliceApp.rpc("fiado_registrar_pagamento", {
+      p_cliente_id: emDiaId,
+    });
+
+    const { data, error } = await aliceApp.rpc("fiado_clientes_com_saldo");
+    expect(error).toBeNull();
+    expect(data).toHaveLength(2);
+
+    const devedor = data?.find(
+      (c: { nome: string }) => c.nome === "Devedor",
+    ) as Record<string, unknown>;
+    expect(devedor.saldo_devedor).toBe(80);
+    expect(devedor.total_ativas).toBe(1);
+    expect(devedor.total_pagas).toBe(0);
+    expect(devedor.inadimplente).toBe(true);
+    expect(devedor.acima_limite).toBe(true);
+
+    const emDia = data?.find(
+      (c: { nome: string }) => c.nome === "Em Dia",
+    ) as Record<string, unknown>;
+    expect(emDia.saldo_devedor).toBe(0);
+    expect(emDia.total_ativas).toBe(0);
+    expect(emDia.total_pagas).toBe(1);
+    expect(emDia.inadimplente).toBe(false);
+    expect(emDia.acima_limite).toBe(false); // sem limite definido = nunca acima
+  });
+
+  it("Bob não enxerga os clientes da Alice pela RPC", async () => {
+    const bobApp = userClient(bob.accessToken);
+    const { data, error } = await bobApp.rpc("fiado_clientes_com_saldo");
+    expect(error).toBeNull();
+    expect(data).toHaveLength(0);
+  });
+});
