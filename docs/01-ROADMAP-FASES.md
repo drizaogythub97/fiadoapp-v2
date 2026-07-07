@@ -33,12 +33,17 @@ Descoberta: a Hostinger sobrescreve o header CSP no servidor.
 
 ## F2 — Modelo de dados + RLS
 
-- [ ] 🤖 Migration `0001`: tabelas `fiado_clientes`, `fiado_vendas`, `fiado_itens_venda`,
-      `fiado_pagamentos` (+ prefs), RLS, índices, RPCs transacionais (ver `docs/02`)
-- [ ] 👤 Decisão de produto: semântica do pagamento parcial (abatimento em cascata
-      das vendas mais antigas — como hoje — vs pagamento por venda) e se o limite
-      de crédito bloqueia ou só alerta
-- [ ] 🤖 Suíte `test:rls` (acesso cruzado + funcional das RPCs)
+- [x] 👤 Decisão de produto (2026-07-07): pagamento parcial abate em **cascata**
+      das vendas mais antigas (como no v1); limite de crédito **só alerta**
+      (nunca bloqueia) + badge persistente no cliente acima do limite
+- [x] 🤖 Migration `0001_init.sql`: tabelas `fiado_clientes`, `fiado_vendas`,
+      `fiado_itens_venda`, `fiado_pagamentos`, `fiado_preferencias`, RLS desde a
+      criação, índices, RPCs transacionais (`fiado_registrar_venda`,
+      `fiado_registrar_pagamento`, `fiado_resumo_dashboard`) — aplicada no banco
+      em 2026-07-07 (técnica `pg`, ver docs/04). `search_path` fixado e checagem
+      de propriedade nas RPCs desde o dia 1 (lições da 0010 do Gaveta)
+- [x] 🤖 Suíte `test:rls` (17 testes: isolamento cruzado + funcional das RPCs,
+      incluindo a cascata e o resumo agregado no banco)
 
 ## F3 — Migração de dados (dados reais — ver `docs/03`)
 
@@ -53,13 +58,10 @@ Descoberta: a Hostinger sobrescreve o header CSP no servidor.
 - [ ] 🤖 4a. Clientes: consulta A–Z/busca/filtros, cadastro, edição, exclusão + Dashboard KPIs
 - [ ] 🤖 4b. Vendas: nova venda (autocomplete, itens, BRL, vencimento +30d), detalhe,
       exclusão + Quitações (total/selecionadas/parcial) com o modelo novo
-- [ ] 🤖 4c. Inadimplentes + WhatsApp + comprovantes (rota de impressão + Web Share)
-      + histórico do cliente
-- [ ] 🤖 4d. Relatórios (filtros, CSV, print) + Analytics + Preferências (limites
-      + **tema claro** via toggle — infra pronta desde a F1 + **personalização do
+- [ ] 🤖 4c. Inadimplentes + WhatsApp + comprovantes (rota de impressão + Web Share) + histórico do cliente
+- [ ] 🤖 4d. Relatórios (filtros, CSV, print) + Analytics + Preferências (limites + **tema claro** via toggle — infra pronta desde a F1 + **personalização do
       header** com nome/logo da loja; 👤 decidir: reusar a marca já configurada no
-      Gaveta (mesma tabela `profiles`, leitura apenas) ou marca própria do Fiado)
-      + fluxos de cadastro/recuperação de senha com a página de privacidade
+      Gaveta (mesma tabela `profiles`, leitura apenas) ou marca própria do Fiado) + fluxos de cadastro/recuperação de senha com a página de privacidade
 
 ## F5 — PWA + cutover
 

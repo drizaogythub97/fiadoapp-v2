@@ -72,8 +72,11 @@ fiado_preferencias  (1 linha por usuário)
   cliente inline + venda + itens numa transação; valida tudo no banco.
 - `fiado_registrar_pagamento(...)` — registra pagamentos REAIS e atualiza
   `valor_pago`/`status`/`quitado_em` das vendas afetadas. Cobre os três modos
-  (todas / selecionadas / valor específico). **Semântica do parcial: decisão
-  pendente do dono na F2** (cascata das mais antigas, como o v1, vs por venda).
+  (todas / selecionadas / valor específico). **Semântica do parcial (decidida
+  pelo dono em 2026-07-07): CASCATA — o valor abate as vendas mais antigas
+  primeiro (`data_compra`, depois `created_at`), como no v1.** Valor maior que
+  o total em aberto é rejeitado. **Limite de crédito nunca bloqueia** (decisão
+  do dono): a UI só alerta na venda + badge persistente no cliente estourado.
 - `fiado_resumo_dashboard()` / agregações de relatório — KPIs somados no banco
   (lição do cap de 1000 linhas do PostgREST, migration 0010 do Gaveta).
 

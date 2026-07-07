@@ -46,8 +46,10 @@ do MySQL sem perda.
    de verdade). Semântica exata: decidir com o dono na Fase F2.
 2. **Sem auto-delete**: o v1 apaga vendas pagas com mais de 6 meses. O v2
    mantém histórico completo.
-3. **Limite de crédito**: v1 é só informativo. v2: alerta no caixa e (a decidir
-   com o dono) bloqueio opcional no servidor.
+3. **Limite de crédito**: v1 é só informativo. v2 (decisão do dono, F2):
+   continua NUNCA bloqueando a venda — alerta no momento da venda + badge
+   persistente no cliente enquanto estiver acima do limite. Sem enforcement
+   no banco/RPC.
 
 ### Fora do escopo do v2 (não inventar)
 
