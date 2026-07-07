@@ -44,7 +44,7 @@ export function DashboardSearch({ clientes }: { clientes: ClienteBusca[] }) {
 
   function irParaCliente(c: ClienteBusca) {
     setAberto(false);
-    router.push(`/clientes?q=${encodeURIComponent(c.nome)}`);
+    router.push(`/clientes/${c.id}`);
   }
 
   return (
