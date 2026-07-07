@@ -55,25 +55,55 @@ apenas onde encontrá-los.
 | Fluxos signup/recover/reset + `/privacidade`                              | adiados intencionalmente                                | F4d                        |
 | `.github/workflows/backup-db.yml`                                         | NÃO duplicar — o backup do Gaveta já cobre o banco todo | —                          |
 
-## Estado da sessão encerrada em 2026-07-06 (F1 concluída)
+## Estado da sessão encerrada em 2026-07-07 (F2 + F3 + F4a concluídas)
 
-**Onde paramos:** F1 mesclada na `main` (PR #1, squash) e validada pelo dono.
-Produção viva em `https://fiadoapp-v2.vercel.app` (login com conta do Gaveta
-funciona; Painel é casca com KPIs "—"; Clientes/Vendas/Inadimplentes/Relatórios
-são placeholders "em construção"). Working tree limpa, sem branch pendente.
+**Onde paramos:** PRs #2 (modelo de dados), #3 (migração) e #4 (Clientes +
+Dashboard) mesclados na `main` e validados pelo dono. Working tree limpa.
+Produção em `https://fiadoapp-v2.vercel.app`: Painel com KPIs REAIS
+(A Receber R$ 3.340,00 na data da migração) e Clientes completo (A–Z, busca,
+filtros, CRUD, badges). Vendas/Inadimplentes/Relatórios ainda placeholders.
 
-**Próximo passo: Fase F2** (`docs/01` + modelo em `docs/02`):
+**O que existe no banco (compartilhado com o Gaveta):**
 
-1. Antes de codar, colher do dono as duas decisões de produto da F2:
-   pagamento parcial (abatimento em cascata das vendas mais antigas, como no
-   v1, vs pagamento por venda) e limite de crédito (bloqueia ou só alerta).
-2. Migration `supabase/migrations/0001_...` — tabelas `fiado_*` com RLS desde
-   a criação, índices e RPCs transacionais. Aplicar com a técnica `pg` acima
-   (`SUPABASE_DB_URL` já está no `.env.local` local) ANTES do push.
-3. Suíte `test:rls` (o `vitest.rls.config.ts` já existe e espera
-   `tests/rls/setup.ts` + `tests/rls/**/*.test.ts` — portar helpers de
-   `../erp-simples/tests/rls/`).
-4. Fluxo: branch → validação local completa → push → Preview → 👤 valida → merge.
+- Migrations 0001 (tabelas `fiado_*` + RLS + RPCs `fiado_registrar_venda`,
+  `fiado_registrar_pagamento` cascata, `fiado_resumo_dashboard`) e 0002
+  (`fiado_clientes_com_saldo`) — ambas APLICADAS.
+- Dados reais do dono migrados (61 clientes, 247 vendas na data) para a conta
+  `adriano.cardoso97@gmail.com` (id `8b43f787-...`). ⚠️ O dono tentou logar
+  no v2 com o e-mail do app ANTIGO (`ademir.cardoso65@outlook.com`) — o login
+  do v2 é a conta do GAVETA; explicar isso se voltar a confundir.
+- Suíte `test:rls` com 19 testes (isolamento + funcional das RPCs).
+
+**Próximo passo: F4b — Vendas + Quitações** (paridade v1, ver `docs/00`):
+
+1. Nova venda: cliente existente (autocomplete) ou novo inline, itens
+   dinâmicos com autocomplete de descrição, máscara BRL, data compra +
+   vencimento (auto +30d), observação. **A RPC `fiado_registrar_venda` já
+   existe e está testada** — é só UI + action + Zod (`lib/validations/`).
+2. Detalhe e exclusão de venda; lista de vendas.
+3. Quitações (total / selecionadas / valor parcial em CASCATA) na tela do
+   cliente — **RPC `fiado_registrar_pagamento` pronta**; decisão do dono:
+   parcial abate das mais antigas; overpay é rejeitado pela RPC.
+4. Alerta de limite de crédito ao vender (badge/aviso, NUNCA bloqueia).
+5. Fluxo: branch → validação local completa (lint+tsc+test+build+test:rls)
+   → verificação E2E no navegador → push → Preview → 👤 valida → merge.
+
+**Técnicas/gotchas novos desta sessão:**
+
+- Verificação E2E local: script temporário que cria usuário Supabase de
+  teste + dados via RPCs (admin API + anon key com Bearer), `npm run dev`,
+  Claude in Chrome para dirigir o fluxo; apagar usuário e script ao final.
+- Base UI: não trocar `defaultValue` de input não controlado após submit —
+  usar `key` no `<form>` para remontar (ver `cliente-form.tsx`).
+- Hydration warning do nonce CSP na página de login é PRÉ-EXISTENTE da F1
+  (React + CSP nonce, só ruído dev) — candidato a polimento na F4d.
+- Polimento pendente menor: telefone aparece como dígitos crus no form de
+  edição (a lista formata com `lib/format.ts`).
+- Cuidado com `prettier --write` em pastas largas: reformata arquivos fora
+  do escopo — rodar só nos arquivos novos/tocados e conferir `git status`.
+- Snapshots/relatórios da migração F3: `C:\Users\adria\Documents\fiado-migracao\`
+  (fora do repo). Script `scripts/migracao/migrar.mjs` re-roda na F5
+  (`dry-run --usuario ademir.cardoso65@outlook.com --conta adriano.cardoso97@gmail.com`).
 
 **Decisões/gotchas da F1 (além dos registrados no roadmap):**
 

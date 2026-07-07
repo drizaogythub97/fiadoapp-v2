@@ -65,10 +65,10 @@ Descoberta: a Hostinger sobrescreve o header CSP no servidor.
 
 ## F4 — Features (uma branch/Preview por bloco; 👤 valida cada uma)
 
-- [ ] 🤖 4a. Clientes: consulta A–Z/busca/filtros, cadastro, edição, exclusão + Dashboard KPIs
-      — entregue em 2026-07-07 (migration 0002 `fiado_clientes_com_saldo`,
-      badge persistente "Acima do limite", busca rápida no painel); aguardando
-      👤 validar o Preview
+- [x] 🤖👤 4a. Clientes: consulta A–Z/busca/filtros, cadastro, edição, exclusão
+      + Dashboard KPIs — entregue e **validado pelo dono em 2026-07-07**
+      (PR #4 mesclado). Migration 0002 `fiado_clientes_com_saldo`, badge
+      persistente "Acima do limite", busca rápida no painel
 - [ ] 🤖 4b. Vendas: nova venda (autocomplete, itens, BRL, vencimento +30d), detalhe,
       exclusão + Quitações (total/selecionadas/parcial) com o modelo novo
 - [ ] 🤖 4c. Inadimplentes + WhatsApp + comprovantes (rota de impressão + Web Share) + histórico do cliente
