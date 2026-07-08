@@ -22,4 +22,7 @@ next-env.d.ts
 .DS_Store
 *.tsbuildinfo
 
+# capturas de tela locais (uso do dono para mostrar imagens ao Claude)
+prints/
+
 .vercel

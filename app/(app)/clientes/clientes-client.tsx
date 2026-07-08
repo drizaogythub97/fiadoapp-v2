@@ -4,6 +4,7 @@ import {
   AlertTriangle,
   Pencil,
   Plus,
+  Receipt,
   Search,
   Trash2,
   Users,
@@ -182,7 +183,12 @@ export function ClientesClient({
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-foreground text-xl font-semibold">
-                  {nomeCompleto(c)}
+                  <Link
+                    href={`/clientes/${c.id}`}
+                    className="hover:text-primary underline-offset-4 hover:underline"
+                  >
+                    {nomeCompleto(c)}
+                  </Link>
                   {c.referencia ? (
                     <span className="text-muted-foreground ml-2 text-base font-normal">
                       ({c.referencia})
@@ -224,6 +230,14 @@ export function ClientesClient({
               </div>
 
               <div className="flex flex-wrap gap-2">
+                <Link
+                  href={`/clientes/${c.id}`}
+                  className={cn(buttonVariants(), "h-12 px-4 text-base")}
+                  aria-label={`Detalhar ${nomeCompleto(c)}`}
+                >
+                  <Receipt aria-hidden="true" className="size-4" />
+                  Detalhar
+                </Link>
                 <Link
                   href={`/clientes/${c.id}/editar`}
                   className={cn(
