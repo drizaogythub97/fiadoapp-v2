@@ -11,6 +11,7 @@ import {
   type EspelhoClienteData,
 } from "@/lib/comprovante";
 import { formatBRL, formatDataBR, formatTelefone } from "@/lib/format";
+import { MARCA_PADRAO, type MarcaComprovante } from "@/lib/marca";
 
 import styles from "./receipt.module.css";
 
@@ -25,17 +26,19 @@ function dataHoraBR(iso: string): string {
 function Frame({
   titulo,
   cliente,
+  marca = MARCA_PADRAO,
   children,
 }: {
   titulo: string;
   cliente: ComprovanteCliente;
+  marca?: MarcaComprovante;
   children: React.ReactNode;
 }) {
   return (
     <div className={styles.receipt}>
       <div className={styles.header}>
-        <img src="/logo.png" alt="" className={styles.logo} />
-        <div className={styles.brand}>FiadoApp</div>
+        <img src={marca.logoUrl} alt="" className={styles.logo} />
+        <div className={styles.brand}>{marca.nome}</div>
       </div>
       <div className={styles.title}>{titulo}</div>
 
@@ -61,10 +64,20 @@ function Frame({
   );
 }
 
-export function ComprovanteVenda({ data }: { data: ComprovanteVendaData }) {
+export function ComprovanteVenda({
+  data,
+  marca,
+}: {
+  data: ComprovanteVendaData;
+  marca?: MarcaComprovante;
+}) {
   const restante = data.valorTotal - data.valorPago;
   return (
-    <Frame titulo={tituloComprovanteVenda(data.status)} cliente={data.cliente}>
+    <Frame
+      titulo={tituloComprovanteVenda(data.status)}
+      cliente={data.cliente}
+      marca={marca}
+    >
       <div className={styles.section}>
         <div className={styles.sectionTitle}>Venda</div>
         <div className={styles.row}>
@@ -144,9 +157,15 @@ export function ComprovanteVenda({ data }: { data: ComprovanteVendaData }) {
   );
 }
 
-export function EspelhoCliente({ data }: { data: EspelhoClienteData }) {
+export function EspelhoCliente({
+  data,
+  marca,
+}: {
+  data: EspelhoClienteData;
+  marca?: MarcaComprovante;
+}) {
   return (
-    <Frame titulo={TITULO_ESPELHO_CLIENTE} cliente={data.cliente}>
+    <Frame titulo={TITULO_ESPELHO_CLIENTE} cliente={data.cliente} marca={marca}>
       <div className={styles.section}>
         <div className={styles.row}>
           <span className={styles.rowLabel}>Gerado em</span>
@@ -238,11 +257,13 @@ export function EspelhoCliente({ data }: { data: EspelhoClienteData }) {
 
 export function ComprovanteQuitacao({
   data,
+  marca,
 }: {
   data: ComprovanteQuitacaoData;
+  marca?: MarcaComprovante;
 }) {
   return (
-    <Frame titulo="Comprovante de quitação" cliente={data.cliente}>
+    <Frame titulo="Comprovante de quitação" cliente={data.cliente} marca={marca}>
       <div className={styles.section}>
         <div className={styles.sectionTitle}>Quitação</div>
         <div className={styles.row}>

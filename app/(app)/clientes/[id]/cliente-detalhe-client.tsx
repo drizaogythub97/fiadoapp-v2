@@ -5,7 +5,6 @@ import {
   ArrowLeft,
   CheckCircle2,
   CheckSquare,
-  FileText,
   History,
   MessageCircle,
   Pencil,
@@ -18,7 +17,9 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 
+import { BotaoComprovante } from "@/components/app/botao-comprovante";
 import { ConfirmDialog } from "@/components/app/confirm-dialog";
+import { FormatoDialog } from "@/components/app/formato-dialog";
 import { VendaStatusBadge } from "@/components/app/venda-status-badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,6 +58,7 @@ export function ClienteDetalheClient({
   const [dialogo, setDialogo] = useState<Dialogo>(null);
   const [selecionadas, setSelecionadas] = useState<Set<string>>(new Set());
   const [valorParcial, setValorParcial] = useState("");
+  const [comprovanteUrl, setComprovanteUrl] = useState<string | null>(null);
 
   const nomeCompleto = cliente.sobrenome
     ? `${cliente.nome} ${cliente.sobrenome}`
@@ -107,11 +109,10 @@ export function ClienteDetalheClient({
       action: pagoEm
         ? {
             label: "Ver comprovante",
+            // Abre o diálogo de formato (PDF/Imagem), como no v1.
             onClick: () =>
-              window.open(
+              setComprovanteUrl(
                 `/comprovante/quitacao/${cliente.id}?em=${encodeURIComponent(pagoEm)}`,
-                "_blank",
-                "noopener",
               ),
           }
         : undefined,
@@ -380,18 +381,10 @@ export function ClienteDetalheClient({
           Nova venda
         </Link>
         {vendasAbertas.length > 0 ? (
-          <a
-            href={`/comprovante/cliente/${cliente.id}`}
-            target="_blank"
-            rel="noopener"
-            className={cn(
-              buttonVariants({ variant: "outline" }),
-              "h-12 px-5 text-base",
-            )}
-          >
-            <FileText aria-hidden="true" className="size-4" />
-            Espelho das vendas
-          </a>
+          <BotaoComprovante
+            url={`/comprovante/cliente/${cliente.id}`}
+            rotulo="Espelho das vendas"
+          />
         ) : null}
         <Link
           href={`/clientes/${cliente.id}/historico`}
@@ -538,6 +531,13 @@ export function ClienteDetalheClient({
           />
         </div>
       </ConfirmDialog>
+
+      <FormatoDialog
+        open={comprovanteUrl !== null}
+        onClose={() => setComprovanteUrl(null)}
+        titulo="Comprovante de quitação"
+        url={comprovanteUrl}
+      />
 
       <ConfirmDialog
         open={dialogo === "excluir"}

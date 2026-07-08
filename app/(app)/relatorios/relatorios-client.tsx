@@ -1,14 +1,7 @@
 "use client";
 
-import {
-  FileSpreadsheet,
-  Image as ImageIcon,
-  Printer,
-  Receipt,
-  Search,
-} from "lucide-react";
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
-import { toast } from "sonner";
+import { FileSpreadsheet, Printer, Receipt, Search } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { VendaStatusBadge } from "@/components/app/venda-status-badge";
 import { Button } from "@/components/ui/button";
@@ -28,7 +21,6 @@ import {
   type SituacaoFiltro,
   type VendaRelatorio,
 } from "@/lib/relatorio";
-import { gerarImagemRelatorio } from "@/lib/relatorio-imagem";
 import { cn } from "@/lib/utils";
 
 const SITUACOES: { valor: SituacaoFiltro; rotulo: string }[] = [
@@ -59,7 +51,6 @@ export function RelatoriosClient({
 }) {
   const [filtros, setFiltros] = useState<FiltrosRelatorio>(FILTROS_INICIAIS);
   const [selecionadas, setSelecionadas] = useState<Set<string>>(new Set());
-  const [gerandoImagem, startGerarImagem] = useTransition();
   const todasRef = useRef<HTMLInputElement>(null);
 
   const filtradas = useMemo(
@@ -119,38 +110,6 @@ export function RelatoriosClient({
       new Blob([csv], { type: "text/csv;charset=utf-8" }),
       `relatorio_fiadoapp_${data}.csv`,
     );
-  }
-
-  function compartilharImagem() {
-    startGerarImagem(async () => {
-      try {
-        const blob = await gerarImagemRelatorio(exportaveis, {
-          emitidoPor,
-          filtroLabel: SITUACAO_FILTRO_LABEL[filtros.situacao],
-          periodo: periodoLabel(filtros.de, filtros.ate),
-          emitidoEm: new Intl.DateTimeFormat("pt-BR", {
-            dateStyle: "short",
-            timeStyle: "short",
-            timeZone: "America/Sao_Paulo",
-          }).format(new Date()),
-        });
-        const file = new File([blob], "relatorio-fiadoapp.png", {
-          type: "image/png",
-        });
-        if (navigator.canShare?.({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: "Relatório de Vendas — FiadoApp",
-          });
-        } else {
-          baixarBlob(blob, "relatorio-fiadoapp.png");
-        }
-      } catch (err) {
-        // Cancelar a caixa de compartilhamento não é erro.
-        if (err instanceof DOMException && err.name === "AbortError") return;
-        toast.error("Não foi possível gerar a imagem. Tente de novo.");
-      }
-    });
   }
 
   return (
@@ -266,7 +225,7 @@ export function RelatoriosClient({
         {/* ── EXPORTAÇÕES ─────────────────────────────────────────── */}
         {filtradas.length > 0 ? (
           <>
-            <div className="grid gap-2 sm:grid-cols-3">
+            <div className="grid gap-2 sm:grid-cols-2">
               <Button
                 type="button"
                 onClick={() => window.print()}
@@ -283,16 +242,6 @@ export function RelatoriosClient({
               >
                 <FileSpreadsheet aria-hidden="true" className="size-5" />
                 Exportar CSV
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={gerandoImagem}
-                onClick={compartilharImagem}
-                className="h-13 text-base font-medium"
-              >
-                <ImageIcon aria-hidden="true" className="size-5" />
-                {gerandoImagem ? "Gerando imagem…" : "Compartilhar imagem"}
               </Button>
             </div>
             <p className="text-muted-foreground text-sm">
