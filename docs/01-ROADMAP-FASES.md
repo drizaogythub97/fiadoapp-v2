@@ -82,9 +82,25 @@ Descoberta: a Hostinger sobrescreve o header CSP no servidor.
       venda por WhatsApp e **espelho do cliente** (vendas ativas agrupadas e
       compartilháveis em `/comprovante/cliente/[clienteId]`) — **validado
       pelo dono e mesclado em 2026-07-08** (PR #6, squash `3693860`)
-- [ ] 🤖 4d. Relatórios (filtros, CSV, print) + Analytics + Preferências (limites + **tema claro** via toggle — infra pronta desde a F1 + **personalização do
-      header** com nome/logo da loja; 👤 decidir: reusar a marca já configurada no
-      Gaveta (mesma tabela `profiles`, leitura apenas) ou marca própria do Fiado) + fluxos de cadastro/recuperação de senha com a página de privacidade
+- [x] 🤖👤 4d-1. Relatórios: filtros (período/situação/inicial A–Z/busca),
+      seleção por checkboxes, KPIs (A Receber = restante), Imprimir/PDF
+      (layout de impressão claro embutido) e CSV (BOM, `;`) — **validado
+      pelo dono e mesclado em 2026-07-08** (PR #7, squash `72a23b4`).
+      Ajustes do dono no mesmo PR: SEM exportação em imagem nos relatórios
+      (card canvas ficava ilegível com muitos dados); em troca, os
+      comprovantes/espelhos ganharam botão **Imagem** (PNG hi-def do
+      próprio papel via html-to-image), **marca da loja do Gaveta**
+      (`profiles.brand_name`/`brand_logo_path`, só leitura; padrão
+      FiadoApp) e **diálogo de formato PDF/Imagem** ao gerar
+      espelho/comprovante/quitação (fluxo do v1, que o dono valoriza)
+- [ ] 🤖 4d-2. Analytics: faturamento por dia, top clientes, pagas × em
+      aberto, KPIs do período (ver `docs/00`)
+- [ ] 🤖 4d-3. Preferências: limite de crédito padrão + **tema claro** via
+      toggle (infra pronta desde a F1) + marca do Gaveta no header do app
+      (decisão 👤 2026-07-08: reusar `profiles`, leitura apenas — já
+      aplicada nos comprovantes via `lib/marca.ts`)
+- [ ] 🤖 4d-4. Cadastro/recuperação/troca de senha + página `/privacidade`
+      (padrão Gaveta; `lib/validations/password.ts` já portado)
 
 ## F5 — PWA + cutover
 

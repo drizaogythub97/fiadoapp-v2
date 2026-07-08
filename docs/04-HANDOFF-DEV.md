@@ -55,7 +55,64 @@ apenas onde encontrá-los.
 | Fluxos signup/recover/reset + `/privacidade`                              | adiados intencionalmente                                | F4d                        |
 | `.github/workflows/backup-db.yml`                                         | NÃO duplicar — o backup do Gaveta já cobre o banco todo | —                          |
 
-## Estado 2026-07-08 (tarde): F4c COMPLETA e mesclada — sprint SEGUE na F4d
+## Estado 2026-07-08 (noite): SPRINT ENCERRADA — F4c e F4d-1 mescladas
+
+**Onde paramos:** working tree limpa, `main` = produção com F4c (PR #6,
+squash `3693860`) e F4d-1 Relatórios (PR #7, squash `72a23b4`), ambas
+validadas pelo dono. Produção: `https://fiadoapp-v2.vercel.app`.
+
+**O que a F4d-1 entregou (PR #7):** `/relatorios` (filtros por período/
+situação/inicial/busca, seleção por checkboxes, KPIs com A Receber =
+restante, Imprimir/PDF via layout claro embutido com `print:` variants,
+CSV com BOM e `;`) + ajustes de comprovantes pedidos na validação:
+botão **Imagem** em todo `/comprovante/*` (PNG hi-def do papel via
+`html-to-image` pixelRatio 3, Web Share de arquivo c/ fallback download,
+`components/receipt/comprovante-shell.tsx` substituiu o print-toolbar),
+**marca da loja do Gaveta** nos comprovantes (`lib/marca.ts` lê
+`profiles.brand_name`/`brand_logo_path`, padrão FiadoApp) e **diálogo de
+formato PDF/Imagem** (`components/app/formato-dialog.tsx` +
+`botao-comprovante.tsx`) nos fluxos de espelho do cliente, espelho/
+comprovante de venda e toast de quitação — `?formato=imagem` abre sem
+auto-print. Decisão do dono: relatórios NÃO têm exportação em imagem
+(card canvas ficava ilegível); o fluxo de perguntar o formato é
+inegociável (paridade v1).
+
+**Ponto de partida da próxima sessão — F4d-2 Analytics:**
+
+1. Escopo em `docs/00`: faturamento por dia, top clientes, pagas × em
+   aberto, KPIs do período. Conferir a referência do v1 em
+   `../erp-simples/fiadoapp-study/` (dashboard/relatórios) para paridade.
+2. Padrão: branch nova → dados via consultas RLS (ou RPC agregada nova em
+   migration aditiva, se necessário — aí rodar `test:rls`) → gráficos
+   seguindo o padrão do Gaveta → validação local completa → E2E headless →
+   push → Preview → 👤 valida → merge squash.
+3. Depois: F4d-3 Preferências (tema claro toggle + marca do Gaveta no
+   header do app — `lib/marca.ts` já existe) e F4d-4 cadastro/recuperação
+   + `/privacidade`.
+
+**Técnicas/gotchas novos desta sessão:**
+
+- **PNG dos comprovantes**: `html-to-image` (dep client-side, import
+  dinâmico no clique) renderiza o node do papel com `pixelRatio: 3` e
+  `backgroundColor: "#ffffff"`. A CSP já permite (`img-src data: blob:`;
+  fetch da logo do Supabase coberto por `connect-src`). Web Share de
+  arquivo exige gesto do usuário — nunca auto-disparar share no load.
+- **Diálogo de formato**: toasts do sonner só têm UMA action — para
+  "Ver comprovante" com escolha de formato, a action abre o
+  `FormatoDialog` (estado local) em vez de `window.open` direto.
+- `lib/relatorio.ts` embute o BOM como caractere U+FEFF literal dentro de
+  aspas (invisível no editor!) — o teste `csv.startsWith("﻿")`
+  protege contra remoção acidental. Cuidado com sed/perl nesse arquivo.
+- E2E: `context.addInitScript` (não `page.`) para stubar
+  `navigator.canShare` também nas abas abertas via `window.open`;
+  downloads com `page.waitForEvent("download")` + `download.path()`;
+  locators de lista escopados em `main` (o nav do header também tem
+  `ul > li`); marca personalizada testável setando
+  `profiles.brand_name` via admin client no usuário descartável.
+- `npm i <pacote>` remove os pacotes `--no-save` órfãos (pg/mysql2 da
+  migração) — é prune normal, reinstalar quando precisar.
+
+## Estado 2026-07-08 (tarde): F4c COMPLETA e mesclada — sprint SEGUIU na F4d
 
 **Onde paramos:** F4c validada pelo dono e mesclada (PR #6, squash
 `3693860`), já incluindo a melhoria **espelho do cliente**: rota
