@@ -78,6 +78,10 @@ Descoberta: a Hostinger sobrescreve o header CSP no servidor.
       e /vendas para o loader de marca aparecer em TODA transição com delay
       (o App Router usa a Suspense boundary mais próxima do segmento que muda)
 - [ ] 🤖 4c. Inadimplentes + WhatsApp + comprovantes (rota de impressão + Web Share) + histórico do cliente
+      — implementada no **PR #6** (aguardando validação 👤). Extras pedidos
+      pelo dono: espelho da venda por WhatsApp ✅ (no PR) e **espelho do
+      cliente** (vendas ativas agrupadas e compartilháveis) — pendente,
+      entra no mesmo PR antes do merge (ver `docs/04`)
 - [ ] 🤖 4d. Relatórios (filtros, CSV, print) + Analytics + Preferências (limites + **tema claro** via toggle — infra pronta desde a F1 + **personalização do
       header** com nome/logo da loja; 👤 decidir: reusar a marca já configurada no
       Gaveta (mesma tabela `profiles`, leitura apenas) ou marca própria do Fiado) + fluxos de cadastro/recuperação de senha com a página de privacidade

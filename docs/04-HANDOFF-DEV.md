@@ -55,6 +55,59 @@ apenas onde encontrá-los.
 | Fluxos signup/recover/reset + `/privacidade`                              | adiados intencionalmente                                | F4d                        |
 | `.github/workflows/backup-db.yml`                                         | NÃO duplicar — o backup do Gaveta já cobre o banco todo | —                          |
 
+## Estado 2026-07-08: F4c no PR #6 — AGUARDANDO validação; 1 melhoria pendente
+
+**Onde paramos:** F4c (Inadimplentes + WhatsApp + comprovantes + histórico)
+implementada, E2E verde e no **PR #6** (branch
+`feat/f4c-inadimplentes-whatsapp-comprovantes`, preview
+`fiadoapp-7lbvunnak-adriano-cardoso-org.vercel.app`). O dono ainda NÃO
+validou/autorizou o merge. Sem migration nova.
+
+**Ponto de partida da próxima sessão — melhoria pedida pelo dono
+(entra no MESMO PR antes do merge):**
+
+1. **Espelho do cliente**: no detalhe do cliente (`/clientes/[id]`), botão
+   que abre um espelho AGRUPANDO as informações detalhadas de TODAS as
+   vendas ativas daquele cliente (itens por venda, datas, restante por
+   venda, total em aberto), compartilhável pelo fluxo já existente dos
+   comprovantes (Imprimir + Web Share + WhatsApp direto ao telefone).
+   Equivale ao "Gerar Relatório de Vendas Ativas" do `cliente_detalhe.php`
+   do v1. Implementação: rota nova `app/comprovante/cliente/[clienteId]/`
+   reusando `components/receipt/` (Frame/print-toolbar/CSS) + builder de
+   texto novo em `lib/comprovante.ts`; botão no
+   `cliente-detalhe-client.tsx`.
+2. Rodar validação local + E2E (ver técnica Playwright abaixo), push na
+   MESMA branch (preview atualiza sozinho), **aguardar permissão do dono**
+   → merge (squash, padrão do repo) → docs de fechamento → fim da sprint.
+
+**O que a F4c entregou (PR #6):** `/inadimplentes` (dias de atraso, devido
+= restante da venda), `lib/whatsapp.ts` (cobrança padrão v1 + envio de
+texto pronto), espelho/comprovante de venda em `/comprovante/[vendaId]`
+(título muda com o status: "Espelho da venda" aberta, "Comprovante de
+venda" paga), comprovante de quitação em
+`/comprovante/quitacao/[clienteId]?em=<timestamp>` (o `now()` único da RPC
+identifica o ato; `registrarPagamento` devolve `pagoEm` e o toast ganha
+"Ver comprovante"), histórico de vendas pagas em
+`/clientes/[id]/historico`, botões WhatsApp no detalhe do cliente/venda.
+
+**Técnicas/gotchas novos desta sessão:**
+
+- **E2E sem extensão Chrome**: Playwright headless com spec TEMPORÁRIO em
+  `tests/e2e/` (apagar antes do commit) + usuário Supabase descartável via
+  admin API. O config reusa o `npm run dev` já aberto. `window.print()` é
+  inofensivo no headless. Gotchas de locator: `getByLabel("Nome")` colide
+  com "Sobrenome" (usar `getByRole("textbox", { name, exact: true })`);
+  o botão "mostrar senha" colide com o label "Senha".
+- `formatBRL` usa espaço não separável (U+00A0) — em asserts de texto,
+  comparar só o número ("185,30").
+- Comprovante: `@page` estático no CSS module (sem `<style>` inline/CSP);
+  flag de Web Share com `useSyncExternalStore` (o lint
+  `react-hooks/set-state-in-effect` barra setState em effect).
+- F4d (relatórios): expliquei ao dono que o layout muda para o padrão v2
+  mantendo filtros/dados do v1; saída = página de impressão + CSV + Web
+  Share. Ele pode pedir o formato IMAGEM do v1 (card p/ WhatsApp) —
+  decidir com ele na F4d.
+
 ## Estado 2026-07-07 (noite): F4b concluída e mesclada
 
 PR #5 (squash `2699e45`) validado pelo dono: `/vendas` (lista+filtros),
