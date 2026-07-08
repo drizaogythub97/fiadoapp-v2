@@ -29,6 +29,26 @@ export type ComprovanteVendaData = {
   valorPago: number;
 };
 
+export type EspelhoClienteData = {
+  cliente: ComprovanteCliente;
+  geradoEm: string;
+  vendas: {
+    dataCompra: string;
+    dataVencimento: string | null;
+    status: VendaStatus;
+    observacao: string | null;
+    itens: {
+      descricao: string;
+      quantidade: number;
+      valorUnitario: number;
+      valorTotal: number;
+    }[];
+    valorTotal: number;
+    valorPago: number;
+  }[];
+  totalEmAberto: number;
+};
+
 export type ComprovanteQuitacaoData = {
   cliente: ComprovanteCliente;
   pagoEm: string;
@@ -53,6 +73,8 @@ export function nomeCompletoCliente(c: ComprovanteCliente): string {
 export function tituloComprovanteVenda(status: VendaStatus): string {
   return status === "PAGA" ? "Comprovante de venda" : "Espelho da venda";
 }
+
+export const TITULO_ESPELHO_CLIENTE = "Espelho das vendas em aberto";
 
 export const STATUS_LABEL: Record<VendaStatus, string> = {
   ATIVA: "Em aberto",
@@ -101,6 +123,44 @@ export function textoComprovanteVenda(data: ComprovanteVendaData): string {
   if (data.observacao) {
     linhas.push("", `Obs.: ${data.observacao}`);
   }
+  return linhas.join("\n");
+}
+
+/**
+ * Texto plano do espelho do cliente (todas as vendas em aberto agrupadas) —
+ * equivalente ao "Relatório de Vendas Ativas" do v1.
+ */
+export function textoEspelhoCliente(data: EspelhoClienteData): string {
+  const linhas: string[] = [
+    `*${TITULO_ESPELHO_CLIENTE} — FiadoApp*`,
+    `Cliente: ${nomeCompletoCliente(data.cliente)}${
+      data.cliente.referencia ? ` (${data.cliente.referencia})` : ""
+    }`,
+    `Gerado em: ${dataHoraBR(data.geradoEm)}`,
+  ];
+  for (const venda of data.vendas) {
+    const restante = venda.valorTotal - venda.valorPago;
+    linhas.push("", `*Venda de ${formatDataBR(venda.dataCompra)}*`);
+    if (venda.dataVencimento) {
+      linhas.push(`Vencimento: ${formatDataBR(venda.dataVencimento)}`);
+    }
+    for (const item of venda.itens) {
+      linhas.push(
+        `- ${item.quantidade}x ${item.descricao} — ${formatBRL(item.valorTotal)}`,
+      );
+    }
+    if (venda.valorPago > 0) {
+      linhas.push(
+        `Total: ${formatBRL(venda.valorTotal)} · Pago: ${formatBRL(venda.valorPago)} · Falta: ${formatBRL(restante)}`,
+      );
+    } else {
+      linhas.push(`Total: ${formatBRL(venda.valorTotal)}`);
+    }
+    if (venda.observacao) {
+      linhas.push(`Obs.: ${venda.observacao}`);
+    }
+  }
+  linhas.push("", `*Total em aberto: ${formatBRL(data.totalEmAberto)}*`);
   return linhas.join("\n");
 }
 

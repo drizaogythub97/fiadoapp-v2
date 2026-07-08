@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import {
   textoComprovanteVenda,
+  textoEspelhoCliente,
   type ComprovanteVendaData,
+  type EspelhoClienteData,
 } from "@/lib/comprovante";
 import {
   diasDeAtraso,
@@ -118,5 +120,65 @@ describe("textoComprovanteVenda", () => {
     expect(texto).toContain("*Comprovante de venda — FiadoApp*");
     expect(texto).not.toContain("Falta:");
     expect(texto).toContain("Situação: Paga");
+  });
+});
+
+describe("textoEspelhoCliente", () => {
+  const data: EspelhoClienteData = {
+    cliente: {
+      nome: "Maria",
+      sobrenome: "Silva",
+      referencia: "Loja",
+      telefone: "11912345678",
+    },
+    geradoEm: "2026-07-08T12:00:00Z",
+    vendas: [
+      {
+        dataCompra: "2026-06-01",
+        dataVencimento: "2026-07-01",
+        status: "PARCIAL",
+        observacao: "Combinou pagar na sexta",
+        itens: [
+          { descricao: "Ração 15kg", quantidade: 2, valorUnitario: 79.9, valorTotal: 159.8 },
+        ],
+        valorTotal: 159.8,
+        valorPago: 59.8,
+      },
+      {
+        dataCompra: "2026-07-05",
+        dataVencimento: null,
+        status: "ATIVA",
+        observacao: null,
+        itens: [
+          { descricao: "Milho 25kg", quantidade: 1, valorUnitario: 85.5, valorTotal: 85.5 },
+        ],
+        valorTotal: 85.5,
+        valorPago: 0,
+      },
+    ],
+    totalEmAberto: 185.5,
+  };
+
+  it("agrupa todas as vendas em aberto com itens e total geral", () => {
+    const texto = textoEspelhoCliente(data);
+    expect(texto).toContain("*Espelho das vendas em aberto — FiadoApp*");
+    expect(texto).toContain("Cliente: Maria Silva (Loja)");
+    expect(texto).toContain("*Venda de 01/06/2026*");
+    expect(texto).toContain("Vencimento: 01/07/2026");
+    expect(texto).toContain("- 2x Ração 15kg —");
+    expect(texto).toContain("Obs.: Combinou pagar na sexta");
+    expect(texto).toContain("*Venda de 05/07/2026*");
+    expect(texto).toContain("- 1x Milho 25kg —");
+    // formatBRL usa espaço não separável — comparar só o número
+    expect(texto).toContain("185,50");
+  });
+
+  it("mostra pago/falta só na venda parcialmente paga", () => {
+    const texto = textoEspelhoCliente(data);
+    const [primeira, segunda] = texto.split("*Venda de 05/07/2026*");
+    expect(primeira).toContain("Pago:");
+    expect(primeira).toContain("Falta:");
+    expect(segunda).not.toContain("Pago:");
+    expect(segunda).not.toContain("Falta:");
   });
 });

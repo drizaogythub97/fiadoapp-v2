@@ -5,6 +5,7 @@ import {
   ArrowLeft,
   CheckCircle2,
   CheckSquare,
+  FileText,
   History,
   MessageCircle,
   Pencil,
@@ -378,6 +379,20 @@ export function ClienteDetalheClient({
           <Plus aria-hidden="true" className="size-4" />
           Nova venda
         </Link>
+        {vendasAbertas.length > 0 ? (
+          <a
+            href={`/comprovante/cliente/${cliente.id}`}
+            target="_blank"
+            rel="noopener"
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "h-12 px-5 text-base",
+            )}
+          >
+            <FileText aria-hidden="true" className="size-4" />
+            Espelho das vendas
+          </a>
+        ) : null}
         <Link
           href={`/clientes/${cliente.id}/historico`}
           className={cn(

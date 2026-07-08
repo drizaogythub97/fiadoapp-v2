@@ -2,11 +2,13 @@
 import {
   NOTA_COMPROVANTE,
   STATUS_LABEL,
+  TITULO_ESPELHO_CLIENTE,
   nomeCompletoCliente,
   tituloComprovanteVenda,
   type ComprovanteCliente,
   type ComprovanteQuitacaoData,
   type ComprovanteVendaData,
+  type EspelhoClienteData,
 } from "@/lib/comprovante";
 import { formatBRL, formatDataBR, formatTelefone } from "@/lib/format";
 
@@ -138,6 +140,98 @@ export function ComprovanteVenda({ data }: { data: ComprovanteVendaData }) {
           ) : null}
         </div>
       ) : null}
+    </Frame>
+  );
+}
+
+export function EspelhoCliente({ data }: { data: EspelhoClienteData }) {
+  return (
+    <Frame titulo={TITULO_ESPELHO_CLIENTE} cliente={data.cliente}>
+      <div className={styles.section}>
+        <div className={styles.row}>
+          <span className={styles.rowLabel}>Gerado em</span>
+          <span className={styles.tabular}>{dataHoraBR(data.geradoEm)}</span>
+        </div>
+        <div className={styles.row}>
+          <span className={styles.rowLabel}>Vendas em aberto</span>
+          <span className={styles.tabular}>{data.vendas.length}</span>
+        </div>
+      </div>
+
+      {data.vendas.map((venda, i) => {
+        const restante = venda.valorTotal - venda.valorPago;
+        return (
+          <div key={i} className={styles.section}>
+            <div className={styles.sectionTitle}>
+              Venda de {formatDataBR(venda.dataCompra)}
+            </div>
+            {venda.dataVencimento ? (
+              <div className={styles.row}>
+                <span className={styles.rowLabel}>Vencimento</span>
+                <span className={styles.tabular}>
+                  {formatDataBR(venda.dataVencimento)}
+                </span>
+              </div>
+            ) : null}
+            {venda.itens.map((item, j) => (
+              <div key={j} className={styles.row}>
+                <span>
+                  {item.quantidade}x {item.descricao}
+                  <span className={styles.itemDetail}>
+                    {" "}
+                    · {formatBRL(item.valorUnitario)} a unidade
+                  </span>
+                </span>
+                <span className={styles.tabular}>
+                  {formatBRL(item.valorTotal)}
+                </span>
+              </div>
+            ))}
+            {venda.observacao ? (
+              <div className={styles.row}>
+                <span className={styles.rowLabel}>Observação</span>
+                <span>{venda.observacao}</span>
+              </div>
+            ) : null}
+            {venda.valorPago > 0 ? (
+              <>
+                <div className={styles.row}>
+                  <span className={styles.rowLabel}>Total da venda</span>
+                  <span className={styles.tabular}>
+                    {formatBRL(venda.valorTotal)}
+                  </span>
+                </div>
+                <div className={styles.row}>
+                  <span className={styles.rowLabel}>Já pago</span>
+                  <span className={styles.tabular}>
+                    {formatBRL(venda.valorPago)}
+                  </span>
+                </div>
+                <div className={styles.destaque}>
+                  <span>Falta</span>
+                  <span className={styles.tabular}>{formatBRL(restante)}</span>
+                </div>
+              </>
+            ) : (
+              <div className={styles.destaque}>
+                <span>Total da venda</span>
+                <span className={styles.tabular}>
+                  {formatBRL(venda.valorTotal)}
+                </span>
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      <div className={styles.section}>
+        <div className={styles.total}>
+          <span>Total em aberto</span>
+          <span className={styles.tabular}>
+            {formatBRL(data.totalEmAberto)}
+          </span>
+        </div>
+      </div>
     </Frame>
   );
 }
