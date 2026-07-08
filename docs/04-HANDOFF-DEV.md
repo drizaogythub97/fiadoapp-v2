@@ -50,35 +50,35 @@ apenas onde encontrá-los.
 | `lib/validations/*` (padrão Zod)                                          | novos schemas do domínio fiado                          | ✅ base F1; domínio na F2+ |
 | Design tokens/`globals.css`                                               | re-tematizado coral #E8624A, escuro padrão              | ✅ F1                      |
 | Loader de marca (`gaveta-loader*`)                                        | `components/app/fiado-loader*` (2 variantes)            | ✅ F1                      |
-| Rota `/comprovante/[id]` (print CSS + auto-print + Web Share)             | comprovante de quitação/pagamento                       | F4c                        |
+| Rota `/comprovante/[id]` (print CSS + auto-print + Web Share)             | comprovante de quitação/pagamento                       | ✅ F4c                     |
 | `tests/` (estrutura Vitest/Playwright/RLS)                                | Vitest+configs ✅ F1; suíte RLS ✅ F2 (17 testes)       | ✅ F2                      |
 | Fluxos signup/recover/reset + `/privacidade`                              | adiados intencionalmente                                | F4d                        |
 | `.github/workflows/backup-db.yml`                                         | NÃO duplicar — o backup do Gaveta já cobre o banco todo | —                          |
 
-## Estado 2026-07-08: F4c no PR #6 — AGUARDANDO validação; 1 melhoria pendente
+## Estado 2026-07-08 (tarde): F4c COMPLETA e mesclada — sprint SEGUE na F4d
 
-**Onde paramos:** F4c (Inadimplentes + WhatsApp + comprovantes + histórico)
-implementada, E2E verde e no **PR #6** (branch
-`feat/f4c-inadimplentes-whatsapp-comprovantes`, preview
-`fiadoapp-7lbvunnak-adriano-cardoso-org.vercel.app`). O dono ainda NÃO
-validou/autorizou o merge. Sem migration nova.
+**Onde paramos:** F4c validada pelo dono e mesclada (PR #6, squash
+`3693860`), já incluindo a melhoria **espelho do cliente**: rota
+`/comprovante/cliente/[clienteId]` agrupa TODAS as vendas em aberto do
+cliente (itens, vencimento, pago/falta por venda, total em aberto) com o
+fluxo dos comprovantes (Imprimir + Web Share + WhatsApp direto ao
+telefone); botão "Espelho das vendas" no `/clientes/[id]` (só com vendas
+em aberto); builder `textoEspelhoCliente` em `lib/comprovante.ts`.
+E2E verificado com Playwright headless (specs temporários apagados).
+**O dono pediu para NÃO encerrar a sprint** — seguir direto para a F4d
+(relatórios + preferências + cadastro/recuperação + privacidade, ver
+roadmap).
 
-**Ponto de partida da próxima sessão — melhoria pedida pelo dono
-(entra no MESMO PR antes do merge):**
-
-1. **Espelho do cliente**: no detalhe do cliente (`/clientes/[id]`), botão
-   que abre um espelho AGRUPANDO as informações detalhadas de TODAS as
-   vendas ativas daquele cliente (itens por venda, datas, restante por
-   venda, total em aberto), compartilhável pelo fluxo já existente dos
-   comprovantes (Imprimir + Web Share + WhatsApp direto ao telefone).
-   Equivale ao "Gerar Relatório de Vendas Ativas" do `cliente_detalhe.php`
-   do v1. Implementação: rota nova `app/comprovante/cliente/[clienteId]/`
-   reusando `components/receipt/` (Frame/print-toolbar/CSS) + builder de
-   texto novo em `lib/comprovante.ts`; botão no
-   `cliente-detalhe-client.tsx`.
-2. Rodar validação local + E2E (ver técnica Playwright abaixo), push na
-   MESMA branch (preview atualiza sozinho), **aguardar permissão do dono**
-   → merge (squash, padrão do repo) → docs de fechamento → fim da sprint.
+**Contexto para a F5 (pergunta do dono em 2026-07-08):** como fica o
+compartilhamento de documentos no mobile com PWA/TWA (hoje o APK WebView
+abre a caixa do Android). Resposta dada: a Web Share API já usada no
+`PrintToolbar` abre a MESMA caixa nativa no Chrome/PWA/TWA sem bridge;
+`wa.me` abre o WhatsApp por deep link; documentos em `target="_blank"`
+viram Custom Tab por cima do app (fechar volta ao app). Ajustes
+planejados para a F5: (1) auto-`window.print()` só em desktop — no
+celular atrapalha o fluxo de compartilhar; (2) se a F4d mantiver o
+relatório-IMAGEM do v1, usar Web Share Level 2 (`navigator.share({files})`)
+para anexar o PNG.
 
 **O que a F4c entregou (PR #6):** `/inadimplentes` (dias de atraso, devido
 = restante da venda), `lib/whatsapp.ts` (cobrança padrão v1 + envio de
@@ -97,7 +97,10 @@ identifica o ato; `registrarPagamento` devolve `pagoEm` e o toast ganha
   admin API. O config reusa o `npm run dev` já aberto. `window.print()` é
   inofensivo no headless. Gotchas de locator: `getByLabel("Nome")` colide
   com "Sobrenome" (usar `getByRole("textbox", { name, exact: true })`);
-  o botão "mostrar senha" colide com o label "Senha".
+  o botão "mostrar senha" colide com o label "Senha". Os helpers de
+  `tests/rls/helpers.ts` leem `process.env` no load do módulo — no spec,
+  carregar o `.env.local` com dotenv ANTES e importá-los com `await
+  import(...)` dinâmico.
 - `formatBRL` usa espaço não separável (U+00A0) — em asserts de texto,
   comparar só o número ("185,30").
 - Comprovante: `@page` estático no CSS module (sem `<style>` inline/CSP);
