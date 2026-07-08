@@ -55,6 +55,28 @@ apenas onde encontrá-los.
 | Fluxos signup/recover/reset + `/privacidade`                              | adiados intencionalmente                                | F4d                        |
 | `.github/workflows/backup-db.yml`                                         | NÃO duplicar — o backup do Gaveta já cobre o banco todo | —                          |
 
+## Estado 2026-07-07 (noite): F4b concluída e mesclada
+
+PR #5 (squash `2699e45`) validado pelo dono: `/vendas` (lista+filtros),
+`/vendas/nova`, `/vendas/[id]`, `/clientes/[id]` com quitações
+total/selecionadas/parcial em cascata. Sem migration nova. **Próximo:
+F4c — Inadimplentes + WhatsApp + comprovantes + histórico do cliente.**
+
+Aprendizados novos:
+
+- **loading.tsx por segmento**: o App Router usa a Suspense boundary mais
+  próxima do segmento que muda — a `(app)/loading.tsx` NÃO cobre navegações
+  dentro de `/clientes` ou `/vendas`. Padrão adotado: re-export do loader em
+  cada segmento com filhos (`clientes/`, `clientes/[id]/`, `vendas/`).
+  Rotas novas da F4c+ devem seguir o mesmo padrão.
+- Verificação de loader em transição: screenshot via CDP perde a corrida;
+  usar `MutationObserver` no body procurando o texto "Carregando" antes de
+  clicar, e ler a flag depois.
+- Erros de negócio das RPCs (raise exception) são mostrados ao usuário só
+  se estiverem na whitelist `ERROS_RPC_CONHECIDOS` de
+  `app/(app)/vendas/actions.ts` — novas RPCs devem registrar lá as
+  mensagens seguras.
+
 ## Estado da sessão encerrada em 2026-07-07 (F2 + F3 + F4a concluídas)
 
 **Onde paramos:** PRs #2 (modelo de dados), #3 (migração) e #4 (Clientes +

@@ -69,8 +69,14 @@ Descoberta: a Hostinger sobrescreve o header CSP no servidor.
       + Dashboard KPIs — entregue e **validado pelo dono em 2026-07-07**
       (PR #4 mesclado). Migration 0002 `fiado_clientes_com_saldo`, badge
       persistente "Acima do limite", busca rápida no painel
-- [ ] 🤖 4b. Vendas: nova venda (autocomplete, itens, BRL, vencimento +30d), detalhe,
-      exclusão + Quitações (total/selecionadas/parcial) com o modelo novo
+- [x] 🤖👤 4b. Vendas: nova venda (autocomplete de cliente e de descrição, itens
+      dinâmicos, máscara BRL, vencimento +30d), lista com filtros, detalhe,
+      exclusão + Quitações (total/selecionadas/parcial em cascata) na tela nova
+      `/clientes/[id]` — **validado pelo dono em 2026-07-07** (PR #5, squash
+      `2699e45`). Alerta de limite só avisa (decisão F2). Correção pós-review
+      do dono: `loading.tsx` re-exportado nos segmentos aninhados de /clientes
+      e /vendas para o loader de marca aparecer em TODA transição com delay
+      (o App Router usa a Suspense boundary mais próxima do segmento que muda)
 - [ ] 🤖 4c. Inadimplentes + WhatsApp + comprovantes (rota de impressão + Web Share) + histórico do cliente
 - [ ] 🤖 4d. Relatórios (filtros, CSV, print) + Analytics + Preferências (limites + **tema claro** via toggle — infra pronta desde a F1 + **personalização do
       header** com nome/logo da loja; 👤 decidir: reusar a marca já configurada no
