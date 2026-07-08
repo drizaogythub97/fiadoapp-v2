@@ -115,7 +115,7 @@ export async function registrarVenda(
 }
 
 export type RegistrarPagamentoResult =
-  | { ok: true; totalPago: number }
+  | { ok: true; totalPago: number; pagoEm: string | null }
   | { ok: false; error: string };
 
 export async function registrarPagamento(
@@ -155,8 +155,27 @@ export async function registrarPagamento(
   }
 
   revalidarTelas(dados.clienteId);
-  const resultado = data as { total_pago: number };
-  return { ok: true, totalPago: Number(resultado.total_pago) };
+  const resultado = data as {
+    total_pago: number;
+    vendas: { venda_id: string }[];
+  };
+
+  // Timestamp do ato (a RPC usa um único now()): identifica a quitação na
+  // rota /comprovante/quitacao/[clienteId]?em=...
+  let pagoEm: string | null = null;
+  const primeiraVenda = resultado.vendas?.[0]?.venda_id;
+  if (primeiraVenda) {
+    const { data: pagamento } = await supabase
+      .from("fiado_pagamentos")
+      .select("pago_em")
+      .eq("venda_id", primeiraVenda)
+      .order("pago_em", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    pagoEm = pagamento?.pago_em ?? null;
+  }
+
+  return { ok: true, totalPago: Number(resultado.total_pago), pagoEm };
 }
 
 export async function excluirVenda(

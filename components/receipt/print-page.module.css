@@ -1,0 +1,53 @@
+/* Página de impressão (padrão do Gaveta): fundo cinza na tela com o
+   "papel" branco centralizado; no print, só o papel. @page estático (A4)
+   fica aqui para não depender de <style> inline (CSP). */
+
+@page {
+  size: A4;
+  margin: 12mm;
+}
+
+.screen {
+  min-height: 100dvh;
+  background: #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 48px;
+  overflow-x: auto;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.paper {
+  background: #fff;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.18);
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 720px;
+}
+
+@media print {
+  .screen {
+    background: #fff;
+    padding: 0;
+    display: block;
+    min-height: 0;
+    overflow-x: visible;
+  }
+
+  .toolbar {
+    display: none !important;
+  }
+
+  .paper {
+    box-shadow: none;
+    max-width: none;
+  }
+}
