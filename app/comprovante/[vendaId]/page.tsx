@@ -1,13 +1,13 @@
 import { notFound, redirect } from "next/navigation";
 
+import { ComprovanteShell } from "@/components/receipt/comprovante-shell";
 import { ComprovanteVenda } from "@/components/receipt/fiado-receipt";
-import { PrintToolbar } from "@/components/receipt/print-toolbar";
-import styles from "@/components/receipt/print-page.module.css";
 import {
   textoComprovanteVenda,
   tituloComprovanteVenda,
   type ComprovanteVendaData,
 } from "@/lib/comprovante";
+import { marcaDoUsuario } from "@/lib/marca";
 import { createClient } from "@/lib/supabase/server";
 import type {
   ClienteResumo,
@@ -27,10 +27,13 @@ const UUID_RE =
 
 export default async function ComprovanteVendaPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ vendaId: string }>;
+  searchParams: Promise<{ formato?: string }>;
 }) {
   const { vendaId } = await params;
+  const { formato } = await searchParams;
   if (!UUID_RE.test(vendaId)) notFound();
 
   const supabase = await createClient();
@@ -40,8 +43,9 @@ export default async function ComprovanteVendaPage({
   if (!user) redirect("/login");
 
   // RLS garante que só a venda do próprio usuário é retornada.
-  const [{ data: vendaData }, { data: itensData }, { data: pagamentosData }] =
+  const [marca, { data: vendaData }, { data: itensData }, { data: pagamentosData }] =
     await Promise.all([
+      marcaDoUsuario(supabase, user.id),
       supabase
         .from("fiado_vendas")
         .select(
@@ -92,15 +96,14 @@ export default async function ComprovanteVendaPage({
   const shareText = textoComprovanteVenda(data);
 
   return (
-    <div className={styles.screen}>
-      <PrintToolbar
-        shareTitle={`${tituloComprovanteVenda(data.status)} — FiadoApp`}
-        shareText={shareText}
-        whatsappUrl={linkWhatsAppTexto(cliente.telefone, shareText)}
-      />
-      <div className={styles.paper}>
-        <ComprovanteVenda data={data} />
-      </div>
-    </div>
+    <ComprovanteShell
+      shareTitle={`${tituloComprovanteVenda(data.status)} — FiadoApp`}
+      shareText={shareText}
+      whatsappUrl={linkWhatsAppTexto(cliente.telefone, shareText)}
+      nomeArquivo="comprovante-venda.png"
+      formato={formato === "imagem" ? "imagem" : "pdf"}
+    >
+      <ComprovanteVenda data={data} marca={marca} />
+    </ComprovanteShell>
   );
 }

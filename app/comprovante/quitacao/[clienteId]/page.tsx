@@ -1,12 +1,12 @@
 import { notFound, redirect } from "next/navigation";
 
+import { ComprovanteShell } from "@/components/receipt/comprovante-shell";
 import { ComprovanteQuitacao } from "@/components/receipt/fiado-receipt";
-import { PrintToolbar } from "@/components/receipt/print-toolbar";
-import styles from "@/components/receipt/print-page.module.css";
 import {
   textoComprovanteQuitacao,
   type ComprovanteQuitacaoData,
 } from "@/lib/comprovante";
+import { marcaDoUsuario } from "@/lib/marca";
 import { createClient } from "@/lib/supabase/server";
 import type { ClienteResumo } from "@/lib/types/fiado";
 import { linkWhatsAppTexto } from "@/lib/whatsapp";
@@ -36,10 +36,10 @@ export default async function ComprovanteQuitacaoPage({
   searchParams,
 }: {
   params: Promise<{ clienteId: string }>;
-  searchParams: Promise<{ em?: string }>;
+  searchParams: Promise<{ em?: string; formato?: string }>;
 }) {
   const { clienteId } = await params;
-  const { em } = await searchParams;
+  const { em, formato } = await searchParams;
   if (!UUID_RE.test(clienteId) || !em || Number.isNaN(Date.parse(em))) {
     notFound();
   }
@@ -52,8 +52,9 @@ export default async function ComprovanteQuitacaoPage({
 
   // O ato de quitação é identificado pelo timestamp: a RPC usa um único
   // now() para todos os pagamentos da cascata/seleção.
-  const [{ data: clienteData }, { data: pagamentosData }, { data: abertas }] =
+  const [marca, { data: clienteData }, { data: pagamentosData }, { data: abertas }] =
     await Promise.all([
+      marcaDoUsuario(supabase, user.id),
       supabase
         .from("fiado_clientes")
         .select("id, nome, sobrenome, referencia, telefone")
@@ -109,15 +110,14 @@ export default async function ComprovanteQuitacaoPage({
   const shareText = textoComprovanteQuitacao(data);
 
   return (
-    <div className={styles.screen}>
-      <PrintToolbar
-        shareTitle="Comprovante de quitação — FiadoApp"
-        shareText={shareText}
-        whatsappUrl={linkWhatsAppTexto(cliente.telefone, shareText)}
-      />
-      <div className={styles.paper}>
-        <ComprovanteQuitacao data={data} />
-      </div>
-    </div>
+    <ComprovanteShell
+      shareTitle="Comprovante de quitação — FiadoApp"
+      shareText={shareText}
+      whatsappUrl={linkWhatsAppTexto(cliente.telefone, shareText)}
+      nomeArquivo="comprovante-quitacao.png"
+      formato={formato === "imagem" ? "imagem" : "pdf"}
+    >
+      <ComprovanteQuitacao data={data} marca={marca} />
+    </ComprovanteShell>
   );
 }

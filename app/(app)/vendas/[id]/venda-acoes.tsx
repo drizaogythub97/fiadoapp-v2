@@ -6,6 +6,7 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
 import { ConfirmDialog } from "@/components/app/confirm-dialog";
+import { FormatoDialog } from "@/components/app/formato-dialog";
 import { Button } from "@/components/ui/button";
 import { formatBRL } from "@/lib/format";
 import type { VendaStatus } from "@/lib/types/fiado";
@@ -28,6 +29,7 @@ export function VendaAcoes({
   const [confirmando, setConfirmando] = useState<"quitar" | "excluir" | null>(
     null,
   );
+  const [comprovanteAberto, setComprovanteAberto] = useState(false);
 
   function quitar() {
     startTransition(async () => {
@@ -44,8 +46,8 @@ export function VendaAcoes({
         duration: 10_000,
         action: {
           label: "Ver comprovante",
-          onClick: () =>
-            window.open(`/comprovante/${vendaId}`, "_blank", "noopener"),
+          // Abre o diálogo de formato (PDF/Imagem), como no v1.
+          onClick: () => setComprovanteAberto(true),
         },
       });
       setConfirmando(null);
@@ -103,6 +105,13 @@ export function VendaAcoes({
         confirmLabel="Confirmar pagamento"
         onConfirm={quitar}
         pending={pending}
+      />
+
+      <FormatoDialog
+        open={comprovanteAberto}
+        onClose={() => setComprovanteAberto(false)}
+        titulo="Comprovante de venda"
+        url={`/comprovante/${vendaId}`}
       />
 
       <ConfirmDialog

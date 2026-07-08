@@ -1,7 +1,8 @@
-import { ArrowLeft, FileText, MessageCircle } from "lucide-react";
+import { ArrowLeft, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { BotaoComprovante } from "@/components/app/botao-comprovante";
 import { VendaStatusBadge } from "@/components/app/venda-status-badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -245,18 +246,11 @@ export default async function VendaDetalhePage({
             const rotulo = tituloComprovanteVenda(venda.status);
             return (
               <div className="flex flex-col gap-2 sm:flex-row">
-                <a
-                  href={`/comprovante/${venda.id}`}
-                  target="_blank"
-                  rel="noopener"
-                  className={cn(
-                    buttonVariants({ variant: "outline" }),
-                    "h-13 px-6 text-base font-medium",
-                  )}
-                >
-                  <FileText aria-hidden="true" className="size-5" />
-                  {rotulo}
-                </a>
+                <BotaoComprovante
+                  url={`/comprovante/${venda.id}`}
+                  rotulo={rotulo}
+                  className="h-13 px-6 font-medium"
+                />
                 {whatsapp ? (
                   <a
                     href={whatsapp}

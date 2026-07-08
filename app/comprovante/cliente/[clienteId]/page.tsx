@@ -1,13 +1,13 @@
 import { notFound, redirect } from "next/navigation";
 
+import { ComprovanteShell } from "@/components/receipt/comprovante-shell";
 import { EspelhoCliente } from "@/components/receipt/fiado-receipt";
-import { PrintToolbar } from "@/components/receipt/print-toolbar";
-import styles from "@/components/receipt/print-page.module.css";
 import {
   TITULO_ESPELHO_CLIENTE,
   textoEspelhoCliente,
   type EspelhoClienteData,
 } from "@/lib/comprovante";
+import { marcaDoUsuario } from "@/lib/marca";
 import { createClient } from "@/lib/supabase/server";
 import type { ClienteResumo, ItemVenda, Venda } from "@/lib/types/fiado";
 import { linkWhatsAppTexto } from "@/lib/whatsapp";
@@ -24,10 +24,13 @@ type VendaComItens = Venda & { fiado_itens_venda: ItemVenda[] };
 
 export default async function EspelhoClientePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ clienteId: string }>;
+  searchParams: Promise<{ formato?: string }>;
 }) {
   const { clienteId } = await params;
+  const { formato } = await searchParams;
   if (!UUID_RE.test(clienteId)) notFound();
 
   const supabase = await createClient();
@@ -37,7 +40,8 @@ export default async function EspelhoClientePage({
   if (!user) redirect("/login");
 
   // RLS garante que só clientes/vendas do próprio usuário são retornados.
-  const [{ data: clienteData }, { data: vendasData }] = await Promise.all([
+  const [marca, { data: clienteData }, { data: vendasData }] = await Promise.all([
+    marcaDoUsuario(supabase, user.id),
     supabase
       .from("fiado_clientes")
       .select("id, nome, sobrenome, referencia, telefone")
@@ -88,15 +92,14 @@ export default async function EspelhoClientePage({
   const shareText = textoEspelhoCliente(data);
 
   return (
-    <div className={styles.screen}>
-      <PrintToolbar
-        shareTitle={`${TITULO_ESPELHO_CLIENTE} — FiadoApp`}
-        shareText={shareText}
-        whatsappUrl={linkWhatsAppTexto(cliente.telefone, shareText)}
-      />
-      <div className={styles.paper}>
-        <EspelhoCliente data={data} />
-      </div>
-    </div>
+    <ComprovanteShell
+      shareTitle={`${TITULO_ESPELHO_CLIENTE} — FiadoApp`}
+      shareText={shareText}
+      whatsappUrl={linkWhatsAppTexto(cliente.telefone, shareText)}
+      nomeArquivo="espelho-vendas.png"
+      formato={formato === "imagem" ? "imagem" : "pdf"}
+    >
+      <EspelhoCliente data={data} marca={marca} />
+    </ComprovanteShell>
   );
 }
