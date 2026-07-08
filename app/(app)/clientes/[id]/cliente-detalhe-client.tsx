@@ -5,6 +5,9 @@ import {
   ArrowLeft,
   CheckCircle2,
   CheckSquare,
+  FileText,
+  History,
+  MessageCircle,
   Pencil,
   Plus,
   Trash2,
@@ -29,6 +32,7 @@ import {
 } from "@/lib/format";
 import type { ClienteResumo, Venda } from "@/lib/types/fiado";
 import { cn } from "@/lib/utils";
+import { diasDeAtraso, linkCobrancaWhatsApp } from "@/lib/whatsapp";
 
 import { registrarPagamento } from "../../vendas/actions";
 import { excluirCliente } from "../actions";
@@ -70,9 +74,17 @@ export function ClienteDetalheClient({
         .reduce((soma, v) => soma + (v.valor_total - v.valor_pago), 0),
     [vendasAbertas, selecionadas],
   );
-  const emAtraso = vendasAbertas.some(
-    (v) => v.data_vencimento !== null && v.data_vencimento < hoje,
+  const diasAtraso = vendasAbertas.reduce(
+    (max, v) => Math.max(max, diasDeAtraso(v.data_vencimento, hoje)),
+    0,
   );
+  const emAtraso = diasAtraso > 0;
+  const whatsapp = linkCobrancaWhatsApp({
+    nome: cliente.nome,
+    telefone: cliente.telefone,
+    valorEmAberto: saldo,
+    diasAtraso,
+  });
   const acimaLimite =
     cliente.limite_credito !== null && saldo > cliente.limite_credito;
 
@@ -89,8 +101,21 @@ export function ClienteDetalheClient({
     if (!pending) setDialogo(null);
   }
 
-  function aposQuitar(totalPago: number) {
-    toast.success(`Pagamento registrado: ${formatBRL(totalPago)}.`);
+  function aposQuitar(totalPago: number, pagoEm: string | null) {
+    toast.success(`Pagamento registrado: ${formatBRL(totalPago)}.`, {
+      duration: 10_000,
+      action: pagoEm
+        ? {
+            label: "Ver comprovante",
+            onClick: () =>
+              window.open(
+                `/comprovante/quitacao/${cliente.id}?em=${encodeURIComponent(pagoEm)}`,
+                "_blank",
+                "noopener",
+              ),
+          }
+        : undefined,
+    });
     setDialogo(null);
     setSelecionadas(new Set());
     setValorParcial("");
@@ -107,7 +132,7 @@ export function ClienteDetalheClient({
         toast.error(result.error);
         return;
       }
-      aposQuitar(result.totalPago);
+      aposQuitar(result.totalPago, result.pagoEm);
     });
   }
 
@@ -122,7 +147,7 @@ export function ClienteDetalheClient({
         toast.error(result.error);
         return;
       }
-      aposQuitar(result.totalPago);
+      aposQuitar(result.totalPago, result.pagoEm);
     });
   }
 
@@ -148,7 +173,7 @@ export function ClienteDetalheClient({
         toast.error(result.error);
         return;
       }
-      aposQuitar(result.totalPago);
+      aposQuitar(result.totalPago, result.pagoEm);
     });
   }
 
@@ -354,6 +379,30 @@ export function ClienteDetalheClient({
           <Plus aria-hidden="true" className="size-4" />
           Nova venda
         </Link>
+        {vendasAbertas.length > 0 ? (
+          <a
+            href={`/comprovante/cliente/${cliente.id}`}
+            target="_blank"
+            rel="noopener"
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "h-12 px-5 text-base",
+            )}
+          >
+            <FileText aria-hidden="true" className="size-4" />
+            Espelho das vendas
+          </a>
+        ) : null}
+        <Link
+          href={`/clientes/${cliente.id}/historico`}
+          className={cn(
+            buttonVariants({ variant: "outline" }),
+            "h-12 px-5 text-base",
+          )}
+        >
+          <History aria-hidden="true" className="size-4" />
+          Ver histórico
+        </Link>
         <Link
           href={`/clientes/${cliente.id}/editar`}
           className={cn(
@@ -364,6 +413,20 @@ export function ClienteDetalheClient({
           <Pencil aria-hidden="true" className="size-4" />
           Editar cliente
         </Link>
+        {whatsapp ? (
+          <a
+            href={whatsapp}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "h-12 px-5 text-base",
+            )}
+          >
+            <MessageCircle aria-hidden="true" className="size-4" />
+            Cobrar pelo WhatsApp
+          </a>
+        ) : null}
         <Button
           type="button"
           variant="destructive"

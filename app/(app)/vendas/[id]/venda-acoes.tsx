@@ -40,7 +40,14 @@ export function VendaAcoes({
         toast.error(result.error);
         return;
       }
-      toast.success(`Venda quitada: ${formatBRL(result.totalPago)}.`);
+      toast.success(`Venda quitada: ${formatBRL(result.totalPago)}.`, {
+        duration: 10_000,
+        action: {
+          label: "Ver comprovante",
+          onClick: () =>
+            window.open(`/comprovante/${vendaId}`, "_blank", "noopener"),
+        },
+      });
       setConfirmando(null);
       router.refresh();
     });

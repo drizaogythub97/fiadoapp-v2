@@ -1,13 +1,18 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, FileText, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { VendaStatusBadge } from "@/components/app/venda-status-badge";
 import { buttonVariants } from "@/components/ui/button";
+import {
+  textoComprovanteVenda,
+  tituloComprovanteVenda,
+} from "@/lib/comprovante";
 import { createClient } from "@/lib/supabase/server";
 import { formatBRL, formatDataBR, formatTelefone, hojeISO } from "@/lib/format";
 import type { ItemVenda, Pagamento, VendaComCliente } from "@/lib/types/fiado";
 import { cn } from "@/lib/utils";
+import { linkWhatsAppTexto } from "@/lib/whatsapp";
 
 import { VendaAcoes } from "./venda-acoes";
 
@@ -212,6 +217,64 @@ export default async function VendaDetalhePage({
         status={venda.status}
         restante={restante}
       />
+
+      {cliente
+        ? (() => {
+            const espelho = textoComprovanteVenda({
+              vendaId: venda.id,
+              cliente,
+              dataCompra: venda.data_compra,
+              dataVencimento: venda.data_vencimento,
+              status: venda.status,
+              quitadoEm: venda.quitado_em,
+              observacao: venda.observacao,
+              itens: itens.map((i) => ({
+                descricao: i.descricao,
+                quantidade: i.quantidade,
+                valorUnitario: i.valor_unitario,
+                valorTotal: i.valor_total,
+              })),
+              pagamentos: pagamentos.map((p) => ({
+                pagoEm: p.pago_em,
+                valor: p.valor_pago,
+              })),
+              valorTotal: venda.valor_total,
+              valorPago: venda.valor_pago,
+            });
+            const whatsapp = linkWhatsAppTexto(cliente.telefone, espelho);
+            const rotulo = tituloComprovanteVenda(venda.status);
+            return (
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <a
+                  href={`/comprovante/${venda.id}`}
+                  target="_blank"
+                  rel="noopener"
+                  className={cn(
+                    buttonVariants({ variant: "outline" }),
+                    "h-13 px-6 text-base font-medium",
+                  )}
+                >
+                  <FileText aria-hidden="true" className="size-5" />
+                  {rotulo}
+                </a>
+                {whatsapp ? (
+                  <a
+                    href={whatsapp}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                      buttonVariants({ variant: "outline" }),
+                      "h-13 px-6 text-base font-medium",
+                    )}
+                  >
+                    <MessageCircle aria-hidden="true" className="size-5" />
+                    Enviar por WhatsApp
+                  </a>
+                ) : null}
+              </div>
+            );
+          })()
+        : null}
 
       <Link
         href={cliente ? `/clientes/${cliente.id}` : "/vendas"}

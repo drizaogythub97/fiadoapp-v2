@@ -1,0 +1,105 @@
+/* Comprovante FiadoApp: papel claro sempre (impressão), tipografia sóbria.
+   Cores fixas de propósito — o comprovante não segue o tema escuro do app. */
+
+.receipt {
+  color: #1f2430;
+  font-family: var(--font-sans, Inter, system-ui, sans-serif);
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 28px 32px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+}
+
+.brand {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.title {
+  color: #6b7280;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.section {
+  margin-top: 18px;
+}
+
+.sectionTitle {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6b7280;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 3px 0;
+}
+
+.rowLabel {
+  color: #6b7280;
+}
+
+.rowStrong {
+  font-weight: 600;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.itemDetail {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.total {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 2px solid #1f2430;
+  margin-top: 10px;
+  padding-top: 8px;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.destaque {
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-weight: 600;
+}
+
+.nota {
+  color: #6b7280;
+  font-size: 11px;
+  text-align: center;
+  margin-top: 24px;
+  border-top: 1px dashed #d1d5db;
+  padding-top: 10px;
+}
