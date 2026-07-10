@@ -58,8 +58,13 @@ export function ComprovanteShell({
 
   // No formato PDF, dispara a impressão automaticamente ao abrir, dando um
   // instante para fontes e a logo carregarem (senão saem em branco).
+  // SÓ em desktop: no celular o diálogo de impressão cobre a tela e atrapalha
+  // quem abriu o comprovante para compartilhar (ajuste planejado da F5).
   useEffect(() => {
     if (formato !== "pdf") return;
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+      return;
+    }
     let done = false;
     let timer: ReturnType<typeof setTimeout>;
     const trigger = () => {
