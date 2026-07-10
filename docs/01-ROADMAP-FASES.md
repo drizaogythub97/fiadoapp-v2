@@ -113,21 +113,38 @@ Descoberta: a Hostinger sobrescreve o header CSP no servidor.
       limit) e exclusão de conta (aviso: a conta é a mesma do ecossistema)
       — **validado pelo dono e mesclado em 2026-07-10** (PR #9, squash
       `2cdef9b`; migrations 0003/0004 aplicadas)
-- [ ] 🤖 4d-4. Cadastro/recuperação/troca de senha + página `/privacidade`
-      (padrão Gaveta; `lib/validations/password.ts` já portado; troca de
-      senha logado já existe em Minha conta — faltam signup/recover/reset
-      e os links na tela de login; ver ponto de partida no docs/04)
+- [x] 🤖👤 4d-4. Cadastro/recuperação/troca de senha + página `/privacidade`
+      (signup/recover/reset portados do Gaveta com rate limit + Zod +
+      política de senha; `/privacidade` adaptada — dados = clientes/vendas/
+      pagamentos, exclusão avisa da conta única; links no login; correção:
+      erro do callback de e-mail agora aparece no login via código fixo) —
+      **mesclado em 2026-07-10** (PR #10, squash `405f9f3`). ⚠️ Descoberto e
+      corrigido: o allowlist de Redirect URLs do Supabase não tinha o Fiado
+      (dono adicionou fiadoapp-v2 + localhost + fiadoapp.net). Confirmação
+      de e-mail está DESLIGADA no projeto compartilhado (decisão: manter)
 
-## F5 — PWA + cutover
+## F5 — PWA + cutover — ✅ CUTOVER FEITO EM 2026-07-10
 
-- [ ] 🤖 PWA (SW sem cache, manifest, ícones), assetlinks, Lighthouse, E2E, `/security-review`
-- [ ] 👤 **Decisão de hosting** (uso comercial): Vercel Pro vs Cloudflare Pages vs manter Hobby
-- [ ] 🤖 Migração final dos dados (janela de congelamento: 👤 não usa o app antigo durante ~1h)
-- [ ] 👤 Apontar DNS de `fiadoapp.net` para o novo hosting (guiado) — o APK WebView
-      antigo continua funcionando
-- [ ] 🤖 Smoke test pós-cutover; app PHP fica como fallback até confiança total
-- [ ] 👤 (Depois) Publicar TWA na Play Console; deixar o plano Hostinger expirar
-      **mantendo o registro do domínio**
+- [x] 🤖 PWA: SW sem cache, manifest, ícones any+maskable do logo 2048px
+      do v1, auto-print só desktop; Lighthouse 97/96/100/100; E2E;
+      `/security-review` sem achados — **mesclado em 2026-07-10** (PR #11,
+      squash `4d5a264`). assetlinks fica para a TWA (precisa do fingerprint
+      da chave de assinatura)
+- [x] 👤 **Decisão de hosting**: manter Vercel Hobby POR ORA (2026-07-10).
+      ⚠️ PENDÊNCIA: sair do Hobby (termos vedam uso comercial) — upgrade
+      Pro é só no painel, nada muda no código
+- [x] 🤖 Migração final na janela de congelamento (2026-07-10): 61 clientes,
+      248 vendas, 372 itens, 192 pagamentos — **zero divergência**. Arthur
+      e contas de teste ficaram fora (decisão do dono; backup completo em
+      `..\fiado-migracao`)
+- [x] 👤 DNS de `fiadoapp.net` apontado para a Vercel (A @ → 76.76.21.21,
+      CNAME www, AAAA da Hostinger REMOVIDO — pegadinha: IPv6 continuaria
+      no app antigo); `A ftp` mantido como acesso ao fallback
+- [x] 🤖 Smoke test pós-cutover 100% (rotas públicas/protegidas, PWA, CSP,
+      TLS apex+www, redirect de e-mails); app PHP congelado como fallback
+      (reverter o A no hPanel o restaura)
+- [ ] 👤 (Depois) Publicar TWA na Play Console (aí entra o assetlinks);
+      deixar o plano Hostinger expirar **mantendo o registro do domínio**
 
 ## F6 — Ecossistema Gaveta ⇄ Fiado (estratégia aprovada 👤 2026-07-09)
 

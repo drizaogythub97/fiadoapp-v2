@@ -52,10 +52,94 @@ apenas onde encontrá-los.
 | Loader de marca (`gaveta-loader*`)                                        | `components/app/fiado-loader*` (2 variantes)            | ✅ F1                      |
 | Rota `/comprovante/[id]` (print CSS + auto-print + Web Share)             | comprovante de quitação/pagamento                       | ✅ F4c                     |
 | `tests/` (estrutura Vitest/Playwright/RLS)                                | Vitest+configs ✅ F1; suíte RLS ✅ F2 (17 testes)       | ✅ F2                      |
-| Fluxos signup/recover/reset + `/privacidade`                              | adiados intencionalmente                                | F4d                        |
+| Fluxos signup/recover/reset + `/privacidade`                              | textos adaptados ao FiadoApp + `ui/checkbox`            | ✅ F4d-4                   |
 | `.github/workflows/backup-db.yml`                                         | NÃO duplicar — o backup do Gaveta já cobre o banco todo | —                          |
 
-## Estado 2026-07-10: SPRINT ENCERRADA — F4d-2 e F4d-3 mescladas; estratégia do ecossistema definida
+## Estado 2026-07-10 (noite): SPRINT ENCERRADA — 🚀 CUTOVER FEITO: fiadoapp.net É O V2
+
+**Onde paramos:** working tree limpa, `main` = produção em
+**`https://fiadoapp.net`** (domínio definitivo, cutover concluído hoje).
+F4d-4 (PR #10, squash `405f9f3`) e F5-PWA (PR #11, squash `4d5a264`)
+mescladas e validadas. Migração FINAL feita na janela de congelamento:
+61 clientes, 248 vendas, 372 itens, 192 pagamentos, **zero divergência**
+(relatórios em `..\fiado-migracao`). O app PHP está congelado como
+fallback (reverter o registro A no hPanel o restaura; `A ftp` preservado).
+`fiadoapp-v2.vercel.app` continua como alias da mesma produção.
+
+**O que a F4d-4 entregou (PR #10):** `/signup`, `/recover`, `/reset`
+(portados do Gaveta: rate limit, Zod no servidor, política de senha),
+`/privacidade` adaptada (dados = clientes/vendas/pagamentos; exclusão
+avisa da conta única do ecossistema), links Criar conta/Esqueci a senha
+no login, `components/ui/checkbox.tsx` portado, e correção: o callback
+de e-mail redireciona com código fixo `?error=link_invalido` e o login
+exibe a mensagem (nunca refletir texto da URL).
+
+**O que a F5 entregou (PR #11 + operações):** PWA instalável (manifest,
+SW SEM cache de propósito — app online, cache autenticado vazaria dados;
+ícones any+maskable gerados do logo 2048px do v1 com fundo coral
+amostrado), auto-print de comprovante só desktop
+(`matchMedia("(hover: hover) and (pointer: fine)")`), Lighthouse
+97/96/100/100, security-review sem achados. Operações: NEXT_PUBLIC_SITE_URL
+= `https://fiadoapp.net` (production+preview na Vercel), domínios
+fiadoapp.net+www no projeto Vercel, DNS trocado no hPanel, smoke test
+completo no domínio novo.
+
+**Pendências deixadas de propósito:**
+
+1. ⚠️ **Sair do Vercel Hobby** (termos vedam uso comercial) — dono decidiu
+   manter POR ORA (2026-07-10); upgrade Pro é só no painel.
+2. **TWA na Play Console** (👤) + `assetlinks.json` (precisa do fingerprint
+   SHA-256 da chave de assinatura, só existe quando a TWA for criada).
+3. **Contraste do botão primário** (Lighthouse A11y 96): coral `#E8624A` +
+   branco ≈ 3,3:1 (AA pede 4,5) — pré-existente da F1 em todo o app;
+   corrigir muda o visual de todos os botões → decisão do dono.
+4. Plano Hostinger pode expirar **mantendo o registro do domínio**.
+5. Venda do Arthur (1, mai/2026) NÃO migrada — fica no backup/app antigo.
+
+**Ponto de partida da próxima sessão: F6 — Ecossistema opt-in** (ver
+roadmap e `memory/ecossistema-autonomia`): descoberta (card em
+Configurações + anúncio + gatilho + `/ecossistema`) e Estágio 1 (app
+switcher). Antes, conferir se o dono já rodou o prompt de padronização
+no Gaveta (IA de Configurações) — impacta o card de descoberta lá.
+
+**Técnicas/gotchas novos desta sessão:**
+
+- **Supabase Auth do projeto compartilhado**: (a) o allowlist de Redirect
+  URLs NÃO tinha o Fiado — e-mails de recuperação caíam em
+  `gaveta-erp.vercel.app`; dono adicionou `fiadoapp-v2.vercel.app/**`,
+  `localhost:3000/**` e `fiadoapp.net/**` (testar com
+  `admin.generateLink` + conferir `redirect_to` do action_link);
+  (b) **confirmação de e-mail está DESLIGADA** — signup cria sessão na
+  hora e o Next re-renderiza a página → cai logado no /dashboard (o ramo
+  de "e-mail de confirmação" do form nunca roda); decisão: manter
+  (paridade v1; ligar exigiria SMTP próprio e afetaria o Gaveta);
+  (c) mensagem genérica p/ e-mail já cadastrado: manter (anti-enumeração).
+- **E2E de recuperação de senha sem ler e-mail**: `admin.generateLink({
+  type: "recovery" })` e montar
+  `/auth/callback?token_hash=<hashed_token>&type=recovery&next=/reset`
+  (mesmo formato do template com TokenHash; dispensa allowlist e SMTP).
+- **Checkbox do Base UI**: o `id` passado vai para um input escondido — no
+  Playwright usar `getByRole("checkbox")`, não `#id` (o span intercepta).
+- `CardTitle` do design system é `<div>`, não heading — asserts E2E devem
+  mirar botão/label (spec protected-routes corrigido).
+- **Ícones**: `npm i sharp --no-save` + script temporário (trim → resize;
+  maskable = canvas na cor amostrada do próprio logo + safe zone 80%;
+  `png({ palette: true })` derruba 245KB→68KB).
+- **DNS Hostinger**: além do A `@`, existia **AAAA (IPv6) da Hostinger** —
+  tinha que REMOVER, senão redes IPv6 continuariam no app antigo. `A ftp`
+  fica (fallback). TTLs 1800/300 → propagação rápida.
+- Enquanto o DNS local não propaga, testar produção com
+  `curl --resolve fiadoapp.net:443:76.76.21.21` (cache local segura o IP
+  velho por até 30 min; 404 com headers Apache = ainda no Hostinger).
+- **Remote MySQL**: o IP local mudou de novo (177.196.12.178 liberado em
+  2026-07-10). O erro "Access denied ... @'IP'" = IP fora do allowlist.
+- `vercel env add NEXT_PUBLIC_SITE_URL production` via stdin funciona;
+  trocar valor = `env rm --yes` + `env add`; depois
+  `vercel redeploy <url-de-produção>` para aplicar.
+- Gmail MCP expirou o token no meio da sessão — a alternativa
+  `generateLink` acima é melhor de qualquer forma.
+
+## Estado 2026-07-10 (manhã): F4d-2 e F4d-3 mescladas; estratégia do ecossistema definida
 
 **Onde paramos:** working tree limpa, `main` = produção com F4d-2 Analytics
 (PR #8, squash `60dbb52`) e F4d-3 Configurações (PR #9, squash `2cdef9b`),
