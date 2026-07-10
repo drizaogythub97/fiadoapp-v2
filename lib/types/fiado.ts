@@ -1,4 +1,4 @@
-/** Linha retornada pela RPC fiado_clientes_com_saldo (migration 0002). */
+/** Linha retornada pela RPC fiado_clientes_com_saldo (migrations 0002/0003). */
 export type ClienteComSaldo = {
   id: string;
   nome: string;
@@ -6,6 +6,8 @@ export type ClienteComSaldo = {
   referencia: string | null;
   telefone: string | null;
   limite_credito: number | null;
+  /** Limite individual ou, na falta dele, o padrão das preferências (0003). */
+  limite_efetivo: number | null;
   saldo_devedor: number;
   total_ativas: number;
   total_pagas: number;

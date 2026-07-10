@@ -5,6 +5,7 @@ import {
   Clock,
   LayoutDashboard,
   Receipt,
+  Settings,
   TrendingUp,
   Users,
 } from "lucide-react";
@@ -20,6 +21,7 @@ const ITEMS = [
   { href: "/inadimplentes", label: "Inadimplentes", Icon: Clock },
   { href: "/relatorios", label: "Relatórios", Icon: BarChart3 },
   { href: "/analytics", label: "Analytics", Icon: TrendingUp },
+  { href: "/preferencias", label: "Preferências", Icon: Settings },
 ] as const;
 
 export function AppNav() {

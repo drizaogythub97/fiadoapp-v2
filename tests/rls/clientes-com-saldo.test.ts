@@ -80,4 +80,46 @@ describe("RPC fiado_clientes_com_saldo", () => {
     expect(error).toBeNull();
     expect(data).toHaveLength(0);
   });
+
+  it("limite padrão das preferências vale para cliente SEM limite próprio (0003)", async () => {
+    const bobApp = userClient(bob.accessToken);
+
+    // Sem limite individual, deve 40
+    const semLimiteId = await createCliente(bob.accessToken, bob.id, "Solto");
+    await bobApp.rpc("fiado_registrar_venda", {
+      p_itens: [{ descricao: "Compra", quantidade: 1, valor_unitario: 40 }],
+      p_cliente_id: semLimiteId,
+    });
+    // Com limite individual 100 (sobrepõe o padrão), deve 40
+    const { data: comLimite } = await bobApp
+      .from("fiado_clientes")
+      .insert({ user_id: bob.id, nome: "Blindado", limite_credito: 100 })
+      .select("id")
+      .single();
+    await bobApp.rpc("fiado_registrar_venda", {
+      p_itens: [{ descricao: "Compra", quantidade: 1, valor_unitario: 40 }],
+      p_cliente_id: comLimite!.id,
+    });
+
+    // Antes das preferências: sem limite efetivo para o Solto
+    let { data } = await bobApp.rpc("fiado_clientes_com_saldo");
+    let solto = data?.find((c: { nome: string }) => c.nome === "Solto");
+    expect(solto.limite_efetivo).toBeNull();
+    expect(solto.acima_limite).toBe(false);
+
+    // Define padrão 25 → Solto (deve 40) fica acima; Blindado (limite 100) não
+    await bobApp
+      .from("fiado_preferencias")
+      .upsert({ user_id: bob.id, limite_credito_padrao: 25 });
+
+    ({ data } = await bobApp.rpc("fiado_clientes_com_saldo"));
+    solto = data?.find((c: { nome: string }) => c.nome === "Solto");
+    const blindado = data?.find(
+      (c: { nome: string }) => c.nome === "Blindado",
+    );
+    expect(solto.limite_efetivo).toBe(25);
+    expect(solto.acima_limite).toBe(true);
+    expect(blindado.limite_efetivo).toBe(100);
+    expect(blindado.acima_limite).toBe(false);
+  });
 });
