@@ -1,10 +1,10 @@
-import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { AppNav } from "@/components/app/app-nav";
 import { LogoutButton } from "@/components/app/logout-button";
 import { Toaster } from "@/components/ui/sonner";
+import { marcaDoUsuario } from "@/lib/marca";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function AppLayout({
@@ -24,6 +24,9 @@ export default async function AppLayout({
   const displayName =
     (user.user_metadata?.full_name as string | undefined) ?? user.email;
 
+  // Marca da loja configurada no Gaveta (decisão F4d: profiles, só leitura).
+  const marca = await marcaDoUsuario(supabase, user.id);
+
   return (
     <div className="flex min-h-screen flex-col">
       <header className="border-border bg-background border-b print:hidden">
@@ -32,14 +35,17 @@ export default async function AppLayout({
             href="/dashboard"
             className="text-foreground flex items-center gap-3 text-xl font-semibold tracking-tight"
           >
-            <Image
-              src="/logo.png"
+            {/* A logo pode vir do Storage do Supabase — <img> simples, como
+                nos comprovantes (sem remotePatterns no next/image). */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={marca.logoUrl}
               alt=""
               width={40}
               height={40}
-              className="size-10 object-contain"
+              className="size-10 rounded-md object-contain"
             />
-            <span>FiadoApp</span>
+            <span>{marca.nome}</span>
           </Link>
           <div className="flex items-center gap-2">
             <span

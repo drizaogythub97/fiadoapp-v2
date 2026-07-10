@@ -38,7 +38,11 @@ import { diasDeAtraso, linkCobrancaWhatsApp } from "@/lib/whatsapp";
 import { registrarPagamento } from "../../vendas/actions";
 import { excluirCliente } from "../actions";
 
-type Cliente = ClienteResumo & { limite_credito: number | null };
+type Cliente = ClienteResumo & {
+  limite_credito: number | null;
+  /** Individual ou o padrão das preferências (F4d-3). */
+  limite_efetivo: number | null;
+};
 
 type Dialogo = "todas" | "selecionadas" | "parcial" | "excluir" | null;
 
@@ -88,7 +92,7 @@ export function ClienteDetalheClient({
     diasAtraso,
   });
   const acimaLimite =
-    cliente.limite_credito !== null && saldo > cliente.limite_credito;
+    cliente.limite_efetivo !== null && saldo > cliente.limite_efetivo;
 
   function alternarSelecao(id: string) {
     setSelecionadas((atual) => {
@@ -223,7 +227,7 @@ export function ClienteDetalheClient({
           {acimaLimite ? (
             <span
               className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-sm font-medium text-amber-900 dark:bg-amber-500/15 dark:text-amber-300"
-              aria-label={`Acima do limite de crédito de ${formatBRL(cliente.limite_credito ?? 0)}`}
+              aria-label={`Acima do limite de crédito de ${formatBRL(cliente.limite_efetivo ?? 0)}`}
             >
               <AlertTriangle aria-hidden="true" className="size-4" />
               Acima do limite

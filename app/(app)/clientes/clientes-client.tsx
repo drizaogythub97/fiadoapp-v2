@@ -199,7 +199,7 @@ export function ClientesClient({
                   {c.acima_limite ? (
                     <span
                       className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-sm font-medium text-amber-900 dark:bg-amber-500/15 dark:text-amber-300"
-                      aria-label={`Acima do limite de crédito de ${formatBRL(c.limite_credito ?? 0)}`}
+                      aria-label={`Acima do limite de crédito de ${formatBRL(c.limite_efetivo ?? 0)}`}
                     >
                       <AlertTriangle aria-hidden="true" className="size-4" />
                       Acima do limite

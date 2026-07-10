@@ -122,10 +122,11 @@ export function VendaForm({
   );
 
   // ── Alerta de limite (decisão F2: SÓ avisa, nunca bloqueia) ────────────
+  // limite_efetivo = individual ou, na falta dele, o padrão das preferências.
   const alertaLimite =
     clienteSel &&
-    clienteSel.limite_credito !== null &&
-    clienteSel.saldo_devedor + totalGeral > clienteSel.limite_credito
+    clienteSel.limite_efetivo !== null &&
+    clienteSel.saldo_devedor + totalGeral > clienteSel.limite_efetivo
       ? clienteSel
       : null;
 
@@ -521,7 +522,7 @@ export function VendaForm({
             />
             <span>
               Com esta venda, {alertaLimite.nome} passa do limite de crédito de{" "}
-              <strong>{formatBRL(alertaLimite.limite_credito ?? 0)}</strong>. O
+              <strong>{formatBRL(alertaLimite.limite_efetivo ?? 0)}</strong>. O
               app só avisa — a venda não é bloqueada.
             </span>
           </p>
