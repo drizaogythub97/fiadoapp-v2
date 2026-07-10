@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { BrandLockup } from "@/components/auth/brand-lockup";
+import { ErrorAlert } from "@/components/auth/form-feedback";
 import {
   Card,
   CardContent,
@@ -16,12 +18,24 @@ export const metadata = {
   title: "Entrar",
 };
 
-export default async function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (user) redirect("/dashboard");
+
+  // O callback de e-mail (confirmação/recuperação) redireciona para cá com um
+  // código fixo — nunca refletir texto vindo da URL.
+  const { error } = await searchParams;
+  const linkError =
+    error === "link_invalido"
+      ? "Não foi possível confirmar o link. Solicite um novo."
+      : null;
 
   return (
     <Card className="p-6">
@@ -35,10 +49,22 @@ export default async function LoginPage() {
         </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-6">
+        {linkError ? <ErrorAlert message={linkError} /> : null}
         <LoginForm />
-        <p className="text-muted-foreground text-center text-base">
-          Já usa o Gaveta? Entre com a mesma conta.
-        </p>
+        <div className="flex flex-col gap-1.5 text-center">
+          <p className="text-muted-foreground text-base">
+            Não tem uma conta?{" "}
+            <Link
+              href="/signup"
+              className="text-primary font-medium underline underline-offset-4 hover:no-underline"
+            >
+              Criar conta
+            </Link>
+          </p>
+          <p className="text-muted-foreground text-base">
+            Já usa o Gaveta? Entre com a mesma conta.
+          </p>
+        </div>
       </CardContent>
     </Card>
   );

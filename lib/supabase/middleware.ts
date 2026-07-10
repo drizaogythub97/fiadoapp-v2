@@ -3,11 +3,15 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { publicEnv } from "@/lib/env";
 
-// F1: apenas login. Cadastro/recuperação de senha entram em fase posterior
-// (a conta é a mesma do Gaveta — SSO do ecossistema).
-const PUBLIC_PREFIXES = ["/login", "/auth"];
+const PUBLIC_PREFIXES = [
+  "/login",
+  "/signup",
+  "/recover",
+  "/privacidade",
+  "/auth",
+];
 
-const AUTH_ONLY_PREFIXES = ["/login"];
+const AUTH_ONLY_PREFIXES = ["/login", "/signup"];
 
 function isPublic(pathname: string) {
   return PUBLIC_PREFIXES.some(
