@@ -17,10 +17,10 @@ function safeNext(raw: string | null): string {
   return value.startsWith("/") ? value : "/dashboard";
 }
 
+// Código fixo — a página de login traduz para a mensagem ao usuário
+// (nunca refletir texto vindo da URL).
 function errorRedirect(origin: string) {
-  return NextResponse.redirect(
-    `${origin}/login?error=${encodeURIComponent("Não foi possível confirmar o link. Solicite um novo.")}`,
-  );
+  return NextResponse.redirect(`${origin}/login?error=link_invalido`);
 }
 
 export async function GET(request: NextRequest) {

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 
 import { ErrorAlert } from "@/components/auth/form-feedback";
@@ -44,9 +45,17 @@ export function LoginForm() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="password" className="text-base">
-          Senha
-        </Label>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="password" className="text-base">
+            Senha
+          </Label>
+          <Link
+            href="/recover"
+            className="text-primary text-base underline underline-offset-4 hover:no-underline"
+          >
+            Esqueci minha senha
+          </Link>
+        </div>
         <PasswordField
           id="password"
           name="password"

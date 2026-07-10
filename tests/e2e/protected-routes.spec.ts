@@ -4,7 +4,8 @@ import { expect, test } from "@playwright/test";
 test("home redireciona visitante para /login", async ({ page }) => {
   await page.goto("/");
   await page.waitForURL("**/login");
-  await expect(page.getByRole("heading", { name: "Entrar" })).toBeVisible();
+  // CardTitle do design system é um <div>, não um heading — asserta o botão.
+  await expect(page.getByRole("button", { name: "Entrar" })).toBeVisible();
 });
 
 test("rota protegida redireciona para /login com next=", async ({ page }) => {
