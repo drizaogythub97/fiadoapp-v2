@@ -55,6 +55,92 @@ apenas onde encontrá-los.
 | Fluxos signup/recover/reset + `/privacidade`                              | adiados intencionalmente                                | F4d                        |
 | `.github/workflows/backup-db.yml`                                         | NÃO duplicar — o backup do Gaveta já cobre o banco todo | —                          |
 
+## Estado 2026-07-10: SPRINT ENCERRADA — F4d-2 e F4d-3 mescladas; estratégia do ecossistema definida
+
+**Onde paramos:** working tree limpa, `main` = produção com F4d-2 Analytics
+(PR #8, squash `60dbb52`) e F4d-3 Configurações (PR #9, squash `2cdef9b`),
+ambas validadas pelo dono. Migrations **0003 e 0004 APLICADAS** no banco.
+Produção: `https://fiadoapp-v2.vercel.app`.
+
+**Decisão estratégica do dono (2026-07-09) — LER `memory/ecossistema-autonomia`
+e a F6 do roadmap:** os apps do ecossistema são AUTÔNOMOS; "padrão Gaveta" =
+qualidade, não dependência. Integração Gaveta⇄Fiado será OPT-IN (5 estágios,
+descoberta por card/anúncio/gatilho + `/ecossistema`). Consequência já
+aplicada: a marca da loja virou recurso NATIVO do Fiado (a herança de
+`profiles` do Gaveta foi revertida no próprio PR #9). NUNCA criar recurso do
+Fiado que dependa de tabela do Gaveta como única fonte.
+
+**O que a F4d-2 entregou (PR #8):** `/analytics` — atalhos de período
+(Este mês/30/90/Este ano) + datas, 5 KPIs (Recebido inclui parciais), linha
+de faturamento/dia em SVG PRÓPRIO (sem dependência; dias sem venda = 0;
+tooltip por hover/teclado; "Ver dados em tabela"), top 10 em barras de cor
+única, Pagas × Em aberto como barra empilhada + % (rosca de 2 fatias é
+anti-padrão). Lógica pura em `lib/analytics.ts` (14 testes).
+
+**O que a F4d-3 entregou (PR #9):** aba **Configurações** → landing com 2
+cards (IA padronizada com o Gaveta; prompt para o Gaveta fazer o mesmo foi
+entregue ao dono — conferir se já foi executado lá antes de referenciar):
+- `/configuracoes/preferencias`: tema Escuro⇄Claro (cookie `fiado_theme`
+  setado no CLIENTE via document.cookie — o script anti-FOUC da F1 lê);
+  **marca nativa** (`fiado_preferencias.brand_name/brand_logo_path`,
+  migration 0004; editor nome + logo com `react-image-crop`, recorte
+  quadrado 256px webp, magic bytes no servidor; upload no bucket
+  compartilhado `brand-logos` com prefixo de ARQUIVO `fiado-` — as policies
+  de Storage por pasta do usuário já cobrem); limite padrão + por cliente
+  (migration 0003: RPC `fiado_clientes_com_saldo` ganhou `limite_efetivo`;
+  precisou DROP+CREATE porque o tipo de retorno mudou — roda numa transação
+  só). `lib/marca.ts` agora lê `fiado_preferencias` (header + comprovantes).
+- `/configuracoes/conta`: alterar nome (user_metadata + espelho best-effort
+  em `profiles`), e-mail e senha (reautenticação + rate limit `reauth`;
+  política `checkPasswordStrength`), exclusão de conta (admin API + limpeza
+  do Storage; o aviso deixa claro que apaga o Gaveta junto — conta única).
+
+**Ponto de partida da próxima sessão — F4d-4 (cadastro/recuperação +
+`/privacidade`), já ESCOPADO nesta sessão:**
+
+1. `lib/validations/auth.ts`: portar do Gaveta os schemas
+   `signupSchema`/`recoverSchema`/`resetSchema` (diff conferido — é só
+   acrescentar; `lib/auth/errors.ts` já é IDÊNTICO).
+2. Portar de `../erp-simples/app/(auth)/`: `signup/`, `recover/`, `reset/`
+   (actions + forms + pages) e `app/privacidade/page.tsx` (adaptar o texto:
+   FiadoApp, dados = clientes/vendas/pagamentos; mencionar a conta única do
+   ecossistema na seção de exclusão). Adicionar links "Criar conta" e
+   "Esqueci a senha" no login do Fiado.
+3. ⚠️ `components/ui/checkbox.tsx` NÃO existe no Fiado (o signup do Gaveta
+   usa) — portar junto.
+4. ⚠️ `NEXT_PUBLIC_SITE_URL` não está setada (siteUrl cai em localhost) —
+   os e-mails de confirmação/recuperação em Preview/produção precisam dela
+   ou do redirect certo; hoje está planejada só para o cutover (F5). Decidir
+   na F4d-4 (ex.: setar para a URL de produção atual).
+5. Nuance do ecossistema no signup: e-mail já cadastrado (conta do Gaveta)
+   → a mensagem genérica de `toPortugueseAuthError` já cobre ("entre ou
+   recupere a senha").
+6. Depois da F4d-4: **F5 (PWA + cutover)**; a fase Ecossistema (nova F6) é
+   pós-F5.
+
+**Técnicas/gotchas novos desta sessão:**
+
+- **Migration que muda tipo de retorno de função**: `create or replace` NÃO
+  basta — `drop function` + `create function` no mesmo arquivo (o script
+  `pg` roda o arquivo inteiro numa transação; atômico p/ produção).
+- **E2E de upload com recorte**: gerar PNG via canvas em `page.evaluate`
+  (toDataURL → Buffer) + `setInputFiles`; o `onComplete` do ReactCrop só
+  dispara com interação — arrastar com `page.mouse` dentro de `.ReactCrop`.
+- **Specs com estado encadeado**: `test.describe.configure({ mode:
+  "serial" })` (senão cada teste pode ganhar worker/usuário próprios).
+- Logout tem ConfirmDialog — E2E precisa confirmar o "Sair" do diálogo.
+- SVG de gráfico: `page.locator("svg").first()` pega ícone do nav — escopar
+  por `getByLabel` do wrapper; screenshot pós-navegação corre contra o
+  ResizeObserver → assertar conteúdo do gráfico antes.
+- Charts (skill dataviz): rosca de 2 fatias e arco-íris por barra são
+  anti-padrões — barra empilhada única e cor única de série; linha com eixo
+  de tempo contínuo (zero-fill) em vez de pular dias como o v1.
+- Rota movida deixa types velhos em `.next` (erro tsc fantasma) —
+  `rm -rf .next`.
+- `npm i <pacote>` continua removendo os `--no-save` (pg) — reinstalar
+  quando precisar. Dependência nova: `react-image-crop`.
+- Não usar `python - <<EOF` nesta máquina (trava; sem python no PATH).
+
 ## Estado 2026-07-08 (noite): SPRINT ENCERRADA — F4c e F4d-1 mescladas
 
 **Onde paramos:** working tree limpa, `main` = produção com F4c (PR #6,

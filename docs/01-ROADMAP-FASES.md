@@ -93,14 +93,30 @@ Descoberta: a Hostinger sobrescreve o header CSP no servidor.
       (`profiles.brand_name`/`brand_logo_path`, só leitura; padrão
       FiadoApp) e **diálogo de formato PDF/Imagem** ao gerar
       espelho/comprovante/quitação (fluxo do v1, que o dono valoriza)
-- [ ] 🤖 4d-2. Analytics: faturamento por dia, top clientes, pagas × em
-      aberto, KPIs do período (ver `docs/00`)
-- [ ] 🤖 4d-3. Preferências: limite de crédito padrão + **tema claro** via
-      toggle (infra pronta desde a F1) + marca do Gaveta no header do app
-      (decisão 👤 2026-07-08: reusar `profiles`, leitura apenas — já
-      aplicada nos comprovantes via `lib/marca.ts`)
+- [x] 🤖👤 4d-2. Analytics: filtro de período (atalhos + datas), 5 KPIs,
+      faturamento por dia (linha SVG própria, dias sem venda = 0, tooltip
+      teclado/mouse + tabela acessível), top 10 clientes (barras em cor
+      única) e Pagas × Em aberto (barra empilhada — a rosca de 2 fatias do
+      v1 é ilegível) — **validado pelo dono e mesclado em 2026-07-09**
+      (PR #8, squash `60dbb52`). Sem migration; lógica pura em
+      `lib/analytics.ts`
+- [x] 🤖👤 4d-3. Configurações (aba → landing com 2 cards, IA padronizada
+      com o Gaveta a pedido do dono):
+      **Preferências** — tema claro via toggle (cookie `fiado_theme`),
+      **marca da loja NATIVA do Fiado** (migration 0004: `brand_name`/
+      `brand_logo_path` em `fiado_preferencias`; editor nome + logo com
+      recorte; a herança da marca do Gaveta foi REVERTIDA pela decisão de
+      autonomia de 2026-07-09), limite de crédito padrão (migration 0003:
+      `limite_efetivo` na RPC de saldo — alerta/badges usam individual OU
+      padrão; segue NUNCA bloqueando) e limites por cliente com busca;
+      **Minha conta** — alterar nome/e-mail/senha (reautenticação + rate
+      limit) e exclusão de conta (aviso: a conta é a mesma do ecossistema)
+      — **validado pelo dono e mesclado em 2026-07-10** (PR #9, squash
+      `2cdef9b`; migrations 0003/0004 aplicadas)
 - [ ] 🤖 4d-4. Cadastro/recuperação/troca de senha + página `/privacidade`
-      (padrão Gaveta; `lib/validations/password.ts` já portado)
+      (padrão Gaveta; `lib/validations/password.ts` já portado; troca de
+      senha logado já existe em Minha conta — faltam signup/recover/reset
+      e os links na tela de login; ver ponto de partida no docs/04)
 
 ## F5 — PWA + cutover
 
@@ -113,9 +129,25 @@ Descoberta: a Hostinger sobrescreve o header CSP no servidor.
 - [ ] 👤 (Depois) Publicar TWA na Play Console; deixar o plano Hostinger expirar
       **mantendo o registro do domínio**
 
-## F6 — Ecossistema Gaveta ⇄ Fiado
+## F6 — Ecossistema Gaveta ⇄ Fiado (estratégia aprovada 👤 2026-07-09)
 
-- [ ] 🤖 App switcher no header dos dois apps (SSO já é nativo — mesmo Supabase Auth)
-- [ ] Estágios futuros (propor um a um): clientes compartilhados, pagamento "fiado"
-      no PDV do Gaveta gerando venda no Fiado, recebíveis do Fiado no resumo
-      financeiro do Gaveta
+**Princípio: uma conta, dois apps completos, pontes opcionais.** Os apps são
+AUTÔNOMOS (cada um com todos os seus recursos — ver marca nativa na F4d-3);
+a infra compartilhada (mesmo Supabase/Auth = SSO) é invisível ao usuário;
+toda integração é OPT-IN, com liga/desliga individual e default DESLIGADO.
+
+- [ ] 🤖 Descoberta (nos dois apps): card permanente em Configurações +
+      anúncio único dispensável no Painel + gatilho contextual (ex.: venda
+      a prazo no PDV do Gaveta sugere o Fiado) + página `/ecossistema`
+      (benefícios, "Ativar com a minha conta" em 1 clique, toggles)
+- [ ] 🤖 Estágio 1 — Vínculo básico: app switcher no header + abrir o outro
+      app já logado
+- [ ] 🤖 Estágio 2 — Marca compartilhada: marca ÚNICA do ecossistema,
+      editável de qualquer um dos dois apps (decisão 👤: opção "a")
+- [ ] 🤖 Estágio 3 — Clientes compartilhados
+- [ ] 🤖 Estágio 4 — Fiado no PDV: venda "a prazo" no caixa do Gaveta cria
+      a venda no Fiado (argumento de venda mais forte)
+- [ ] 🤖 Estágio 5 — Recebíveis do Fiado no resumo financeiro do Gaveta
+
+Nota: a IA de Configurações já foi padronizada nos dois apps (Fiado na
+F4d-3; Gaveta via prompt entregue ao dono em 2026-07-09).
