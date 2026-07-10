@@ -1,4 +1,4 @@
-import { marcaDoUsuario } from "@/lib/marca";
+import { BUCKET_LOGOS } from "@/lib/marca";
 import { createClient } from "@/lib/supabase/server";
 import { getThemeFromCookie } from "@/lib/theme/cookie";
 import type { ClienteComSaldo } from "@/lib/types/fiado";
@@ -9,22 +9,23 @@ export const metadata = { title: "Preferências" };
 
 export default async function PreferenciasPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
-  const [tema, marca, { data: prefs }, { data: clientesData, error }] =
+  const [tema, { data: prefs }, { data: clientesData, error }] =
     await Promise.all([
       getThemeFromCookie(),
-      marcaDoUsuario(supabase, user!.id),
       supabase
         .from("fiado_preferencias")
-        .select("limite_credito_padrao")
+        .select("limite_credito_padrao, brand_name, brand_logo_path")
         .maybeSingle(),
       supabase.rpc("fiado_clientes_com_saldo"),
     ]);
 
-  const limitePadrao = prefs?.limite_credito_padrao as number | null;
+  const limitePadrao = (prefs?.limite_credito_padrao as number | null) ?? null;
+  const marcaNome = ((prefs?.brand_name as string | null) ?? "").trim();
+  const logoPath = (prefs?.brand_logo_path as string | null) ?? null;
+  const logoUrl = logoPath
+    ? supabase.storage.from(BUCKET_LOGOS).getPublicUrl(logoPath).data.publicUrl
+    : null;
   const clientes = (clientesData ?? []) as ClienteComSaldo[];
 
   return (
@@ -32,7 +33,7 @@ export default async function PreferenciasPage() {
       <header>
         <h1 className="text-3xl font-bold tracking-tight">Preferências</h1>
         <p className="text-muted-foreground mt-1 text-lg">
-          Ajuste o tema, os limites de crédito e veja a marca da sua loja.
+          Ajuste o tema, a marca da sua loja e os limites de crédito.
         </p>
       </header>
 
@@ -45,7 +46,8 @@ export default async function PreferenciasPage() {
           temaInicial={tema}
           limitePadraoInicial={limitePadrao}
           clientes={clientes}
-          marca={marca}
+          marcaNome={marcaNome}
+          logoUrl={logoUrl}
         />
       )}
     </section>

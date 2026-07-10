@@ -15,10 +15,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { formatBRL } from "@/lib/format";
-import type { MarcaComprovante } from "@/lib/marca";
 import type { ClienteComSaldo } from "@/lib/types/fiado";
 
 import { salvarLimiteCliente, salvarLimitePadrao } from "./actions";
+import { MarcaSection } from "./marca-section";
 
 type Tema = "light" | "dark";
 
@@ -35,12 +35,15 @@ export function PreferenciasClient({
   temaInicial,
   limitePadraoInicial,
   clientes,
-  marca,
+  marcaNome,
+  logoUrl,
 }: {
   temaInicial: Tema;
   limitePadraoInicial: number | null;
   clientes: ClienteComSaldo[];
-  marca: MarcaComprovante;
+  /** brand_name salvo (cru, "" quando não configurado) e URL da logo. */
+  marcaNome: string;
+  logoUrl: string | null;
 }) {
   const [tema, setTema] = useState<Tema>(temaInicial);
   const [busca, setBusca] = useState("");
@@ -113,39 +116,8 @@ export function PreferenciasClient({
         </CardContent>
       </Card>
 
-      {/* ── MARCA DA LOJA ─────────────────────────────────────────── */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl">Marca da loja</CardTitle>
-          <CardDescription className="text-base">
-            Aparece no topo do app e nos comprovantes.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-3">
-          <div className="flex items-center gap-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={marca.logoUrl}
-              alt=""
-              className="size-12 rounded-lg object-contain"
-            />
-            <span className="text-lg font-semibold">{marca.nome}</span>
-          </div>
-          <p className="text-muted-foreground text-base">
-            O nome e a logo vêm do seu perfil no{" "}
-            <a
-              href="https://gaveta-erp.vercel.app"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary underline underline-offset-4"
-            >
-              Gaveta
-            </a>
-            {" "}— configurou lá, vale aqui também. Sem personalização, o app
-            usa a marca FiadoApp.
-          </p>
-        </CardContent>
-      </Card>
+      {/* ── MARCA DA LOJA (recurso nativo do Fiado) ───────────────── */}
+      <MarcaSection nomeInicial={marcaNome} logoUrlInicial={logoUrl} />
 
       {/* ── LIMITE PADRÃO ─────────────────────────────────────────── */}
       <Card>
