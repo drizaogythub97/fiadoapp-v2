@@ -65,16 +65,17 @@ export default async function InadimplentesPage() {
   return (
     <section className="flex flex-col gap-6">
       <header>
-        <h1 className="text-3xl font-bold tracking-tight">Inadimplentes</h1>
-        <p className="text-muted-foreground mt-1 text-lg">
+        <h1 className="minimal:max-sm:text-2xl text-3xl font-bold tracking-tight">
+          Inadimplentes
+        </h1>
+        <p className="minimal:max-sm:text-base text-muted-foreground mt-1 text-lg">
           Clientes com vendas vencidas e ainda em aberto.
         </p>
       </header>
 
       {error ? (
         <p role="alert" className="text-destructive text-base">
-          Não foi possível carregar os inadimplentes. Tente recarregar a
-          página.
+          Não foi possível carregar os inadimplentes. Tente recarregar a página.
         </p>
       ) : inadimplentes.length === 0 ? (
         <div className="bg-muted/40 flex flex-col items-center gap-3 rounded-xl p-10 text-center">
@@ -116,7 +117,7 @@ export default async function InadimplentesPage() {
                 return (
                   <li
                     key={cliente.id}
-                    className="ring-foreground/10 bg-card flex flex-col gap-3 rounded-xl p-4 ring-1"
+                    className="minimal:max-sm:p-3 ring-foreground/10 bg-card flex flex-col gap-3 rounded-xl p-4 ring-1"
                   >
                     {/* Mobile: coluna única alinhada à esquerda (o wrap
                         deixava o valor "solto" no meio). Desktop: valor à

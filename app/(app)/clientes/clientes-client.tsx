@@ -179,7 +179,7 @@ export function ClientesClient({
           {filtrados.map((c) => (
             <li
               key={c.id}
-              className="ring-foreground/10 bg-card flex flex-col gap-3 rounded-xl p-4 ring-1"
+              className="minimal:max-sm:p-3 ring-foreground/10 bg-card flex flex-col gap-3 rounded-xl p-4 ring-1"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-foreground text-xl font-semibold">

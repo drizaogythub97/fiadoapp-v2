@@ -4,12 +4,7 @@ import { ChartNoAxesColumn } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -195,8 +190,7 @@ export function AnalyticsClient({ vendas }: { vendas: VendaAnalytics[] }) {
                           }}
                         />
                         <span className="text-muted-foreground text-xs whitespace-nowrap">
-                          {c.qtdVendas}{" "}
-                          {c.qtdVendas === 1 ? "venda" : "vendas"}
+                          {c.qtdVendas} {c.qtdVendas === 1 ? "venda" : "vendas"}
                         </span>
                       </div>
                     </li>
@@ -212,7 +206,7 @@ export function AnalyticsClient({ vendas }: { vendas: VendaAnalytics[] }) {
               </CardHeader>
               <CardContent className="flex flex-col gap-5">
                 <p className="text-base">
-                  <span className="text-3xl font-bold tracking-tight">
+                  <span className="minimal:max-sm:text-2xl text-3xl font-bold tracking-tight">
                     {pctRecebido}%
                   </span>{" "}
                   <span className="text-muted-foreground">

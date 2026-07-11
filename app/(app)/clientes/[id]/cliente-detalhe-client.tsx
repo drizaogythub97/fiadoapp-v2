@@ -70,7 +70,10 @@ export function ClienteDetalheClient({
 
   const saldo = useMemo(
     () =>
-      vendasAbertas.reduce((soma, v) => soma + (v.valor_total - v.valor_pago), 0),
+      vendasAbertas.reduce(
+        (soma, v) => soma + (v.valor_total - v.valor_pago),
+        0,
+      ),
     [vendasAbertas],
   );
   const somaSelecionadas = useMemo(
@@ -199,7 +202,7 @@ export function ClienteDetalheClient({
       {/* ── CABEÇALHO ───────────────────────────────────────────────── */}
       <header className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h1 className="minimal:max-sm:text-2xl text-3xl font-bold tracking-tight">
             {nomeCompleto}
             {cliente.referencia ? (
               <span className="text-muted-foreground ml-2 text-xl font-normal">

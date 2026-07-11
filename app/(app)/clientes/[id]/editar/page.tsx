@@ -27,8 +27,10 @@ export default async function EditarClientePage({
   return (
     <section className="flex flex-col gap-6">
       <header>
-        <h1 className="text-3xl font-bold tracking-tight">Editar cliente</h1>
-        <p className="text-muted-foreground mt-1 text-lg">
+        <h1 className="minimal:max-sm:text-2xl text-3xl font-bold tracking-tight">
+          Editar cliente
+        </h1>
+        <p className="minimal:max-sm:text-base text-muted-foreground mt-1 text-lg">
           Atualize os dados de {cliente.nome as string}.
         </p>
       </header>

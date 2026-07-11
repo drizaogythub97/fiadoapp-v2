@@ -3,6 +3,9 @@
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
+/* Modo Minimalista do celular: ativado pelo data-ui-mode no <html> (cookie
+   fiado_ui_mode). Usar sempre combinado com max-sm: — o desktop não muda. */
+@custom-variant minimal (&:is([data-ui-mode="minimalista"] *));
 
 @theme inline {
   --font-sans: var(--font-inter), system-ui, Arial, sans-serif;

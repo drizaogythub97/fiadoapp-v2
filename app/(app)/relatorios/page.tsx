@@ -27,9 +27,7 @@ export default async function RelatoriosPage() {
     data: { user },
   } = await supabase.auth.getUser();
   const emitidoPor =
-    (user?.user_metadata?.full_name as string | undefined) ??
-    user?.email ??
-    "";
+    (user?.user_metadata?.full_name as string | undefined) ?? user?.email ?? "";
 
   // Todas as vendas com itens: os filtros/exports rodam no cliente sobre o
   // conjunto completo (uso real ~250 vendas; 1000 dá folga).
@@ -65,8 +63,10 @@ export default async function RelatoriosPage() {
   return (
     <section className="flex flex-col gap-6">
       <header className="print:hidden">
-        <h1 className="text-3xl font-bold tracking-tight">Relatórios</h1>
-        <p className="text-muted-foreground mt-1 text-lg">
+        <h1 className="minimal:max-sm:text-2xl text-3xl font-bold tracking-tight">
+          Relatórios
+        </h1>
+        <p className="minimal:max-sm:text-base text-muted-foreground mt-1 text-lg">
           Filtre, imprima e exporte suas vendas.
         </p>
       </header>
