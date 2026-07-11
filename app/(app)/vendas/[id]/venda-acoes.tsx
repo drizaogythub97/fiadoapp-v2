@@ -6,8 +6,19 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
 import { ConfirmDialog } from "@/components/app/confirm-dialog";
-import { FormatoDialog } from "@/components/app/formato-dialog";
+import {
+  FormatoEscolha,
+  type FormatoQuitacao,
+} from "@/components/app/formato-escolha";
+import {
+  isDesktop,
+  useEmissorComprovante,
+} from "@/components/receipt/emissor-comprovante";
 import { Button } from "@/components/ui/button";
+import {
+  urlDoComprovanteComFormato,
+  type PedidoComprovante,
+} from "@/lib/comprovante";
 import { formatBRL } from "@/lib/format";
 import type { VendaStatus } from "@/lib/types/fiado";
 
@@ -29,7 +40,10 @@ export function VendaAcoes({
   const [confirmando, setConfirmando] = useState<"quitar" | "excluir" | null>(
     null,
   );
-  const [comprovanteAberto, setComprovanteAberto] = useState(false);
+  // Formato escolhido dentro do diálogo de quitação (fluxo v1): no celular
+  // gera e compartilha direto; no desktop o toast abre o preview.
+  const [formato, setFormato] = useState<FormatoQuitacao>("pdf");
+  const { emitir, node: emissorNode } = useEmissorComprovante();
 
   function quitar() {
     startTransition(async () => {
@@ -42,14 +56,30 @@ export function VendaAcoes({
         toast.error(result.error);
         return;
       }
-      toast.success(`Venda quitada: ${formatBRL(result.totalPago)}.`, {
-        duration: 10_000,
-        action: {
-          label: "Ver comprovante",
-          // Abre o diálogo de formato (PDF/Imagem), como no v1.
-          onClick: () => setComprovanteAberto(true),
-        },
-      });
+
+      const pedido: PedidoComprovante | null =
+        formato !== "nenhum" ? { tipo: "venda", vendaId } : null;
+      if (pedido && !isDesktop()) {
+        toast.success(`Venda quitada: ${formatBRL(result.totalPago)}.`);
+        void emitir(pedido, formato === "imagem" ? "imagem" : "pdf");
+      } else {
+        toast.success(`Venda quitada: ${formatBRL(result.totalPago)}.`, {
+          duration: 10_000,
+          action: pedido
+            ? {
+                label: "Ver comprovante",
+                onClick: () =>
+                  window.open(
+                    urlDoComprovanteComFormato(
+                      pedido,
+                      formato === "imagem" ? "imagem" : "pdf",
+                    ),
+                    "_blank",
+                  ),
+              }
+            : undefined,
+        });
+      }
       setConfirmando(null);
       router.refresh();
     });
@@ -63,7 +93,9 @@ export function VendaAcoes({
         return;
       }
       toast.success("Venda excluída.");
-      router.push(result.clienteId ? `/clientes/${result.clienteId}` : "/vendas");
+      router.push(
+        result.clienteId ? `/clientes/${result.clienteId}` : "/vendas",
+      );
     });
   }
 
@@ -105,14 +137,15 @@ export function VendaAcoes({
         confirmLabel="Confirmar pagamento"
         onConfirm={quitar}
         pending={pending}
-      />
+      >
+        <FormatoEscolha
+          valor={formato}
+          onChange={setFormato}
+          disabled={pending}
+        />
+      </ConfirmDialog>
 
-      <FormatoDialog
-        open={comprovanteAberto}
-        onClose={() => setComprovanteAberto(false)}
-        titulo="Comprovante de venda"
-        url={`/comprovante/${vendaId}`}
-      />
+      {emissorNode}
 
       <ConfirmDialog
         open={confirmando === "excluir"}

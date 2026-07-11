@@ -4,25 +4,31 @@ import { Image as ImageIcon, Printer } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 import { Button } from "@/components/ui/button";
+import {
+  useEmissorComprovante,
+  type FormatoEmissao,
+} from "@/components/receipt/emissor-comprovante";
+import type { PedidoComprovante } from "@/lib/comprovante";
 
 /**
- * Escolha de formato do comprovante/espelho antes de abrir (fluxo do v1:
- * quitar venda / gerar espelho perguntam o formato). PDF abre a página de
- * impressão como sempre; Imagem abre com ?formato=imagem (sem auto-print,
- * botão Imagem em destaque).
+ * Escolha de formato do comprovante/espelho antes de gerar (fluxo do v1).
+ * Desktop: abre a rota /comprovante/* em nova aba (PDF auto-imprime).
+ * Celular: gera o documento na própria tela e abre o compartilhamento
+ * nativo do aparelho (useEmissorComprovante) — sem aba de preview.
  */
 export function FormatoDialog({
   open,
   onClose,
   titulo,
-  url,
+  pedido,
 }: {
   open: boolean;
   onClose: () => void;
   titulo: string;
-  url: string | null;
+  pedido: PedidoComprovante | null;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const { emitir, node } = useEmissorComprovante();
 
   useEffect(() => {
     if (!open) return;
@@ -43,71 +49,70 @@ export function FormatoDialog({
     };
   }, [open, onClose]);
 
-  if (!open || !url) return null;
-
-  function abrir(formato: "pdf" | "imagem") {
-    if (!url) return;
-    const destino =
-      formato === "imagem"
-        ? `${url}${url.includes("?") ? "&" : "?"}formato=imagem`
-        : url;
-    window.open(destino, "_blank", "noopener");
+  function abrir(formato: FormatoEmissao) {
+    if (!pedido) return;
     onClose();
+    void emitir(pedido, formato);
   }
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="formato-dialog-title"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-      onClick={onClose}
-    >
-      <div
-        ref={panelRef}
-        onClick={(e) => e.stopPropagation()}
-        className="bg-card text-card-foreground ring-foreground/10 flex w-full max-w-md flex-col gap-4 rounded-xl p-6 ring-1"
-      >
-        <div>
-          <h2
-            id="formato-dialog-title"
-            className="text-xl font-semibold tracking-tight"
-          >
-            {titulo}
-          </h2>
-          <p className="text-muted-foreground mt-2 text-base">
-            Em qual formato você quer gerar?
-          </p>
-        </div>
-        <div className="flex flex-col gap-2">
-          <Button
-            type="button"
-            onClick={() => abrir("pdf")}
-            data-formato-pdf
-            className="h-13 justify-start gap-3 px-5 text-base font-medium"
-          >
-            <Printer aria-hidden="true" className="size-5" />
-            PDF / Imprimir
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => abrir("imagem")}
-            className="h-13 justify-start gap-3 px-5 text-base font-medium"
-          >
-            <ImageIcon aria-hidden="true" className="size-5" />
-            Imagem (foto para enviar)
-          </Button>
-        </div>
-        <Button
-          type="button"
-          variant="outline"
+    <>
+      {open && pedido ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="formato-dialog-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
           onClick={onClose}
-          className="h-12 px-5 text-base sm:self-end"
         >
-          Cancelar
-        </Button>
-      </div>
-    </div>
+          <div
+            ref={panelRef}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-card text-card-foreground ring-foreground/10 flex w-full max-w-md flex-col gap-4 rounded-xl p-6 ring-1"
+          >
+            <div>
+              <h2
+                id="formato-dialog-title"
+                className="text-xl font-semibold tracking-tight"
+              >
+                {titulo}
+              </h2>
+              <p className="text-muted-foreground mt-2 text-base">
+                Em qual formato você quer gerar?
+              </p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Button
+                type="button"
+                onClick={() => abrir("pdf")}
+                data-formato-pdf
+                className="h-13 justify-start gap-3 px-5 text-base font-medium"
+              >
+                <Printer aria-hidden="true" className="size-5" />
+                PDF / Imprimir
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => abrir("imagem")}
+                className="h-13 justify-start gap-3 px-5 text-base font-medium"
+              >
+                <ImageIcon aria-hidden="true" className="size-5" />
+                Imagem (foto para enviar)
+              </Button>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="h-12 px-5 text-base sm:self-end"
+            >
+              Cancelar
+            </Button>
+          </div>
+        </div>
+      ) : null}
+      {node}
+    </>
   );
 }

@@ -1,7 +1,8 @@
-import { ArrowLeft, FileText, Plus } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { BotaoComprovante } from "@/components/app/botao-comprovante";
 import { VendaStatusBadge } from "@/components/app/venda-status-badge";
 import { buttonVariants } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
@@ -107,18 +108,11 @@ export default async function HistoricoClientePage({
                 Total <span>{formatBRL(v.valor_total)}</span>
               </p>
               <div className="flex flex-wrap gap-2">
-                <a
-                  href={`/comprovante/${v.id}`}
-                  target="_blank"
-                  rel="noopener"
-                  className={cn(
-                    buttonVariants({ variant: "outline" }),
-                    "h-11 px-4 text-base",
-                  )}
-                >
-                  <FileText aria-hidden="true" className="size-4" />
-                  Comprovante
-                </a>
+                <BotaoComprovante
+                  pedido={{ tipo: "venda", vendaId: v.id }}
+                  rotulo="Comprovante"
+                  className="h-11 px-4"
+                />
                 <Link
                   href={`/vendas/${v.id}`}
                   className={cn(

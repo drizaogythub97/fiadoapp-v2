@@ -1,13 +1,7 @@
 "use client";
 
-import {
-  Image as ImageIcon,
-  MessageCircle,
-  Printer,
-  Share2,
-  X,
-} from "lucide-react";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { Image as ImageIcon, MessageCircle, Printer, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -18,21 +12,21 @@ export type FormatoComprovante = "pdf" | "imagem";
 
 /**
  * Casca do comprovante (padrão do Gaveta, estendido): toolbar Imprimir /
- * Imagem (PNG hi-def do próprio papel) / Compartilhar (Web Share) /
- * WhatsApp / Fechar + o "papel". Com formato "pdf" dispara window.print()
- * ao abrir; com "imagem" não imprime e destaca o botão Imagem — a escolha
- * vem do diálogo de formato (fluxo do v1).
+ * Imagem (PNG hi-def do próprio papel) / WhatsApp / Fechar + o "papel".
+ * Com formato "pdf" dispara window.print() ao abrir; com "imagem" não
+ * imprime e destaca o botão Imagem — a escolha vem do diálogo de formato
+ * (fluxo do v1). No celular este preview nem costuma abrir (F5b: emissão
+ * direta na tela de origem); o botão Compartilhar de texto puro foi
+ * removido a pedido do dono — compartilhar = arquivo (botão Imagem).
  */
 export function ComprovanteShell({
   shareTitle,
-  shareText,
   whatsappUrl,
   nomeArquivo,
   formato,
   children,
 }: {
   shareTitle: string;
-  shareText: string;
   whatsappUrl: string | null;
   nomeArquivo: string;
   formato: FormatoComprovante;
@@ -41,20 +35,6 @@ export function ComprovanteShell({
   const paperRef = useRef<HTMLDivElement>(null);
   const [gerandoImagem, setGerandoImagem] = useState(false);
   const [erroImagem, setErroImagem] = useState(false);
-
-  // Web Share só existe no cliente (celulares/alguns desktops) — o snapshot
-  // de servidor devolve false, evitando divergência de hidratação.
-  const canShare = useSyncExternalStore(
-    () => () => {},
-    () => "share" in navigator,
-    () => false,
-  );
-
-  function handleShare() {
-    navigator.share?.({ title: shareTitle, text: shareText }).catch(() => {
-      // Usuário cancelou ou compartilhamento indisponível: silencioso.
-    });
-  }
 
   // No formato PDF, dispara a impressão automaticamente ao abrir, dando um
   // instante para fontes e a logo carregarem (senão saem em branco).
@@ -156,17 +136,6 @@ export function ComprovanteShell({
           <ImageIcon aria-hidden="true" className="size-5" />
           {gerandoImagem ? "Gerando…" : "Imagem"}
         </Button>
-        {canShare ? (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleShare}
-            className="h-14 gap-2 px-6 text-lg"
-          >
-            <Share2 aria-hidden="true" className="size-5" />
-            Compartilhar
-          </Button>
-        ) : null}
         {whatsappUrl ? (
           <a
             href={whatsappUrl}

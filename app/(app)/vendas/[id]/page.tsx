@@ -245,7 +245,7 @@ export default async function VendaDetalhePage({
             return (
               <div className="flex flex-col gap-2 sm:flex-row">
                 <BotaoComprovante
-                  url={`/comprovante/${venda.id}`}
+                  pedido={{ tipo: "venda", vendaId: venda.id }}
                   rotulo={rotulo}
                   className="h-13 px-6 font-medium"
                 />
