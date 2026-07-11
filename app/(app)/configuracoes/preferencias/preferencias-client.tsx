@@ -1,6 +1,6 @@
 "use client";
 
-import { Moon, Search, Sun } from "lucide-react";
+import { LayoutGrid, Moon, Search, Smartphone, Sun } from "lucide-react";
 import { useMemo, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -21,24 +21,26 @@ import { salvarLimiteCliente, salvarLimitePadrao } from "./actions";
 import { MarcaSection } from "./marca-section";
 
 type Tema = "light" | "dark";
+// Mesmo valor de lib/ui-mode/cookie.ts (não importável aqui: next/headers).
+type ModoUi = "simples" | "minimalista";
 
 const norm = (s: string) =>
-  s
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase();
+  s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
 /** Valor inicial dos inputs de limite: número → "500.00"-like sem R$. */
 const limiteParaInput = (v: number | null) => (v === null ? "" : String(v));
 
 export function PreferenciasClient({
   temaInicial,
+  modoUiInicial,
   limitePadraoInicial,
   clientes,
   marcaNome,
   logoUrl,
 }: {
   temaInicial: Tema;
+  /** null = nunca escolheu (o padrão efetivo é "simples"). */
+  modoUiInicial: ModoUi | null;
   limitePadraoInicial: number | null;
   clientes: ClienteComSaldo[];
   /** brand_name salvo (cru, "" quando não configurado) e URL da logo. */
@@ -46,6 +48,7 @@ export function PreferenciasClient({
   logoUrl: string | null;
 }) {
   const [tema, setTema] = useState<Tema>(temaInicial);
+  const [modoUi, setModoUi] = useState<ModoUi>(modoUiInicial ?? "simples");
   const [busca, setBusca] = useState("");
   const [salvandoPadrao, startPadrao] = useTransition();
   const limitePadraoRef = useRef<HTMLInputElement>(null);
@@ -57,6 +60,14 @@ export function PreferenciasClient({
     const root = document.documentElement;
     root.classList.toggle("dark", novo === "dark");
     root.style.colorScheme = novo;
+  }
+
+  function trocarModoUi(novo: ModoUi) {
+    setModoUi(novo);
+    // Escolha por aparelho, como o tema. O atributo aplica na hora (variant
+    // `minimal` do CSS); o cookie mantém no SSR das próximas navegações.
+    document.cookie = `fiado_ui_mode=${novo}; path=/; max-age=31536000; samesite=lax`;
+    document.documentElement.setAttribute("data-ui-mode", novo);
   }
 
   function submeterLimitePadrao(e: React.FormEvent) {
@@ -86,8 +97,7 @@ export function PreferenciasClient({
         <CardHeader>
           <CardTitle className="text-xl">Tema do aplicativo</CardTitle>
           <CardDescription className="text-base">
-            O FiadoApp é escuro por padrão. A escolha fica salva neste
-            aparelho.
+            O FiadoApp é escuro por padrão. A escolha fica salva neste aparelho.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -116,6 +126,46 @@ export function PreferenciasClient({
         </CardContent>
       </Card>
 
+      {/* ── MODO DE EXIBIÇÃO DO CELULAR ───────────────────────────── */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl">Modo de exibição no celular</CardTitle>
+          <CardDescription className="text-base">
+            Vale só neste aparelho e não muda nada no computador. Simples:
+            botões grandes e menu sempre visível. Minimalista: visual compacto
+            com barra de navegação embaixo.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div
+            className="flex flex-wrap gap-2"
+            role="group"
+            aria-label="Modo de exibição no celular"
+          >
+            <Button
+              type="button"
+              variant={modoUi === "simples" ? "default" : "outline"}
+              aria-pressed={modoUi === "simples"}
+              onClick={() => trocarModoUi("simples")}
+              className="h-12 px-5 text-base"
+            >
+              <LayoutGrid aria-hidden="true" className="size-5" />
+              Simples
+            </Button>
+            <Button
+              type="button"
+              variant={modoUi === "minimalista" ? "default" : "outline"}
+              aria-pressed={modoUi === "minimalista"}
+              onClick={() => trocarModoUi("minimalista")}
+              className="h-12 px-5 text-base"
+            >
+              <Smartphone aria-hidden="true" className="size-5" />
+              Minimalista
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* ── MARCA DA LOJA (recurso nativo do Fiado) ───────────────── */}
       <MarcaSection nomeInicial={marcaNome} logoUrlInicial={logoUrl} />
 
@@ -124,8 +174,8 @@ export function PreferenciasClient({
         <CardHeader>
           <CardTitle className="text-xl">Limite de crédito padrão</CardTitle>
           <CardDescription className="text-base">
-            Vale para clientes sem limite próprio. Ao passar do limite o app
-            só avisa — a venda nunca é bloqueada.
+            Vale para clientes sem limite próprio. Ao passar do limite o app só
+            avisa — a venda nunca é bloqueada.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -165,8 +215,8 @@ export function PreferenciasClient({
         <CardHeader>
           <CardTitle className="text-xl">Limite por cliente</CardTitle>
           <CardDescription className="text-base">
-            O limite individual sobrepõe o padrão. O valor salva sozinho ao
-            sair do campo.
+            O limite individual sobrepõe o padrão. O valor salva sozinho ao sair
+            do campo.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">

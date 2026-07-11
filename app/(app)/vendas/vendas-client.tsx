@@ -134,7 +134,7 @@ export function VendasClient({
               <li key={v.id}>
                 <Link
                   href={`/vendas/${v.id}`}
-                  className="ring-foreground/10 bg-card hover:ring-primary/40 flex flex-col gap-2 rounded-xl p-4 ring-1 transition-shadow"
+                  className="minimal:max-sm:p-3 ring-foreground/10 bg-card hover:ring-primary/40 flex flex-col gap-2 rounded-xl p-4 ring-1 transition-shadow"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="text-foreground text-lg font-semibold">

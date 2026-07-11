@@ -30,7 +30,7 @@ export function AppNav() {
   return (
     <nav
       aria-label="Navegação principal"
-      className="border-border bg-background border-t"
+      className="minimal:max-sm:hidden border-border bg-background border-t"
     >
       {/* Mobile: grid uniforme de 2 colunas (último item ocupa a linha
           inteira) — o flex-wrap gerava linhas assimétricas. Desktop: flex. */}

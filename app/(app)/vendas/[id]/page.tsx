@@ -63,7 +63,7 @@ export default async function VendaDetalhePage({
     <section className="flex max-w-2xl flex-col gap-6">
       <header className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h1 className="minimal:max-sm:text-2xl text-3xl font-bold tracking-tight">
             {cliente ? (
               <Link
                 href={`/clientes/${cliente.id}`}
@@ -164,9 +164,7 @@ export default async function VendaDetalhePage({
       </dl>
 
       <div className="flex flex-col gap-3">
-        <h2 className="text-xl font-semibold tracking-tight">
-          Itens da venda
-        </h2>
+        <h2 className="text-xl font-semibold tracking-tight">Itens da venda</h2>
         <ul className="flex flex-col gap-2">
           {itens.map((item) => (
             <li

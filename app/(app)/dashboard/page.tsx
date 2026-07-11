@@ -82,15 +82,17 @@ export default async function DashboardPage() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">
+        <h1 className="minimal:max-sm:text-2xl text-3xl font-bold tracking-tight">
           Olá{firstName ? `, ${firstName}` : ""}!
         </h1>
-        <p className="text-muted-foreground mt-1 text-lg">
+        <p className="minimal:max-sm:text-base text-muted-foreground mt-1 text-lg">
           Gerencie suas vendas e acompanhe seus recebimentos.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Minimalista (mobile): KPIs em grade 2×2 compacta, sem o texto de
+          apoio — mais informação na primeira dobra. */}
+      <div className="minimal:max-sm:grid-cols-2 minimal:max-sm:gap-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {kpis.map(({ label, valor, hint, href, destaque }) => (
           <Link
             key={label}
@@ -100,23 +102,27 @@ export default async function DashboardPage() {
           >
             <Card
               className={cn(
-                "hover:bg-muted/50 h-full transition-colors",
+                "minimal:max-sm:[--card-spacing:--spacing(3)] hover:bg-muted/50 h-full transition-colors",
                 destaque === "brand" && "border-primary/40",
                 destaque === "danger" && "border-destructive/40",
               )}
             >
               <CardHeader>
-                <CardDescription className="text-base">{label}</CardDescription>
+                <CardDescription className="minimal:max-sm:text-sm text-base">
+                  {label}
+                </CardDescription>
                 <CardTitle
                   className={cn(
-                    "text-3xl",
+                    "minimal:max-sm:text-2xl text-3xl",
                     destaque === "brand" && "text-primary",
                     destaque === "danger" && "text-destructive",
                   )}
                 >
                   {valor}
                 </CardTitle>
-                <CardDescription>{hint}</CardDescription>
+                <CardDescription className="minimal:max-sm:hidden">
+                  {hint}
+                </CardDescription>
               </CardHeader>
             </Card>
           </Link>
