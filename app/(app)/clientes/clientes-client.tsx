@@ -122,7 +122,7 @@ export function ClientesClient({
               variant={situacao === valor ? "default" : "outline"}
               aria-pressed={situacao === valor}
               onClick={() => setSituacao(valor)}
-              className="h-11 px-4 text-base"
+              className="h-11 flex-1 px-4 text-base sm:flex-initial"
             >
               {rotulo}
             </Button>
@@ -229,10 +229,15 @@ export function ClientesClient({
                 {c.telefone ? <span>{formatTelefone(c.telefone)}</span> : null}
               </div>
 
+              {/* Mobile: 3 botões em terços iguais (o wrap deixava 2+1
+                  assimétrico). Desktop: largura natural. */}
               <div className="flex flex-wrap gap-2">
                 <Link
                   href={`/clientes/${c.id}`}
-                  className={cn(buttonVariants(), "h-12 px-4 text-base")}
+                  className={cn(
+                    buttonVariants(),
+                    "h-12 flex-1 px-2 text-base sm:flex-initial sm:px-4",
+                  )}
                   aria-label={`Detalhar ${nomeCompleto(c)}`}
                 >
                   <Receipt aria-hidden="true" className="size-4" />
@@ -242,7 +247,7 @@ export function ClientesClient({
                   href={`/clientes/${c.id}/editar`}
                   className={cn(
                     buttonVariants({ variant: "outline" }),
-                    "h-12 px-4 text-base",
+                    "h-12 flex-1 px-2 text-base sm:flex-initial sm:px-4",
                   )}
                   aria-label={`Editar ${nomeCompleto(c)}`}
                 >
@@ -254,7 +259,7 @@ export function ClientesClient({
                   variant="destructive"
                   onClick={() => setExcluindo(c)}
                   aria-label={`Excluir ${nomeCompleto(c)}`}
-                  className="h-12 px-4 text-base"
+                  className="h-12 flex-1 px-2 text-base sm:flex-initial sm:px-4"
                 >
                   <Trash2 aria-hidden="true" className="size-4" />
                   Excluir
