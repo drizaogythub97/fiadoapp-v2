@@ -423,8 +423,11 @@ export function VendaForm({
               key={item.key}
               className="ring-foreground/10 bg-card rounded-xl p-4 ring-1"
             >
-              <div className="flex flex-wrap items-end gap-3">
-                <div className="flex w-24 flex-col gap-2">
+              {/* Mobile: grid com spans fixos (linha 1 = Qtd+Descrição,
+                  linha 2 = Valor+remover) — flex-wrap quebrava conforme a
+                  largura intrínseca dos inputs. Desktop: flex como antes. */}
+              <div className="grid grid-cols-6 items-end gap-3 sm:flex sm:flex-wrap">
+                <div className="col-span-2 flex flex-col gap-2 sm:w-24">
                   <Label htmlFor={`item-${item.key}-qtd`} className="text-base">
                     Qtd <span aria-hidden="true">*</span>
                   </Label>
@@ -450,7 +453,7 @@ export function VendaForm({
                   sugestoes={sugestoesDescricao}
                 />
 
-                <div className="flex w-36 flex-col gap-2">
+                <div className="col-span-4 flex min-w-0 flex-col gap-2 sm:w-36">
                   <Label
                     htmlFor={`item-${item.key}-valor`}
                     className="text-base"
@@ -484,7 +487,7 @@ export function VendaForm({
                     )
                   }
                   aria-label={`Remover produto ${idx + 1}`}
-                  className="text-destructive h-12 w-12 px-0"
+                  className="text-destructive col-span-2 h-12 w-12 justify-self-end px-0"
                 >
                   <X aria-hidden="true" className="size-5" />
                 </Button>
@@ -593,7 +596,7 @@ function CampoDescricao({
     aberto && resultados.length > 0 && resultados[0] !== value.trim();
 
   return (
-    <div className="relative flex min-w-48 flex-1 flex-col gap-2">
+    <div className="relative col-span-4 flex min-w-0 flex-col gap-2 sm:min-w-48 sm:flex-1">
       <Label htmlFor={id} className="text-base">
         Descrição <span aria-hidden="true">*</span>
       </Label>

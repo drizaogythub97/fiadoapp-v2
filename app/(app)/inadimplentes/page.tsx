@@ -118,9 +118,12 @@ export default async function InadimplentesPage() {
                     key={cliente.id}
                     className="ring-foreground/10 bg-card flex flex-col gap-3 rounded-xl p-4 ring-1"
                   >
+                    {/* Mobile: coluna única alinhada à esquerda (o wrap
+                        deixava o valor "solto" no meio). Desktop: valor à
+                        direita, como antes. */}
                     <Link
                       href={`/clientes/${cliente.id}`}
-                      className="flex flex-wrap items-center justify-between gap-2"
+                      className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between"
                     >
                       <span className="flex flex-col gap-0.5">
                         <span className="text-foreground hover:text-primary text-xl font-semibold underline-offset-4 hover:underline">
@@ -140,7 +143,7 @@ export default async function InadimplentesPage() {
                             : ""}
                         </span>
                       </span>
-                      <span className="flex flex-col items-end gap-1">
+                      <span className="flex flex-wrap items-center gap-2 sm:flex-col sm:items-end sm:gap-1">
                         <span className="text-destructive text-lg font-bold">
                           {formatBRL(totalDevido)}
                         </span>
