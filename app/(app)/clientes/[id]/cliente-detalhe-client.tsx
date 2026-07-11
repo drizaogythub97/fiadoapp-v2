@@ -19,8 +19,15 @@ import { toast } from "sonner";
 
 import { BotaoComprovante } from "@/components/app/botao-comprovante";
 import { ConfirmDialog } from "@/components/app/confirm-dialog";
-import { FormatoDialog } from "@/components/app/formato-dialog";
+import {
+  FormatoEscolha,
+  type FormatoQuitacao,
+} from "@/components/app/formato-escolha";
 import { VendaStatusBadge } from "@/components/app/venda-status-badge";
+import {
+  isDesktop,
+  useEmissorComprovante,
+} from "@/components/receipt/emissor-comprovante";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,6 +38,10 @@ import {
   maskBRL,
   parseBRL,
 } from "@/lib/format";
+import {
+  urlDoComprovanteComFormato,
+  type PedidoComprovante,
+} from "@/lib/comprovante";
 import type { ClienteResumo, Venda } from "@/lib/types/fiado";
 import { cn } from "@/lib/utils";
 import { diasDeAtraso, linkCobrancaWhatsApp } from "@/lib/whatsapp";
@@ -62,7 +73,12 @@ export function ClienteDetalheClient({
   const [dialogo, setDialogo] = useState<Dialogo>(null);
   const [selecionadas, setSelecionadas] = useState<Set<string>>(new Set());
   const [valorParcial, setValorParcial] = useState("");
-  const [comprovanteUrl, setComprovanteUrl] = useState<string | null>(null);
+  // Formato do comprovante escolhido DENTRO do diálogo de quitação (fluxo
+  // v1 pedido pelo dono): no celular gera e compartilha direto; no desktop
+  // o toast abre o preview já no formato escolhido.
+  const [formatoQuitacao, setFormatoQuitacao] =
+    useState<FormatoQuitacao>("pdf");
+  const { emitir, node: emissorNode } = useEmissorComprovante();
 
   const nomeCompleto = cliente.sobrenome
     ? `${cliente.nome} ${cliente.sobrenome}`
@@ -111,19 +127,36 @@ export function ClienteDetalheClient({
   }
 
   function aposQuitar(totalPago: number, pagoEm: string | null) {
-    toast.success(`Pagamento registrado: ${formatBRL(totalPago)}.`, {
-      duration: 10_000,
-      action: pagoEm
-        ? {
-            label: "Ver comprovante",
-            // Abre o diálogo de formato (PDF/Imagem), como no v1.
-            onClick: () =>
-              setComprovanteUrl(
-                `/comprovante/quitacao/${cliente.id}?em=${encodeURIComponent(pagoEm)}`,
-              ),
-          }
-        : undefined,
-    });
+    const pedido: PedidoComprovante | null =
+      pagoEm && formatoQuitacao !== "nenhum"
+        ? { tipo: "quitacao", clienteId: cliente.id, em: pagoEm }
+        : null;
+
+    if (pedido && !isDesktop()) {
+      // Celular: gera o documento e abre o compartilhamento nativo direto,
+      // sem aba de preview (pedido do dono, 2026-07-11).
+      toast.success(`Pagamento registrado: ${formatBRL(totalPago)}.`);
+      void emitir(pedido, formatoQuitacao === "imagem" ? "imagem" : "pdf");
+    } else {
+      toast.success(`Pagamento registrado: ${formatBRL(totalPago)}.`, {
+        duration: 10_000,
+        action: pedido
+          ? {
+              label: "Ver comprovante",
+              // Desktop: abre o preview já no formato escolhido no diálogo.
+              // (Precisa do clique: window.open fora de gesto é bloqueado.)
+              onClick: () =>
+                window.open(
+                  urlDoComprovanteComFormato(
+                    pedido,
+                    formatoQuitacao === "imagem" ? "imagem" : "pdf",
+                  ),
+                  "_blank",
+                ),
+            }
+          : undefined,
+      });
+    }
     setDialogo(null);
     setSelecionadas(new Set());
     setValorParcial("");
@@ -389,7 +422,7 @@ export function ClienteDetalheClient({
         </Link>
         {vendasAbertas.length > 0 ? (
           <BotaoComprovante
-            url={`/comprovante/cliente/${cliente.id}`}
+            pedido={{ tipo: "espelho-cliente", clienteId: cliente.id }}
             rotulo="Espelho das vendas"
           />
         ) : null}
@@ -476,7 +509,13 @@ export function ClienteDetalheClient({
         confirmLabel="Confirmar pagamento"
         onConfirm={quitarTodas}
         pending={pending}
-      />
+      >
+        <FormatoEscolha
+          valor={formatoQuitacao}
+          onChange={setFormatoQuitacao}
+          disabled={pending}
+        />
+      </ConfirmDialog>
 
       <ConfirmDialog
         open={dialogo === "selecionadas"}
@@ -504,7 +543,13 @@ export function ClienteDetalheClient({
         confirmLabel="Confirmar pagamento"
         onConfirm={quitarSelecionadas}
         pending={pending}
-      />
+      >
+        <FormatoEscolha
+          valor={formatoQuitacao}
+          onChange={setFormatoQuitacao}
+          disabled={pending}
+        />
+      </ConfirmDialog>
 
       <ConfirmDialog
         open={dialogo === "parcial"}
@@ -522,29 +567,31 @@ export function ClienteDetalheClient({
         onConfirm={quitarParcial}
         pending={pending}
       >
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="valor-parcial" className="text-base">
-            Valor recebido
-          </Label>
-          <Input
-            id="valor-parcial"
-            inputMode="decimal"
-            autoComplete="off"
-            placeholder="R$ 0,00"
-            value={valorParcial}
-            onChange={(e) => setValorParcial(maskBRL(e.target.value))}
-            onFocus={(e) => e.target.select()}
-            className="h-12 text-base"
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="valor-parcial" className="text-base">
+              Valor recebido
+            </Label>
+            <Input
+              id="valor-parcial"
+              inputMode="decimal"
+              autoComplete="off"
+              placeholder="R$ 0,00"
+              value={valorParcial}
+              onChange={(e) => setValorParcial(maskBRL(e.target.value))}
+              onFocus={(e) => e.target.select()}
+              className="h-12 text-base"
+            />
+          </div>
+          <FormatoEscolha
+            valor={formatoQuitacao}
+            onChange={setFormatoQuitacao}
+            disabled={pending}
           />
         </div>
       </ConfirmDialog>
 
-      <FormatoDialog
-        open={comprovanteUrl !== null}
-        onClose={() => setComprovanteUrl(null)}
-        titulo="Comprovante de quitação"
-        url={comprovanteUrl}
-      />
+      {emissorNode}
 
       <ConfirmDialog
         open={dialogo === "excluir"}
