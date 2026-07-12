@@ -5,16 +5,17 @@ import { useState } from "react";
 
 import { FormatoDialog } from "@/components/app/formato-dialog";
 import { Button } from "@/components/ui/button";
+import type { PedidoComprovante } from "@/lib/comprovante";
 import { cn } from "@/lib/utils";
 
-/** Botão que abre comprovante/espelho perguntando o formato (fluxo do v1). */
+/** Botão que gera comprovante/espelho perguntando o formato (fluxo do v1). */
 export function BotaoComprovante({
-  url,
+  pedido,
   rotulo,
   titulo,
   className,
 }: {
-  url: string;
+  pedido: PedidoComprovante;
   rotulo: string;
   /** Título do diálogo; por padrão usa o próprio rótulo. */
   titulo?: string;
@@ -27,7 +28,13 @@ export function BotaoComprovante({
         type="button"
         variant="outline"
         onClick={() => setAberto(true)}
-        className={cn("h-12 px-5 text-base", className)}
+        className={cn(
+          // As classes minimal ficam depois do override: no Minimalista
+          // (mobile) este botão acompanha os irmãos secundários (h-10).
+          "h-12 px-5 text-base",
+          className,
+          "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm",
+        )}
       >
         <FileText aria-hidden="true" className="size-4" />
         {rotulo}
@@ -36,7 +43,7 @@ export function BotaoComprovante({
         open={aberto}
         onClose={() => setAberto(false)}
         titulo={titulo ?? rotulo}
-        url={url}
+        pedido={pedido}
       />
     </>
   );

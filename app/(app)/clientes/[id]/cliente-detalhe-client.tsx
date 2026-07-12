@@ -19,8 +19,15 @@ import { toast } from "sonner";
 
 import { BotaoComprovante } from "@/components/app/botao-comprovante";
 import { ConfirmDialog } from "@/components/app/confirm-dialog";
-import { FormatoDialog } from "@/components/app/formato-dialog";
+import {
+  FormatoEscolha,
+  type FormatoQuitacao,
+} from "@/components/app/formato-escolha";
 import { VendaStatusBadge } from "@/components/app/venda-status-badge";
+import {
+  isDesktop,
+  useEmissorComprovante,
+} from "@/components/receipt/emissor-comprovante";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,6 +38,10 @@ import {
   maskBRL,
   parseBRL,
 } from "@/lib/format";
+import {
+  urlDoComprovanteComFormato,
+  type PedidoComprovante,
+} from "@/lib/comprovante";
 import type { ClienteResumo, Venda } from "@/lib/types/fiado";
 import { cn } from "@/lib/utils";
 import { diasDeAtraso, linkCobrancaWhatsApp } from "@/lib/whatsapp";
@@ -62,7 +73,12 @@ export function ClienteDetalheClient({
   const [dialogo, setDialogo] = useState<Dialogo>(null);
   const [selecionadas, setSelecionadas] = useState<Set<string>>(new Set());
   const [valorParcial, setValorParcial] = useState("");
-  const [comprovanteUrl, setComprovanteUrl] = useState<string | null>(null);
+  // Formato do comprovante escolhido DENTRO do diálogo de quitação (fluxo
+  // v1 pedido pelo dono): no celular gera e compartilha direto; no desktop
+  // o toast abre o preview já no formato escolhido.
+  const [formatoQuitacao, setFormatoQuitacao] =
+    useState<FormatoQuitacao>("pdf");
+  const { emitir, node: emissorNode } = useEmissorComprovante();
 
   const nomeCompleto = cliente.sobrenome
     ? `${cliente.nome} ${cliente.sobrenome}`
@@ -70,7 +86,10 @@ export function ClienteDetalheClient({
 
   const saldo = useMemo(
     () =>
-      vendasAbertas.reduce((soma, v) => soma + (v.valor_total - v.valor_pago), 0),
+      vendasAbertas.reduce(
+        (soma, v) => soma + (v.valor_total - v.valor_pago),
+        0,
+      ),
     [vendasAbertas],
   );
   const somaSelecionadas = useMemo(
@@ -108,19 +127,36 @@ export function ClienteDetalheClient({
   }
 
   function aposQuitar(totalPago: number, pagoEm: string | null) {
-    toast.success(`Pagamento registrado: ${formatBRL(totalPago)}.`, {
-      duration: 10_000,
-      action: pagoEm
-        ? {
-            label: "Ver comprovante",
-            // Abre o diálogo de formato (PDF/Imagem), como no v1.
-            onClick: () =>
-              setComprovanteUrl(
-                `/comprovante/quitacao/${cliente.id}?em=${encodeURIComponent(pagoEm)}`,
-              ),
-          }
-        : undefined,
-    });
+    const pedido: PedidoComprovante | null =
+      pagoEm && formatoQuitacao !== "nenhum"
+        ? { tipo: "quitacao", clienteId: cliente.id, em: pagoEm }
+        : null;
+
+    if (pedido && !isDesktop()) {
+      // Celular: gera o documento e abre o compartilhamento nativo direto,
+      // sem aba de preview (pedido do dono, 2026-07-11).
+      toast.success(`Pagamento registrado: ${formatBRL(totalPago)}.`);
+      void emitir(pedido, formatoQuitacao === "imagem" ? "imagem" : "pdf");
+    } else {
+      toast.success(`Pagamento registrado: ${formatBRL(totalPago)}.`, {
+        duration: 10_000,
+        action: pedido
+          ? {
+              label: "Ver comprovante",
+              // Desktop: abre o preview já no formato escolhido no diálogo.
+              // (Precisa do clique: window.open fora de gesto é bloqueado.)
+              onClick: () =>
+                window.open(
+                  urlDoComprovanteComFormato(
+                    pedido,
+                    formatoQuitacao === "imagem" ? "imagem" : "pdf",
+                  ),
+                  "_blank",
+                ),
+            }
+          : undefined,
+      });
+    }
     setDialogo(null);
     setSelecionadas(new Set());
     setValorParcial("");
@@ -195,11 +231,11 @@ export function ClienteDetalheClient({
   }
 
   return (
-    <section className="flex max-w-2xl flex-col gap-6">
+    <section className="minimal:max-sm:gap-4 flex max-w-2xl flex-col gap-6">
       {/* ── CABEÇALHO ───────────────────────────────────────────────── */}
       <header className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h1 className="minimal:max-sm:text-xl text-3xl font-bold tracking-tight">
             {nomeCompleto}
             {cliente.referencia ? (
               <span className="text-muted-foreground ml-2 text-xl font-normal">
@@ -243,12 +279,12 @@ export function ClienteDetalheClient({
 
       {/* ── VENDAS EM ABERTO ────────────────────────────────────────── */}
       <div className="flex flex-col gap-3">
-        <h2 className="text-xl font-semibold tracking-tight">
+        <h2 className="minimal:max-sm:text-lg text-xl font-semibold tracking-tight">
           Vendas em aberto
         </h2>
 
         {vendasAbertas.length === 0 ? (
-          <p className="text-muted-foreground text-base">
+          <p className="minimal:max-sm:text-sm text-muted-foreground text-base">
             Este cliente não tem vendas em aberto.
             {totalPagas > 0
               ? ` Já quitou ${totalPagas === 1 ? "1 venda" : `${totalPagas} vendas`}.`
@@ -313,7 +349,7 @@ export function ClienteDetalheClient({
                       href={`/vendas/${v.id}`}
                       className={cn(
                         buttonVariants({ variant: "outline" }),
-                        "h-11 px-4 text-base",
+                        "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-11 px-4 text-base",
                       )}
                       aria-label={`Detalhar venda de ${formatDataBR(v.data_compra)}`}
                     >
@@ -334,7 +370,7 @@ export function ClienteDetalheClient({
               <Button
                 type="button"
                 onClick={() => setDialogo("todas")}
-                className="h-13 text-base font-medium"
+                className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-13 text-base font-medium"
               >
                 <CheckCircle2 aria-hidden="true" className="size-5" />
                 Quitar todas
@@ -344,7 +380,7 @@ export function ClienteDetalheClient({
                 variant="outline"
                 disabled={selecionadas.size === 0}
                 onClick={() => setDialogo("selecionadas")}
-                className="h-13 text-base font-medium"
+                className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-13 text-base font-medium"
               >
                 <CheckSquare aria-hidden="true" className="size-5" />
                 Quitar selecionadas
@@ -353,7 +389,7 @@ export function ClienteDetalheClient({
                 type="button"
                 variant="outline"
                 onClick={() => setDialogo("parcial")}
-                className="h-13 text-base font-medium"
+                className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-13 text-base font-medium"
               >
                 <Wallet aria-hidden="true" className="size-5" />
                 Quitar um valor
@@ -379,14 +415,14 @@ export function ClienteDetalheClient({
       <div className="flex flex-wrap gap-2">
         <Link
           href={`/vendas/nova?cliente=${cliente.id}`}
-          className={cn(buttonVariants(), "h-12 px-5 text-base")}
+          className={cn(buttonVariants(), "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base")}
         >
           <Plus aria-hidden="true" className="size-4" />
           Nova venda
         </Link>
         {vendasAbertas.length > 0 ? (
           <BotaoComprovante
-            url={`/comprovante/cliente/${cliente.id}`}
+            pedido={{ tipo: "espelho-cliente", clienteId: cliente.id }}
             rotulo="Espelho das vendas"
           />
         ) : null}
@@ -394,7 +430,7 @@ export function ClienteDetalheClient({
           href={`/clientes/${cliente.id}/historico`}
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "h-12 px-5 text-base",
+            "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base",
           )}
         >
           <History aria-hidden="true" className="size-4" />
@@ -404,7 +440,7 @@ export function ClienteDetalheClient({
           href={`/clientes/${cliente.id}/editar`}
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "h-12 px-5 text-base",
+            "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base",
           )}
         >
           <Pencil aria-hidden="true" className="size-4" />
@@ -417,7 +453,7 @@ export function ClienteDetalheClient({
             rel="noopener noreferrer"
             className={cn(
               buttonVariants({ variant: "outline" }),
-              "h-12 px-5 text-base",
+              "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base",
             )}
           >
             <MessageCircle aria-hidden="true" className="size-4" />
@@ -428,7 +464,7 @@ export function ClienteDetalheClient({
           type="button"
           variant="destructive"
           onClick={() => setDialogo("excluir")}
-          className="h-12 px-5 text-base"
+          className="minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base"
         >
           <Trash2 aria-hidden="true" className="size-4" />
           Excluir cliente
@@ -439,7 +475,7 @@ export function ClienteDetalheClient({
         href="/clientes"
         className={cn(
           buttonVariants({ variant: "outline" }),
-          "h-12 self-start px-5 text-base",
+          "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 self-start px-5 text-base",
         )}
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
@@ -473,7 +509,13 @@ export function ClienteDetalheClient({
         confirmLabel="Confirmar pagamento"
         onConfirm={quitarTodas}
         pending={pending}
-      />
+      >
+        <FormatoEscolha
+          valor={formatoQuitacao}
+          onChange={setFormatoQuitacao}
+          disabled={pending}
+        />
+      </ConfirmDialog>
 
       <ConfirmDialog
         open={dialogo === "selecionadas"}
@@ -501,7 +543,13 @@ export function ClienteDetalheClient({
         confirmLabel="Confirmar pagamento"
         onConfirm={quitarSelecionadas}
         pending={pending}
-      />
+      >
+        <FormatoEscolha
+          valor={formatoQuitacao}
+          onChange={setFormatoQuitacao}
+          disabled={pending}
+        />
+      </ConfirmDialog>
 
       <ConfirmDialog
         open={dialogo === "parcial"}
@@ -519,29 +567,31 @@ export function ClienteDetalheClient({
         onConfirm={quitarParcial}
         pending={pending}
       >
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="valor-parcial" className="text-base">
-            Valor recebido
-          </Label>
-          <Input
-            id="valor-parcial"
-            inputMode="decimal"
-            autoComplete="off"
-            placeholder="R$ 0,00"
-            value={valorParcial}
-            onChange={(e) => setValorParcial(maskBRL(e.target.value))}
-            onFocus={(e) => e.target.select()}
-            className="h-12 text-base"
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="valor-parcial" className="text-base">
+              Valor recebido
+            </Label>
+            <Input
+              id="valor-parcial"
+              inputMode="decimal"
+              autoComplete="off"
+              placeholder="R$ 0,00"
+              value={valorParcial}
+              onChange={(e) => setValorParcial(maskBRL(e.target.value))}
+              onFocus={(e) => e.target.select()}
+              className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base"
+            />
+          </div>
+          <FormatoEscolha
+            valor={formatoQuitacao}
+            onChange={setFormatoQuitacao}
+            disabled={pending}
           />
         </div>
       </ConfirmDialog>
 
-      <FormatoDialog
-        open={comprovanteUrl !== null}
-        onClose={() => setComprovanteUrl(null)}
-        titulo="Comprovante de quitação"
-        url={comprovanteUrl}
-      />
+      {emissorNode}
 
       <ConfirmDialog
         open={dialogo === "excluir"}

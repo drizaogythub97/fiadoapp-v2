@@ -1,6 +1,6 @@
 "use client";
 
-import { Moon, Search, Sun } from "lucide-react";
+import { LayoutGrid, Moon, Search, Smartphone, Sun, X } from "lucide-react";
 import { useMemo, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -21,24 +21,26 @@ import { salvarLimiteCliente, salvarLimitePadrao } from "./actions";
 import { MarcaSection } from "./marca-section";
 
 type Tema = "light" | "dark";
+// Mesmo valor de lib/ui-mode/cookie.ts (não importável aqui: next/headers).
+type ModoUi = "simples" | "minimalista";
 
 const norm = (s: string) =>
-  s
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase();
+  s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
 /** Valor inicial dos inputs de limite: número → "500.00"-like sem R$. */
 const limiteParaInput = (v: number | null) => (v === null ? "" : String(v));
 
 export function PreferenciasClient({
   temaInicial,
+  modoUiInicial,
   limitePadraoInicial,
   clientes,
   marcaNome,
   logoUrl,
 }: {
   temaInicial: Tema;
+  /** null = nunca escolheu (o padrão efetivo é "simples"). */
+  modoUiInicial: ModoUi | null;
   limitePadraoInicial: number | null;
   clientes: ClienteComSaldo[];
   /** brand_name salvo (cru, "" quando não configurado) e URL da logo. */
@@ -46,7 +48,11 @@ export function PreferenciasClient({
   logoUrl: string | null;
 }) {
   const [tema, setTema] = useState<Tema>(temaInicial);
+  const [modoUi, setModoUi] = useState<ModoUi>(modoUiInicial ?? "simples");
   const [busca, setBusca] = useState("");
+  const [clienteLimite, setClienteLimite] = useState<ClienteComSaldo | null>(
+    null,
+  );
   const [salvandoPadrao, startPadrao] = useTransition();
   const limitePadraoRef = useRef<HTMLInputElement>(null);
 
@@ -57,6 +63,14 @@ export function PreferenciasClient({
     const root = document.documentElement;
     root.classList.toggle("dark", novo === "dark");
     root.style.colorScheme = novo;
+  }
+
+  function trocarModoUi(novo: ModoUi) {
+    setModoUi(novo);
+    // Escolha por aparelho, como o tema. O atributo aplica na hora (variant
+    // `minimal` do CSS); o cookie mantém no SSR das próximas navegações.
+    document.cookie = `fiado_ui_mode=${novo}; path=/; max-age=31536000; samesite=lax`;
+    document.documentElement.setAttribute("data-ui-mode", novo);
   }
 
   function submeterLimitePadrao(e: React.FormEvent) {
@@ -83,21 +97,30 @@ export function PreferenciasClient({
     <div className="flex flex-col gap-5">
       {/* ── TEMA ──────────────────────────────────────────────────── */}
       <Card>
-        <CardHeader>
-          <CardTitle className="text-xl">Tema do aplicativo</CardTitle>
-          <CardDescription className="text-base">
-            O FiadoApp é escuro por padrão. A escolha fica salva neste
-            aparelho.
+        {/* Minimalista: cabeçalho com divisor — separa a explicação do
+            controle (a tela parecia um bloco só, tudo "grudado"). */}
+        <CardHeader className="minimal:max-sm:border-b minimal:max-sm:border-border/60 minimal:max-sm:pb-3">
+          <CardTitle className="minimal:max-sm:text-base text-xl">
+            Tema do aplicativo
+          </CardTitle>
+          <CardDescription className="minimal:max-sm:text-sm text-base">
+            O FiadoApp é escuro por padrão. A escolha fica salva neste aparelho.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-2" role="group" aria-label="Tema">
+          {/* Minimalista: controle segmentado em metades — escolha de 2
+              opções vira uma linha organizada de ponta a ponta. */}
+          <div
+            className="minimal:max-sm:grid minimal:max-sm:grid-cols-2 flex flex-wrap gap-2"
+            role="group"
+            aria-label="Tema"
+          >
             <Button
               type="button"
               variant={tema === "dark" ? "default" : "outline"}
               aria-pressed={tema === "dark"}
               onClick={() => trocarTema("dark")}
-              className="h-12 px-5 text-base"
+              className="minimal:max-sm:h-11 minimal:max-sm:px-2 minimal:max-sm:text-sm h-12 px-5 text-base"
             >
               <Moon aria-hidden="true" className="size-5" />
               Escuro
@@ -107,10 +130,52 @@ export function PreferenciasClient({
               variant={tema === "light" ? "default" : "outline"}
               aria-pressed={tema === "light"}
               onClick={() => trocarTema("light")}
-              className="h-12 px-5 text-base"
+              className="minimal:max-sm:h-11 minimal:max-sm:px-2 minimal:max-sm:text-sm h-12 px-5 text-base"
             >
               <Sun aria-hidden="true" className="size-5" />
               Claro
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ── MODO DE EXIBIÇÃO DO CELULAR ───────────────────────────── */}
+      <Card>
+        <CardHeader className="minimal:max-sm:border-b minimal:max-sm:border-border/60 minimal:max-sm:pb-3">
+          <CardTitle className="minimal:max-sm:text-base text-xl">
+            Modo de exibição no celular
+          </CardTitle>
+          <CardDescription className="minimal:max-sm:text-sm text-base">
+            Vale só neste aparelho e não muda nada no computador. Simples:
+            botões grandes e menu sempre visível. Minimalista: visual compacto
+            com barra de navegação embaixo.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div
+            className="minimal:max-sm:grid minimal:max-sm:grid-cols-2 flex flex-wrap gap-2"
+            role="group"
+            aria-label="Modo de exibição no celular"
+          >
+            <Button
+              type="button"
+              variant={modoUi === "simples" ? "default" : "outline"}
+              aria-pressed={modoUi === "simples"}
+              onClick={() => trocarModoUi("simples")}
+              className="minimal:max-sm:h-11 minimal:max-sm:px-2 minimal:max-sm:text-sm h-12 px-5 text-base"
+            >
+              <LayoutGrid aria-hidden="true" className="size-5" />
+              Simples
+            </Button>
+            <Button
+              type="button"
+              variant={modoUi === "minimalista" ? "default" : "outline"}
+              aria-pressed={modoUi === "minimalista"}
+              onClick={() => trocarModoUi("minimalista")}
+              className="minimal:max-sm:h-11 minimal:max-sm:px-2 minimal:max-sm:text-sm h-12 px-5 text-base"
+            >
+              <Smartphone aria-hidden="true" className="size-5" />
+              Minimalista
             </Button>
           </div>
         </CardContent>
@@ -121,11 +186,13 @@ export function PreferenciasClient({
 
       {/* ── LIMITE PADRÃO ─────────────────────────────────────────── */}
       <Card>
-        <CardHeader>
-          <CardTitle className="text-xl">Limite de crédito padrão</CardTitle>
-          <CardDescription className="text-base">
-            Vale para clientes sem limite próprio. Ao passar do limite o app
-            só avisa — a venda nunca é bloqueada.
+        <CardHeader className="minimal:max-sm:border-b minimal:max-sm:border-border/60 minimal:max-sm:pb-3">
+          <CardTitle className="minimal:max-sm:text-base text-xl">
+            Limite de crédito padrão
+          </CardTitle>
+          <CardDescription className="minimal:max-sm:text-sm text-base">
+            Vale para clientes sem limite próprio. Ao passar do limite o app só
+            avisa — a venda nunca é bloqueada.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -133,8 +200,8 @@ export function PreferenciasClient({
             onSubmit={submeterLimitePadrao}
             className="flex flex-col gap-3 sm:flex-row sm:items-end"
           >
-            <div className="flex flex-1 flex-col gap-2 sm:max-w-xs">
-              <Label htmlFor="limite-padrao" className="text-base">
+            <div className="minimal:max-sm:gap-1.5 flex flex-1 flex-col gap-2 sm:max-w-xs">
+              <Label htmlFor="limite-padrao" className="minimal:max-sm:text-sm text-base">
                 Limite padrão (R$)
               </Label>
               <Input
@@ -146,13 +213,13 @@ export function PreferenciasClient({
                 inputMode="decimal"
                 placeholder="Vazio = sem limite"
                 defaultValue={limiteParaInput(limitePadraoInicial)}
-                className="h-12 text-base"
+                className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base"
               />
             </div>
             <Button
               type="submit"
               disabled={salvandoPadrao}
-              className="h-12 px-6 text-base font-medium"
+              className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 px-6 text-base font-medium"
             >
               {salvandoPadrao ? "Salvando…" : "Salvar"}
             </Button>
@@ -162,20 +229,24 @@ export function PreferenciasClient({
 
       {/* ── LIMITE POR CLIENTE ────────────────────────────────────── */}
       <Card>
-        <CardHeader>
-          <CardTitle className="text-xl">Limite por cliente</CardTitle>
-          <CardDescription className="text-base">
-            O limite individual sobrepõe o padrão. O valor salva sozinho ao
-            sair do campo.
+        <CardHeader className="minimal:max-sm:border-b minimal:max-sm:border-border/60 minimal:max-sm:pb-3">
+          <CardTitle className="minimal:max-sm:text-base text-xl">
+            Limite por cliente
+          </CardTitle>
+          <CardDescription className="minimal:max-sm:text-sm text-base">
+            O limite individual sobrepõe o padrão. O valor salva sozinho ao sair
+            do campo.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           {clientes.length === 0 ? (
-            <p className="text-muted-foreground text-base">
+            <p className="minimal:max-sm:text-sm text-muted-foreground text-base">
               Nenhum cliente cadastrado ainda.
             </p>
           ) : (
             <>
+              {/* Busca com dropdown (pedido do dono, 2026-07-11): nada de
+                  listar todos os clientes na página. */}
               <div className="relative sm:max-w-sm">
                 <Search
                   aria-hidden="true"
@@ -183,24 +254,67 @@ export function PreferenciasClient({
                 />
                 <Input
                   type="search"
+                  role="combobox"
+                  aria-expanded={busca.trim().length > 0}
+                  aria-controls="limite-busca-resultados"
+                  autoComplete="off"
                   value={busca}
                   onChange={(e) => setBusca(e.target.value)}
-                  placeholder="Filtrar cliente pelo nome…"
-                  aria-label="Filtrar cliente pelo nome"
-                  className="h-12 pl-10 text-base"
+                  placeholder="Buscar cliente pelo nome…"
+                  aria-label="Buscar cliente pelo nome"
+                  className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 pl-10 text-base"
                 />
+                {busca.trim().length > 0 ? (
+                  <ul
+                    id="limite-busca-resultados"
+                    className="border-border bg-card absolute z-10 mt-2 w-full overflow-hidden rounded-xl border shadow-lg"
+                  >
+                    {filtrados.length === 0 ? (
+                      <li className="text-muted-foreground px-4 py-3 text-base">
+                        Nenhum cliente encontrado.
+                      </li>
+                    ) : (
+                      filtrados.slice(0, 6).map((c) => (
+                        <li key={c.id}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setClienteLimite(c);
+                              setBusca("");
+                            }}
+                            className="minimal:max-sm:h-11 minimal:max-sm:text-sm hover:bg-muted focus-visible:bg-muted flex h-12 w-full items-center gap-2 px-4 text-left text-base outline-none"
+                          >
+                            <span className="font-medium">
+                              {c.sobrenome ? `${c.nome} ${c.sobrenome}` : c.nome}
+                            </span>
+                            {c.referencia ? (
+                              <span className="text-muted-foreground text-sm">
+                                ({c.referencia})
+                              </span>
+                            ) : null}
+                            {c.limite_credito !== null ? (
+                              <span className="text-muted-foreground ml-auto text-sm">
+                                Limite: {formatBRL(c.limite_credito)}
+                              </span>
+                            ) : null}
+                          </button>
+                        </li>
+                      ))
+                    )}
+                  </ul>
+                ) : null}
               </div>
 
-              {filtrados.length === 0 ? (
-                <p className="text-muted-foreground text-base">
-                  Nenhum cliente encontrado com esse nome.
-                </p>
+              {clienteLimite ? (
+                <LinhaLimiteCliente
+                  key={clienteLimite.id}
+                  cliente={clienteLimite}
+                  onFechar={() => setClienteLimite(null)}
+                />
               ) : (
-                <ul className="flex flex-col gap-2">
-                  {filtrados.map((c) => (
-                    <LinhaLimiteCliente key={c.id} cliente={c} />
-                  ))}
-                </ul>
+                <p className="minimal:max-sm:text-sm text-muted-foreground text-base">
+                  Busque um cliente para ver e ajustar o limite dele.
+                </p>
               )}
             </>
           )}
@@ -210,7 +324,13 @@ export function PreferenciasClient({
   );
 }
 
-function LinhaLimiteCliente({ cliente }: { cliente: ClienteComSaldo }) {
+function LinhaLimiteCliente({
+  cliente,
+  onFechar,
+}: {
+  cliente: ClienteComSaldo;
+  onFechar: () => void;
+}) {
   const [salvando, startSalvar] = useTransition();
   // Último valor persistido — evita re-salvar quando nada mudou no blur.
   const salvoRef = useRef(limiteParaInput(cliente.limite_credito));
@@ -232,34 +352,57 @@ function LinhaLimiteCliente({ cliente }: { cliente: ClienteComSaldo }) {
     });
   }
 
+  // Camadas empilhadas com folga: identificação (nome + situação), depois o
+  // campo com rótulo — nada de texto espremido em coluna ao lado do input.
   return (
-    <li className="ring-foreground/10 bg-card flex flex-wrap items-center gap-3 rounded-xl px-4 py-3 ring-1">
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <span className="truncate text-base font-medium">
-          {nomeCompleto}
-          {cliente.referencia ? (
-            <span className="text-muted-foreground ml-1.5 font-normal">
-              ({cliente.referencia})
-            </span>
-          ) : null}
-        </span>
-        {cliente.saldo_devedor > 0 ? (
-          <span className="bg-destructive/10 text-destructive inline-flex w-fit rounded-full px-3 py-1 text-sm font-semibold">
-            Deve {formatBRL(cliente.saldo_devedor)}
+    <div className="ring-foreground/10 bg-muted/30 flex flex-col gap-3 rounded-xl p-4 ring-1">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <span className="truncate text-base font-semibold">
+            {nomeCompleto}
+            {cliente.referencia ? (
+              <span className="text-muted-foreground text-sm ml-1.5 font-normal">
+                ({cliente.referencia})
+              </span>
+            ) : null}
           </span>
-        ) : (
-          <span className="inline-flex w-fit rounded-full bg-emerald-100 px-3 py-1 text-sm font-medium text-emerald-900 dark:bg-emerald-500/15 dark:text-emerald-300">
-            Em dia
+          <span className="text-muted-foreground text-sm">
+            {cliente.limite_credito !== null
+              ? `Limite atual: ${formatBRL(cliente.limite_credito)}`
+              : "Sem limite próprio (vale o padrão)"}
           </span>
-        )}
+        </div>
+        <button
+          type="button"
+          onClick={onFechar}
+          aria-label={`Fechar ajuste de limite de ${nomeCompleto}`}
+          className="text-muted-foreground hover:text-foreground hover:bg-muted -mt-1 -mr-1 flex size-9 shrink-0 items-center justify-center rounded-lg"
+        >
+          <X aria-hidden="true" className="size-5" />
+        </button>
       </div>
-      <div className="flex w-36 flex-col gap-1">
+
+      {cliente.saldo_devedor > 0 ? (
+        <span className="bg-destructive/10 text-destructive inline-flex w-fit rounded-full px-2.5 py-0.5 text-xs font-semibold">
+          Deve {formatBRL(cliente.saldo_devedor)}
+        </span>
+      ) : (
+        <span className="inline-flex w-fit rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-900 dark:bg-emerald-500/15 dark:text-emerald-300">
+          Em dia
+        </span>
+      )}
+
+      <div className="flex flex-col gap-1.5 sm:max-w-xs">
+        <Label htmlFor={`limite-${cliente.id}`} className="text-sm">
+          Novo limite (R$)
+        </Label>
         <Input
+          id={`limite-${cliente.id}`}
           type="number"
           min="0"
           step="0.01"
           inputMode="decimal"
-          placeholder="Sem limite"
+          placeholder="Vazio = sem limite próprio"
           defaultValue={limiteParaInput(cliente.limite_credito)}
           aria-label={`Limite de crédito de ${nomeCompleto}`}
           disabled={salvando}
@@ -270,9 +413,9 @@ function LinhaLimiteCliente({ cliente }: { cliente: ClienteComSaldo }) {
               (e.target as HTMLInputElement).blur();
             }
           }}
-          className="h-12 text-base"
+          className="minimal:max-sm:text-sm h-11 text-base"
         />
       </div>
-    </li>
+    </div>
   );
 }

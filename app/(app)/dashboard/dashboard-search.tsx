@@ -76,7 +76,7 @@ export function DashboardSearch({ clientes }: { clientes: ClienteBusca[] }) {
             if (e.key === "Escape") setAberto(false);
           }}
           placeholder="Digite o nome ou referência…"
-          className="h-13 pl-12 text-base"
+          className="minimal:max-sm:h-11 minimal:max-sm:pl-10 minimal:max-sm:text-sm h-13 pl-12 text-base"
         />
       </div>
       {aberto && resultados.length > 0 ? (
@@ -89,7 +89,7 @@ export function DashboardSearch({ clientes }: { clientes: ClienteBusca[] }) {
               <button
                 type="button"
                 onClick={() => irParaCliente(c)}
-                className="hover:bg-muted focus-visible:bg-muted flex h-12 w-full items-center gap-2 px-4 text-left text-base outline-none"
+                className="minimal:max-sm:h-11 minimal:max-sm:text-sm hover:bg-muted focus-visible:bg-muted flex h-12 w-full items-center gap-2 px-4 text-left text-base outline-none"
               >
                 <span className="font-medium">
                   {c.sobrenome ? `${c.nome} ${c.sobrenome}` : c.nome}

@@ -35,7 +35,7 @@ export function ResetForm() {
               ? "password-error password-hint"
               : "password-hint"
           }
-          className="h-14 text-lg"
+          className="max-sm:h-12 max-sm:text-base h-14 text-lg"
         />
         <p id="password-hint" className="text-muted-foreground text-sm">
           {PASSWORD_HINT}
@@ -67,7 +67,7 @@ export function ResetForm() {
               ? "passwordConfirm-error"
               : undefined
           }
-          className="h-14 text-lg"
+          className="max-sm:h-12 max-sm:text-base h-14 text-lg"
         />
         {state.fieldErrors?.passwordConfirm ? (
           <p

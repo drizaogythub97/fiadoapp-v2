@@ -126,7 +126,7 @@ export function RelatoriosClient({
               type="date"
               value={filtros.de}
               onChange={(e) => mudarFiltro("de", e.target.value)}
-              className="h-12 text-base"
+              className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base"
             />
           </div>
           <div className="flex flex-col gap-2">
@@ -138,7 +138,7 @@ export function RelatoriosClient({
               type="date"
               value={filtros.ate}
               onChange={(e) => mudarFiltro("ate", e.target.value)}
-              className="h-12 text-base"
+              className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base"
             />
           </div>
           <div className="flex flex-col gap-2">
@@ -150,7 +150,7 @@ export function RelatoriosClient({
               value={filtros.inicial}
               onChange={(e) => mudarFiltro("inicial", e.target.value)}
               className={cn(
-                "border-input dark:bg-input/30 focus-visible:border-ring focus-visible:ring-ring/50 h-12 w-full rounded-lg border bg-transparent px-2.5 text-base transition-colors outline-none focus-visible:ring-3",
+                "minimal:max-sm:h-11 minimal:max-sm:text-sm border-input dark:bg-input/30 focus-visible:border-ring focus-visible:ring-ring/50 h-12 w-full rounded-lg border bg-transparent px-2.5 text-base transition-colors outline-none focus-visible:ring-3",
               )}
             >
               <option value="">Todas</option>
@@ -176,14 +176,15 @@ export function RelatoriosClient({
                 value={filtros.busca}
                 onChange={(e) => mudarFiltro("busca", e.target.value)}
                 placeholder="Nome ou referência…"
-                className="h-12 pl-10 text-base"
+                className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 pl-10 text-base"
               />
             </div>
           </div>
         </div>
 
+        {/* mb-2 na legend: fora do layout flex do fieldset, o gap não conta. */}
         <fieldset className="flex flex-col gap-2">
-          <legend className="text-muted-foreground text-sm font-medium">
+          <legend className="text-muted-foreground mb-2 text-sm font-medium">
             Situação
           </legend>
           <div className="flex flex-wrap gap-2">
@@ -194,7 +195,7 @@ export function RelatoriosClient({
                 variant={filtros.situacao === valor ? "default" : "outline"}
                 aria-pressed={filtros.situacao === valor}
                 onClick={() => mudarFiltro("situacao", valor)}
-                className="h-11 px-4 text-base"
+                className="minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-11 px-4 text-base"
               >
                 {rotulo}
               </Button>
@@ -229,7 +230,7 @@ export function RelatoriosClient({
               <Button
                 type="button"
                 onClick={() => window.print()}
-                className="h-13 text-base font-medium"
+                className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-13 text-base font-medium"
               >
                 <Printer aria-hidden="true" className="size-5" />
                 Imprimir / PDF
@@ -238,7 +239,7 @@ export function RelatoriosClient({
                 type="button"
                 variant="outline"
                 onClick={exportarCSV}
-                className="h-13 text-base font-medium"
+                className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-13 text-base font-medium"
               >
                 <FileSpreadsheet aria-hidden="true" className="size-5" />
                 Exportar CSV
@@ -281,7 +282,7 @@ export function RelatoriosClient({
                 />
                 Selecionar todas
               </label>
-              <span aria-live="polite" className="text-muted-foreground text-base">
+              <span aria-live="polite" className="minimal:max-sm:text-sm text-muted-foreground text-base">
                 {marcadasVisiveis === 0
                   ? "Nenhuma selecionada"
                   : marcadasVisiveis === 1

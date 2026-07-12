@@ -1,6 +1,7 @@
 import { BUCKET_LOGOS } from "@/lib/marca";
 import { createClient } from "@/lib/supabase/server";
 import { getThemeFromCookie } from "@/lib/theme/cookie";
+import { getUiModeFromCookie } from "@/lib/ui-mode/cookie";
 import type { ClienteComSaldo } from "@/lib/types/fiado";
 
 import { PreferenciasClient } from "./preferencias-client";
@@ -10,9 +11,10 @@ export const metadata = { title: "Preferências" };
 export default async function PreferenciasPage() {
   const supabase = await createClient();
 
-  const [tema, { data: prefs }, { data: clientesData, error }] =
+  const [tema, modoUi, { data: prefs }, { data: clientesData, error }] =
     await Promise.all([
       getThemeFromCookie(),
+      getUiModeFromCookie(),
       supabase
         .from("fiado_preferencias")
         .select("limite_credito_padrao, brand_name, brand_logo_path")
@@ -29,10 +31,12 @@ export default async function PreferenciasPage() {
   const clientes = (clientesData ?? []) as ClienteComSaldo[];
 
   return (
-    <section className="flex flex-col gap-6">
+    <section className="minimal:max-sm:gap-4 flex flex-col gap-6">
       <header>
-        <h1 className="text-3xl font-bold tracking-tight">Preferências</h1>
-        <p className="text-muted-foreground mt-1 text-lg">
+        <h1 className="minimal:max-sm:text-xl text-3xl font-bold tracking-tight">
+          Preferências
+        </h1>
+        <p className="minimal:max-sm:text-sm text-muted-foreground mt-1 text-lg">
           Ajuste o tema, a marca da sua loja e os limites de crédito.
         </p>
       </header>
@@ -44,6 +48,7 @@ export default async function PreferenciasPage() {
       ) : (
         <PreferenciasClient
           temaInicial={tema}
+          modoUiInicial={modoUi}
           limitePadraoInicial={limitePadrao}
           clientes={clientes}
           marcaNome={marcaNome}

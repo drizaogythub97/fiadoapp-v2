@@ -144,7 +144,7 @@ export function ContaClient({ nomeInicial, email, criadaEm }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="minimal:max-sm:gap-4 flex flex-col gap-6">
       {aviso?.kind === "success" ? (
         <SuccessAlert message={aviso.message} />
       ) : null}
@@ -158,7 +158,7 @@ export function ContaClient({ nomeInicial, email, criadaEm }: Props) {
           <h2 id="dados-heading" className="text-xl font-semibold">
             Dados pessoais
           </h2>
-          <p className="text-muted-foreground text-base">
+          <p className="minimal:max-sm:text-sm text-muted-foreground text-base">
             Para alterar o e-mail ou a senha pedimos a sua senha atual.
           </p>
         </header>
@@ -209,7 +209,7 @@ export function ContaClient({ nomeInicial, email, criadaEm }: Props) {
                     setNomeErro(null);
                   }}
                   disabled={salvandoNome}
-                  className="h-12 px-5 text-base"
+                  className="minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base"
                 >
                   Cancelar
                 </Button>
@@ -218,7 +218,7 @@ export function ContaClient({ nomeInicial, email, criadaEm }: Props) {
                   onClick={salvarNome}
                   disabled={salvandoNome}
                   aria-busy={salvandoNome}
-                  className="h-12 px-5 text-base"
+                  className="minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base"
                 >
                   {salvandoNome ? "Salvando…" : "Salvar"}
                 </Button>
@@ -241,7 +241,7 @@ export function ContaClient({ nomeInicial, email, criadaEm }: Props) {
                   setNomeErro(null);
                   setEditandoNome(true);
                 }}
-                className="h-12 px-5 text-base"
+                className="minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base"
               >
                 <Pencil aria-hidden="true" className="size-4" />
                 Alterar
@@ -303,7 +303,7 @@ export function ContaClient({ nomeInicial, email, criadaEm }: Props) {
             setExcluirErro(null);
             setExcluirAberto(true);
           }}
-          className="h-12 px-5 text-base sm:self-start"
+          className="minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base sm:self-start"
         >
           <Trash2 aria-hidden="true" className="size-4" />
           Excluir minha conta
@@ -481,7 +481,7 @@ function Linha({
         type="button"
         variant="outline"
         onClick={onAlterar}
-        className="h-12 px-5 text-base"
+        className="minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base"
       >
         <Pencil aria-hidden="true" className="size-4" />
         Alterar

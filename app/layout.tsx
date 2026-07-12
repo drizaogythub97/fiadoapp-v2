@@ -5,6 +5,7 @@ import "./globals.css";
 import { PwaRegister } from "@/components/app/pwa-register";
 import { cn } from "@/lib/utils";
 import { getThemeFromCookie } from "@/lib/theme/cookie";
+import { getUiModeFromCookie } from "@/lib/ui-mode/cookie";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -62,6 +63,7 @@ export default async function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const theme = await getThemeFromCookie();
   const isDark = theme === "dark";
+  const uiMode = await getUiModeFromCookie();
   const nonce = (await headers()).get("x-nonce") ?? undefined;
 
   return (
@@ -74,6 +76,7 @@ export default async function RootLayout({
         isDark ? "dark" : undefined,
       )}
       style={{ colorScheme: isDark ? "dark" : "light" }}
+      data-ui-mode={uiMode ?? undefined}
       suppressHydrationWarning
     >
       <head>

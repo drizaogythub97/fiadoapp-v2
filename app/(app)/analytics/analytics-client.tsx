@@ -4,12 +4,7 @@ import { ChartNoAxesColumn } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -81,7 +76,7 @@ export function AnalyticsClient({ vendas }: { vendas: VendaAnalytics[] }) {
                 setDe(e.target.value);
                 setAtalho(null);
               }}
-              className="h-12 text-base"
+              className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base"
             />
           </div>
           <div className="flex flex-col gap-2">
@@ -96,12 +91,13 @@ export function AnalyticsClient({ vendas }: { vendas: VendaAnalytics[] }) {
                 setAte(e.target.value);
                 setAtalho(null);
               }}
-              className="h-12 text-base"
+              className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base"
             />
           </div>
         </div>
+        {/* mb-2 na legend: fora do layout flex do fieldset, o gap não conta. */}
         <fieldset className="flex flex-col gap-2">
-          <legend className="text-muted-foreground text-sm font-medium">
+          <legend className="text-muted-foreground mb-2 text-sm font-medium">
             Atalhos de período
           </legend>
           <div className="flex flex-wrap gap-2">
@@ -112,7 +108,7 @@ export function AnalyticsClient({ vendas }: { vendas: VendaAnalytics[] }) {
                 variant={atalho === valor ? "default" : "outline"}
                 aria-pressed={atalho === valor}
                 onClick={() => aplicarAtalho(valor)}
-                className="h-11 px-4 text-base"
+                className="minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-11 px-4 text-base"
               >
                 {rotulo}
               </Button>
@@ -145,7 +141,7 @@ export function AnalyticsClient({ vendas }: { vendas: VendaAnalytics[] }) {
               ? "Nenhuma venda registrada ainda."
               : "Nenhuma venda no período escolhido."}
           </p>
-          <p className="text-muted-foreground text-base">
+          <p className="minimal:max-sm:text-sm text-muted-foreground text-base">
             Ajuste as datas ou use um dos atalhos acima.
           </p>
         </div>
@@ -195,8 +191,7 @@ export function AnalyticsClient({ vendas }: { vendas: VendaAnalytics[] }) {
                           }}
                         />
                         <span className="text-muted-foreground text-xs whitespace-nowrap">
-                          {c.qtdVendas}{" "}
-                          {c.qtdVendas === 1 ? "venda" : "vendas"}
+                          {c.qtdVendas} {c.qtdVendas === 1 ? "venda" : "vendas"}
                         </span>
                       </div>
                     </li>
@@ -212,7 +207,7 @@ export function AnalyticsClient({ vendas }: { vendas: VendaAnalytics[] }) {
               </CardHeader>
               <CardContent className="flex flex-col gap-5">
                 <p className="text-base">
-                  <span className="text-3xl font-bold tracking-tight">
+                  <span className="minimal:max-sm:text-xl text-3xl font-bold tracking-tight">
                     {pctRecebido}%
                   </span>{" "}
                   <span className="text-muted-foreground">

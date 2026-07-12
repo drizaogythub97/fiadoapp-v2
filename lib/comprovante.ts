@@ -192,3 +192,35 @@ export function textoComprovanteQuitacao(
   );
   return linhas.join("\n");
 }
+
+/* ── Pedido de comprovante (F5b) ─────────────────────────────────────────
+ * Identifica um documento emissível pelos fluxos do app. No desktop vira a
+ * URL da rota /comprovante/*; no celular alimenta o emissor direto
+ * (useEmissorComprovante), que gera PDF/PNG e abre o compartilhamento
+ * nativo sem sair da tela. */
+
+export type PedidoComprovante =
+  | { tipo: "venda"; vendaId: string }
+  | { tipo: "quitacao"; clienteId: string; em: string }
+  | { tipo: "espelho-cliente"; clienteId: string };
+
+export function urlDoComprovante(pedido: PedidoComprovante): string {
+  switch (pedido.tipo) {
+    case "venda":
+      return `/comprovante/${pedido.vendaId}`;
+    case "quitacao":
+      return `/comprovante/quitacao/${pedido.clienteId}?em=${encodeURIComponent(pedido.em)}`;
+    case "espelho-cliente":
+      return `/comprovante/cliente/${pedido.clienteId}`;
+  }
+}
+
+/** URL da rota de preview já com o formato escolhido (fluxo desktop). */
+export function urlDoComprovanteComFormato(
+  pedido: PedidoComprovante,
+  formato: "pdf" | "imagem",
+): string {
+  const url = urlDoComprovante(pedido);
+  if (formato !== "imagem") return url;
+  return `${url}${url.includes("?") ? "&" : "?"}formato=imagem`;
+}

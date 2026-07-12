@@ -43,7 +43,7 @@ export function ClienteForm({ action, initialValues, submitLabel }: Props) {
         "aria-invalid": erro ? true : undefined,
         "aria-describedby": erro ? `${nome}-erro` : undefined,
         defaultValue: valores[nome] ?? "",
-        className: "h-12 text-base",
+        className: "minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base",
       },
     };
   }
@@ -152,7 +152,7 @@ export function ClienteForm({ action, initialValues, submitLabel }: Props) {
           href="/clientes"
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "h-12 px-6 text-base",
+            "minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 px-6 text-base",
           )}
         >
           Cancelar
@@ -161,7 +161,7 @@ export function ClienteForm({ action, initialValues, submitLabel }: Props) {
           type="submit"
           disabled={pending}
           aria-busy={pending}
-          className="h-12 px-6 text-base font-medium"
+          className="minimal:max-sm:h-11 h-12 px-6 text-base font-medium"
         >
           {pending ? "Salvando…" : submitLabel}
         </Button>

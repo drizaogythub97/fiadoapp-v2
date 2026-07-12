@@ -60,10 +60,10 @@ export default async function VendaDetalhePage({
     venda.data_vencimento < hojeISO();
 
   return (
-    <section className="flex max-w-2xl flex-col gap-6">
+    <section className="minimal:max-sm:gap-4 flex max-w-2xl flex-col gap-6">
       <header className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h1 className="minimal:max-sm:text-xl text-3xl font-bold tracking-tight">
             {cliente ? (
               <Link
                 href={`/clientes/${cliente.id}`}
@@ -164,9 +164,7 @@ export default async function VendaDetalhePage({
       </dl>
 
       <div className="flex flex-col gap-3">
-        <h2 className="text-xl font-semibold tracking-tight">
-          Itens da venda
-        </h2>
+        <h2 className="minimal:max-sm:text-lg text-xl font-semibold tracking-tight">Itens da venda</h2>
         <ul className="flex flex-col gap-2">
           {itens.map((item) => (
             <li
@@ -191,14 +189,14 @@ export default async function VendaDetalhePage({
 
       {pagamentos.length > 0 ? (
         <div className="flex flex-col gap-3">
-          <h2 className="text-xl font-semibold tracking-tight">Pagamentos</h2>
+          <h2 className="minimal:max-sm:text-lg text-xl font-semibold tracking-tight">Pagamentos</h2>
           <ul className="flex flex-col gap-2">
             {pagamentos.map((p) => (
               <li
                 key={p.id}
                 className="ring-foreground/10 bg-card flex items-center justify-between rounded-xl px-4 py-3 ring-1"
               >
-                <span className="text-muted-foreground text-base">
+                <span className="minimal:max-sm:text-sm text-muted-foreground text-base">
                   {new Date(p.pago_em).toLocaleDateString("pt-BR", {
                     timeZone: "America/Sao_Paulo",
                   })}
@@ -247,7 +245,7 @@ export default async function VendaDetalhePage({
             return (
               <div className="flex flex-col gap-2 sm:flex-row">
                 <BotaoComprovante
-                  url={`/comprovante/${venda.id}`}
+                  pedido={{ tipo: "venda", vendaId: venda.id }}
                   rotulo={rotulo}
                   className="h-13 px-6 font-medium"
                 />
@@ -258,7 +256,7 @@ export default async function VendaDetalhePage({
                     rel="noopener noreferrer"
                     className={cn(
                       buttonVariants({ variant: "outline" }),
-                      "h-13 px-6 text-base font-medium",
+                      "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-13 px-6 text-base font-medium",
                     )}
                   >
                     <MessageCircle aria-hidden="true" className="size-5" />
@@ -274,7 +272,7 @@ export default async function VendaDetalhePage({
         href={cliente ? `/clientes/${cliente.id}` : "/vendas"}
         className={cn(
           buttonVariants({ variant: "outline" }),
-          "h-12 self-start px-5 text-base",
+          "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 self-start px-5 text-base",
         )}
       >
         <ArrowLeft aria-hidden="true" className="size-4" />

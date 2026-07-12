@@ -25,10 +25,12 @@ export default async function EditarClientePage({
   const action = atualizarCliente.bind(null, cliente.id as string);
 
   return (
-    <section className="flex flex-col gap-6">
+    <section className="minimal:max-sm:gap-4 flex flex-col gap-6">
       <header>
-        <h1 className="text-3xl font-bold tracking-tight">Editar cliente</h1>
-        <p className="text-muted-foreground mt-1 text-lg">
+        <h1 className="minimal:max-sm:text-xl text-3xl font-bold tracking-tight">
+          Editar cliente
+        </h1>
+        <p className="minimal:max-sm:text-sm text-muted-foreground mt-1 text-lg">
           Atualize os dados de {cliente.nome as string}.
         </p>
       </header>

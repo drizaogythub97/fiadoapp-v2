@@ -67,12 +67,14 @@ export function VendasClient({
           onChange={(e) => setBusca(e.target.value)}
           placeholder="Buscar pelo nome do cliente…"
           aria-label="Buscar venda pelo cliente"
-          className="h-13 pl-12 text-base"
+          className="minimal:max-sm:h-11 minimal:max-sm:pl-10 minimal:max-sm:text-sm h-13 pl-12 text-base"
         />
       </div>
 
+      {/* mb-2 na legend: ela fica fora do layout flex do fieldset, então o
+          gap não a afasta dos botões. */}
       <fieldset className="flex flex-col gap-2">
-        <legend className="text-muted-foreground text-sm font-medium">
+        <legend className="text-muted-foreground mb-2 text-sm font-medium">
           Filtrar por situação
         </legend>
         <div className="flex flex-wrap gap-2">
@@ -83,7 +85,7 @@ export function VendasClient({
               variant={filtro === valor ? "default" : "outline"}
               aria-pressed={filtro === valor}
               onClick={() => setFiltro(valor)}
-              className="h-11 px-4 text-base"
+              className="minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-11 px-4 text-base"
             >
               {rotulo}
             </Button>
@@ -91,7 +93,7 @@ export function VendasClient({
         </div>
       </fieldset>
 
-      <p aria-live="polite" className="text-muted-foreground text-base">
+      <p aria-live="polite" className="minimal:max-sm:text-sm text-muted-foreground text-base">
         {filtradas.length === 0
           ? null
           : filtradas.length === 1
@@ -115,7 +117,7 @@ export function VendasClient({
               href="/vendas/nova"
               className={cn(
                 buttonVariants(),
-                "mt-2 h-13 px-6 text-lg font-medium",
+                "minimal:max-sm:h-11 minimal:max-sm:text-base mt-2 h-13 px-6 text-lg font-medium",
               )}
             >
               Registrar venda
@@ -123,7 +125,7 @@ export function VendasClient({
           ) : null}
         </div>
       ) : (
-        <ul className="flex flex-col gap-3">
+        <ul className="minimal:max-sm:gap-2 flex flex-col gap-3">
           {filtradas.map((v) => {
             const restante = v.valor_total - v.valor_pago;
             const vencida =
@@ -134,20 +136,20 @@ export function VendasClient({
               <li key={v.id}>
                 <Link
                   href={`/vendas/${v.id}`}
-                  className="ring-foreground/10 bg-card hover:ring-primary/40 flex flex-col gap-2 rounded-xl p-4 ring-1 transition-shadow"
+                  className="minimal:max-sm:p-3.5 minimal:max-sm:gap-1.5 ring-foreground/10 bg-card hover:ring-primary/40 flex flex-col gap-2 rounded-xl p-4 ring-1 transition-shadow"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-foreground text-lg font-semibold">
+                    <span className="minimal:max-sm:text-base text-foreground text-lg font-semibold">
                       {nomeCliente(v)}
                       {v.fiado_clientes?.referencia ? (
-                        <span className="text-muted-foreground ml-2 text-base font-normal">
+                        <span className="minimal:max-sm:text-sm text-muted-foreground ml-2 text-base font-normal">
                           ({v.fiado_clientes.referencia})
                         </span>
                       ) : null}
                     </span>
                     <VendaStatusBadge status={v.status} />
                   </div>
-                  <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-base">
+                  <div className="minimal:max-sm:text-xs minimal:max-sm:gap-x-3 text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-base">
                     <span>Compra: {formatDataBR(v.data_compra)}</span>
                     {v.data_vencimento ? (
                       <span className={vencida ? "text-destructive" : ""}>

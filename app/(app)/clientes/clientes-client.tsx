@@ -2,6 +2,7 @@
 
 import {
   AlertTriangle,
+  ChevronRight,
   Pencil,
   Plus,
   Receipt,
@@ -106,15 +107,18 @@ export function ClientesClient({
           onChange={(e) => setBusca(e.target.value)}
           placeholder="Buscar por nome, sobrenome ou referência…"
           aria-label="Buscar cliente"
-          className="h-13 pl-12 text-base"
+          className="minimal:max-sm:h-11 minimal:max-sm:pl-10 minimal:max-sm:text-sm h-13 pl-12 text-base"
         />
       </div>
 
+      {/* mb-2 na legend: ela fica fora do layout flex do fieldset, então o
+          gap não a afasta dos botões. */}
       <fieldset className="flex flex-col gap-2">
-        <legend className="text-muted-foreground text-sm font-medium">
+        <legend className="minimal:max-sm:text-xs text-muted-foreground mb-2 text-sm font-medium">
           Filtrar por situação
         </legend>
-        <div className="flex flex-wrap gap-2">
+        {/* Minimalista: controle segmentado em terços — uma linha só. */}
+        <div className="minimal:max-sm:grid minimal:max-sm:grid-cols-3 flex flex-wrap gap-2">
           {SITUACOES.map(({ valor, rotulo }) => (
             <Button
               key={valor}
@@ -122,7 +126,7 @@ export function ClientesClient({
               variant={situacao === valor ? "default" : "outline"}
               aria-pressed={situacao === valor}
               onClick={() => setSituacao(valor)}
-              className="h-11 flex-1 px-4 text-base sm:flex-initial"
+              className="minimal:max-sm:h-10 minimal:max-sm:px-1 minimal:max-sm:text-sm h-11 flex-1 px-4 text-base sm:flex-initial"
             >
               {rotulo}
             </Button>
@@ -130,11 +134,29 @@ export function ClientesClient({
         </div>
       </fieldset>
 
-      <fieldset className="flex flex-col gap-2">
-        <legend className="text-muted-foreground text-sm font-medium">
+      {/* min-w-0: fieldset tem min-inline-size:min-content e estouraria a
+          página com o conteúdo largo. */}
+      <fieldset className="flex min-w-0 flex-col gap-2">
+        <legend className="minimal:max-sm:text-xs text-muted-foreground mb-2 text-sm font-medium">
           Pesquise pela inicial do nome
         </legend>
-        <div className="flex flex-wrap gap-1.5">
+        {/* Minimalista: dropdown nativo (pedido do dono, 2026-07-11) —
+            "Todas" é o padrão; escolher a letra filtra na hora. */}
+        <select
+          value={letra ?? ""}
+          onChange={(e) => setLetra(e.target.value || null)}
+          aria-label="Pesquise pela inicial do nome"
+          className="minimal:max-sm:block border-input dark:bg-input/30 focus-visible:border-ring focus-visible:ring-ring/50 hidden h-11 w-full rounded-lg border bg-transparent px-2.5 text-sm transition-colors outline-none focus-visible:ring-3"
+        >
+          <option value="">Todas as letras</option>
+          {LETRAS.map((l) => (
+            <option key={l} value={l}>
+              {l}
+            </option>
+          ))}
+        </select>
+        {/* Modo Simples/desktop: grade de letras como sempre. */}
+        <div className="minimal:max-sm:hidden flex flex-wrap gap-1.5">
           <Button
             type="button"
             variant={letra === null ? "default" : "outline"}
@@ -160,7 +182,7 @@ export function ClientesClient({
         </div>
       </fieldset>
 
-      <p aria-live="polite" className="text-muted-foreground text-base">
+      <p aria-live="polite" className="minimal:max-sm:text-xs text-muted-foreground text-base">
         {filtrados.length === 0
           ? null
           : filtrados.length === 1
@@ -175,22 +197,25 @@ export function ClientesClient({
           letra={letra}
         />
       ) : (
-        <ul className="flex flex-col gap-3">
+        <ul className="minimal:max-sm:gap-2 flex flex-col gap-3">
           {filtrados.map((c) => (
             <li
               key={c.id}
-              className="ring-foreground/10 bg-card flex flex-col gap-3 rounded-xl p-4 ring-1"
+              // Minimalista: a linha inteira abre o detalhe (link esticado +
+              // seta); Editar/Excluir ficam na tela do cliente. Nos outros
+              // modos, card com os 3 botões como sempre.
+              className="minimal:max-sm:gap-1.5 minimal:max-sm:p-3.5 ring-foreground/10 bg-card relative flex flex-col gap-3 rounded-xl p-4 ring-1"
             >
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-foreground text-xl font-semibold">
+              <div className="minimal:max-sm:pr-6 flex flex-wrap items-center justify-between gap-2">
+                <span className="minimal:max-sm:text-base text-foreground text-xl font-semibold">
                   <Link
                     href={`/clientes/${c.id}`}
-                    className="hover:text-primary underline-offset-4 hover:underline"
+                    className="minimal:max-sm:after:absolute minimal:max-sm:after:inset-0 minimal:max-sm:after:content-[''] hover:text-primary underline-offset-4 hover:underline"
                   >
                     {nomeCompleto(c)}
                   </Link>
                   {c.referencia ? (
-                    <span className="text-muted-foreground ml-2 text-base font-normal">
+                    <span className="minimal:max-sm:text-sm text-muted-foreground ml-2 text-base font-normal">
                       ({c.referencia})
                     </span>
                   ) : null}
@@ -198,7 +223,7 @@ export function ClientesClient({
                 <div className="flex flex-wrap items-center gap-2">
                   {c.acima_limite ? (
                     <span
-                      className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-sm font-medium text-amber-900 dark:bg-amber-500/15 dark:text-amber-300"
+                      className="minimal:max-sm:px-2 minimal:max-sm:text-xs inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-sm font-medium text-amber-900 dark:bg-amber-500/15 dark:text-amber-300"
                       aria-label={`Acima do limite de crédito de ${formatBRL(c.limite_efetivo ?? 0)}`}
                     >
                       <AlertTriangle aria-hidden="true" className="size-4" />
@@ -206,18 +231,18 @@ export function ClientesClient({
                     </span>
                   ) : null}
                   {c.saldo_devedor > 0 ? (
-                    <span className="bg-destructive/10 text-destructive inline-flex rounded-full px-3 py-1 text-sm font-semibold">
+                    <span className="minimal:max-sm:px-2 minimal:max-sm:text-xs bg-destructive/10 text-destructive inline-flex rounded-full px-3 py-1 text-sm font-semibold">
                       Deve {formatBRL(c.saldo_devedor)}
                     </span>
                   ) : (
-                    <span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-sm font-medium text-emerald-900 dark:bg-emerald-500/15 dark:text-emerald-300">
+                    <span className="minimal:max-sm:px-2 minimal:max-sm:text-xs inline-flex rounded-full bg-emerald-100 px-3 py-1 text-sm font-medium text-emerald-900 dark:bg-emerald-500/15 dark:text-emerald-300">
                       Sem dívida
                     </span>
                   )}
                 </div>
               </div>
 
-              <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-base">
+              <div className="minimal:max-sm:text-xs minimal:max-sm:gap-x-3 text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-base">
                 <span>
                   Ativas:{" "}
                   <strong className="text-foreground">{c.total_ativas}</strong>
@@ -229,9 +254,14 @@ export function ClientesClient({
                 {c.telefone ? <span>{formatTelefone(c.telefone)}</span> : null}
               </div>
 
+              <ChevronRight
+                aria-hidden="true"
+                className="minimal:max-sm:block text-muted-foreground absolute top-1/2 right-3 hidden size-5 -translate-y-1/2"
+              />
+
               {/* Mobile: 3 botões em terços iguais (o wrap deixava 2+1
                   assimétrico). Desktop: largura natural. */}
-              <div className="flex flex-wrap gap-2">
+              <div className="minimal:max-sm:hidden flex flex-wrap gap-2">
                 <Link
                   href={`/clientes/${c.id}`}
                   className={cn(
@@ -319,13 +349,16 @@ function EmptyState({
         : "Nenhum cliente nesta situação.";
 
   return (
-    <div className="bg-muted/40 flex flex-col items-center gap-3 rounded-xl p-10 text-center">
-      <Users aria-hidden="true" className="text-muted-foreground size-10" />
-      <p className="text-lg font-medium">{mensagem}</p>
+    <div className="minimal:max-sm:p-6 bg-muted/40 flex flex-col items-center gap-3 rounded-xl p-10 text-center">
+      <Users aria-hidden="true" className="minimal:max-sm:size-8 text-muted-foreground size-10" />
+      <p className="minimal:max-sm:text-base text-lg font-medium">{mensagem}</p>
       {!temClientes ? (
         <Link
           href="/clientes/novo"
-          className={cn(buttonVariants(), "mt-2 h-13 px-6 text-lg font-medium")}
+          className={cn(
+            buttonVariants(),
+            "minimal:max-sm:h-11 minimal:max-sm:text-base mt-2 h-13 px-6 text-lg font-medium",
+          )}
         >
           <Plus aria-hidden="true" className="size-5" />
           Cadastrar cliente

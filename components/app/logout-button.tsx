@@ -25,7 +25,7 @@ export function LogoutButton() {
       <Button
         type="button"
         variant="outline"
-        className="h-12 px-5 text-base"
+        className="minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base"
         onClick={() => setOpen(true)}
       >
         Sair

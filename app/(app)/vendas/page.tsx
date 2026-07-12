@@ -27,11 +27,13 @@ export default async function VendasPage() {
   const vendas = (data ?? []) as unknown as VendaComCliente[];
 
   return (
-    <section className="flex flex-col gap-6">
+    <section className="minimal:max-sm:gap-4 flex flex-col gap-6">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Vendas</h1>
-          <p className="text-muted-foreground mt-1 text-lg">
+          <h1 className="minimal:max-sm:text-xl text-3xl font-bold tracking-tight">
+            Vendas
+          </h1>
+          <p className="minimal:max-sm:text-sm text-muted-foreground mt-1 text-lg">
             Acompanhe as vendas fiado e registre novas.
           </p>
         </div>
@@ -39,7 +41,7 @@ export default async function VendasPage() {
           href="/vendas/nova"
           className={cn(
             buttonVariants(),
-            "h-13 px-6 text-lg font-medium sm:self-start",
+            "minimal:max-sm:h-11 minimal:max-sm:text-base h-13 px-6 text-lg font-medium sm:self-start",
           )}
         >
           <Plus aria-hidden="true" className="size-5" />

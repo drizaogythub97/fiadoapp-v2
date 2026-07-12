@@ -20,7 +20,7 @@ export function SubmitButton({
       type="submit"
       disabled={pending}
       aria-busy={pending}
-      className={cn("h-14 w-full px-6 text-lg font-medium", className)}
+      className={cn("max-sm:h-12 max-sm:text-base h-14 w-full px-6 text-lg font-medium", className)}
     >
       {pending ? (pendingText ?? "Enviando…") : children}
     </Button>

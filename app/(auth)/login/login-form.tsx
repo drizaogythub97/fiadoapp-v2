@@ -35,7 +35,7 @@ export function LoginForm() {
           aria-describedby={
             state.fieldErrors?.email ? "email-error" : undefined
           }
-          className="h-14 text-lg"
+          className="max-sm:h-12 max-sm:text-base h-14 text-lg"
         />
         {state.fieldErrors?.email ? (
           <p id="email-error" className="text-destructive text-sm" role="alert">
@@ -65,7 +65,7 @@ export function LoginForm() {
           aria-describedby={
             state.fieldErrors?.password ? "password-error" : undefined
           }
-          className="h-14 text-lg"
+          className="max-sm:h-12 max-sm:text-base h-14 text-lg"
         />
         {state.fieldErrors?.password ? (
           <p

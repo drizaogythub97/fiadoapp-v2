@@ -15,10 +15,12 @@ export default async function ContaPage() {
   const criadaEm = user?.created_at ?? null;
 
   return (
-    <section className="flex flex-col gap-6">
+    <section className="minimal:max-sm:gap-4 flex flex-col gap-6">
       <header>
-        <h1 className="text-3xl font-bold tracking-tight">Minha conta</h1>
-        <p className="text-muted-foreground mt-1 text-lg">
+        <h1 className="minimal:max-sm:text-xl text-3xl font-bold tracking-tight">
+          Minha conta
+        </h1>
+        <p className="minimal:max-sm:text-sm text-muted-foreground mt-1 text-lg">
           Seus dados pessoais. Você pode alterar nome, e-mail e senha ou, se
           quiser, excluir definitivamente a conta.
         </p>
