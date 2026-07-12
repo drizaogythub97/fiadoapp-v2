@@ -4,7 +4,6 @@ import {
   KeyRound,
   Landmark,
   ShoppingCart,
-  Store,
   Users,
 } from "lucide-react";
 
@@ -20,19 +19,14 @@ import { GAVETA_URL } from "@/lib/ecossistema";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 
-import { SwitcherToggle } from "./switcher-toggle";
+import { salvarMarcaUnica, salvarSwitcher } from "./actions";
+import { EcoToggle } from "./eco-toggle";
 
 export const metadata = { title: "Ecossistema" };
 
 // Pontes dos estágios 2–5 da F6 — apresentadas desde já, entregues aos
 // poucos. Toda ponte nasce DESLIGADA e terá liga/desliga próprio (opt-in).
 const PONTES = [
-  {
-    titulo: "Marca única da loja",
-    descricao:
-      "O nome e a logo que você configurou valem nos dois apps, editáveis de qualquer um.",
-    Icon: Store,
-  },
   {
     titulo: "Clientes compartilhados",
     descricao: "O mesmo caderno de clientes no fiado e no caixa.",
@@ -59,10 +53,11 @@ export default async function EcossistemaPage() {
   } = await supabase.auth.getUser();
   const { data: prefs } = await supabase
     .from("ecossistema_prefs")
-    .select("switcher_ativo")
+    .select("switcher_ativo, marca_unica")
     .eq("user_id", user?.id ?? "")
     .maybeSingle();
   const switcherAtivo = Boolean(prefs?.switcher_ativo);
+  const marcaUnica = Boolean(prefs?.marca_unica);
 
   return (
     <section className="minimal:max-sm:gap-4 flex max-w-2xl flex-col gap-6">
@@ -126,7 +121,37 @@ export default async function EcossistemaPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <SwitcherToggle ativoInicial={switcherAtivo} />
+          <EcoToggle
+            ativoInicial={switcherAtivo}
+            rotulo="Atalho rápido no menu"
+            onSalvar={salvarSwitcher}
+            msgAtivado="Atalho ativado."
+            msgDesativado="Atalho desativado."
+          />
+        </CardContent>
+      </Card>
+
+      {/* ── MARCA ÚNICA (estágio 2 — opt-in) ───────────────────────── */}
+      <Card>
+        <CardHeader className="minimal:max-sm:border-b minimal:max-sm:border-border/60 minimal:max-sm:pb-3">
+          <CardTitle className="minimal:max-sm:text-base text-xl">
+            Marca única da loja
+          </CardTitle>
+          <CardDescription className="minimal:max-sm:text-sm text-base">
+            O nome e a logo da sua loja passam a valer nos dois apps,
+            editáveis de qualquer um. Ao ativar aqui, a marca configurada no
+            FiadoApp é copiada para o Gaveta. Desativar não apaga nada — cada
+            app volta a valer a própria marca.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <EcoToggle
+            ativoInicial={marcaUnica}
+            rotulo="Marca única da loja"
+            onSalvar={salvarMarcaUnica}
+            msgAtivado="Marca única ativada — a marca do FiadoApp agora vale nos dois apps."
+            msgDesativado="Marca única desativada."
+          />
         </CardContent>
       </Card>
 

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { BUCKET_LOGOS } from "@/lib/marca";
+import { marcaUnicaAtiva } from "@/lib/ecossistema-server";
 import { createClient } from "@/lib/supabase/server";
 import {
   limiteClienteSchema,
@@ -138,6 +139,14 @@ export async function salvarNomeMarca(
   });
   if (error) return { error: "Não foi possível salvar. Tente novamente." };
 
+  // Marca única ligada (ecossistema): o nome também vale no Gaveta.
+  if (await marcaUnicaAtiva(supabase, user.id)) {
+    await supabase
+      .from("profiles")
+      .update({ brand_name: limpo.length === 0 ? null : limpo })
+      .eq("id", user.id);
+  }
+
   revalidatePath("/", "layout");
   return {};
 }
@@ -205,6 +214,24 @@ export async function uploadLogoMarca(
     return { ok: false, error: "Não foi possível salvar a logo." };
   }
 
+  // Marca única ligada: o MESMO arquivo passa a valer no Gaveta (bucket
+  // compartilhado). O arquivo antigo de lá é removido para não órfã-lo.
+  if (await marcaUnicaAtiva(supabase, user.id)) {
+    const { data: perfil } = await supabase
+      .from("profiles")
+      .select("brand_logo_path")
+      .eq("id", user.id)
+      .maybeSingle();
+    const anteriorGaveta = (perfil?.brand_logo_path as string | null) ?? null;
+    await supabase
+      .from("profiles")
+      .update({ brand_logo_path: key })
+      .eq("id", user.id);
+    if (anteriorGaveta && anteriorGaveta !== key && anteriorGaveta !== anterior) {
+      await supabase.storage.from(BUCKET_LOGOS).remove([anteriorGaveta]);
+    }
+  }
+
   if (anterior && anterior !== key) {
     await supabase.storage.from(BUCKET_LOGOS).remove([anterior]);
   }
@@ -233,6 +260,23 @@ export async function removerLogoMarca(): Promise<LogoUploadResult> {
     .from("fiado_preferencias")
     .update({ brand_logo_path: null, updated_at: new Date().toISOString() })
     .eq("user_id", user.id);
+
+  // Marca única ligada: remover também vale nos dois apps.
+  if (await marcaUnicaAtiva(supabase, user.id)) {
+    const { data: perfil } = await supabase
+      .from("profiles")
+      .select("brand_logo_path")
+      .eq("id", user.id)
+      .maybeSingle();
+    const doGaveta = (perfil?.brand_logo_path as string | null) ?? null;
+    if (doGaveta && doGaveta !== path) {
+      await supabase.storage.from(BUCKET_LOGOS).remove([doGaveta]);
+    }
+    await supabase
+      .from("profiles")
+      .update({ brand_logo_path: null })
+      .eq("id", user.id);
+  }
 
   revalidatePath("/", "layout");
   return { ok: true };
