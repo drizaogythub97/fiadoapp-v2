@@ -231,11 +231,11 @@ export function ClienteDetalheClient({
   }
 
   return (
-    <section className="flex max-w-2xl flex-col gap-6">
+    <section className="minimal:max-sm:gap-4 flex max-w-2xl flex-col gap-6">
       {/* ── CABEÇALHO ───────────────────────────────────────────────── */}
       <header className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="minimal:max-sm:text-2xl text-3xl font-bold tracking-tight">
+          <h1 className="minimal:max-sm:text-xl text-3xl font-bold tracking-tight">
             {nomeCompleto}
             {cliente.referencia ? (
               <span className="text-muted-foreground ml-2 text-xl font-normal">
@@ -279,12 +279,12 @@ export function ClienteDetalheClient({
 
       {/* ── VENDAS EM ABERTO ────────────────────────────────────────── */}
       <div className="flex flex-col gap-3">
-        <h2 className="text-xl font-semibold tracking-tight">
+        <h2 className="minimal:max-sm:text-lg text-xl font-semibold tracking-tight">
           Vendas em aberto
         </h2>
 
         {vendasAbertas.length === 0 ? (
-          <p className="text-muted-foreground text-base">
+          <p className="minimal:max-sm:text-sm text-muted-foreground text-base">
             Este cliente não tem vendas em aberto.
             {totalPagas > 0
               ? ` Já quitou ${totalPagas === 1 ? "1 venda" : `${totalPagas} vendas`}.`
@@ -349,7 +349,7 @@ export function ClienteDetalheClient({
                       href={`/vendas/${v.id}`}
                       className={cn(
                         buttonVariants({ variant: "outline" }),
-                        "h-11 px-4 text-base",
+                        "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-11 px-4 text-base",
                       )}
                       aria-label={`Detalhar venda de ${formatDataBR(v.data_compra)}`}
                     >
@@ -370,7 +370,7 @@ export function ClienteDetalheClient({
               <Button
                 type="button"
                 onClick={() => setDialogo("todas")}
-                className="h-13 text-base font-medium"
+                className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-13 text-base font-medium"
               >
                 <CheckCircle2 aria-hidden="true" className="size-5" />
                 Quitar todas
@@ -380,7 +380,7 @@ export function ClienteDetalheClient({
                 variant="outline"
                 disabled={selecionadas.size === 0}
                 onClick={() => setDialogo("selecionadas")}
-                className="h-13 text-base font-medium"
+                className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-13 text-base font-medium"
               >
                 <CheckSquare aria-hidden="true" className="size-5" />
                 Quitar selecionadas
@@ -389,7 +389,7 @@ export function ClienteDetalheClient({
                 type="button"
                 variant="outline"
                 onClick={() => setDialogo("parcial")}
-                className="h-13 text-base font-medium"
+                className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-13 text-base font-medium"
               >
                 <Wallet aria-hidden="true" className="size-5" />
                 Quitar um valor
@@ -415,7 +415,7 @@ export function ClienteDetalheClient({
       <div className="flex flex-wrap gap-2">
         <Link
           href={`/vendas/nova?cliente=${cliente.id}`}
-          className={cn(buttonVariants(), "h-12 px-5 text-base")}
+          className={cn(buttonVariants(), "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base")}
         >
           <Plus aria-hidden="true" className="size-4" />
           Nova venda
@@ -430,7 +430,7 @@ export function ClienteDetalheClient({
           href={`/clientes/${cliente.id}/historico`}
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "h-12 px-5 text-base",
+            "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base",
           )}
         >
           <History aria-hidden="true" className="size-4" />
@@ -440,7 +440,7 @@ export function ClienteDetalheClient({
           href={`/clientes/${cliente.id}/editar`}
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "h-12 px-5 text-base",
+            "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base",
           )}
         >
           <Pencil aria-hidden="true" className="size-4" />
@@ -453,7 +453,7 @@ export function ClienteDetalheClient({
             rel="noopener noreferrer"
             className={cn(
               buttonVariants({ variant: "outline" }),
-              "h-12 px-5 text-base",
+              "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base",
             )}
           >
             <MessageCircle aria-hidden="true" className="size-4" />
@@ -464,7 +464,7 @@ export function ClienteDetalheClient({
           type="button"
           variant="destructive"
           onClick={() => setDialogo("excluir")}
-          className="h-12 px-5 text-base"
+          className="minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base"
         >
           <Trash2 aria-hidden="true" className="size-4" />
           Excluir cliente
@@ -475,7 +475,7 @@ export function ClienteDetalheClient({
         href="/clientes"
         className={cn(
           buttonVariants({ variant: "outline" }),
-          "h-12 self-start px-5 text-base",
+          "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 self-start px-5 text-base",
         )}
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
@@ -580,7 +580,7 @@ export function ClienteDetalheClient({
               value={valorParcial}
               onChange={(e) => setValorParcial(maskBRL(e.target.value))}
               onFocus={(e) => e.target.select()}
-              className="h-12 text-base"
+              className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base"
             />
           </div>
           <FormatoEscolha

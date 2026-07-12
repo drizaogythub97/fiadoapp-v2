@@ -9,6 +9,7 @@ import {
   Settings,
   TrendingUp,
   Users,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -71,10 +72,22 @@ export function BottomNav({ displayName }: { displayName: string }) {
             onClick={(e) => e.stopPropagation()}
             className="bg-card text-card-foreground ring-foreground/10 flex flex-col gap-1 rounded-t-2xl p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] ring-1"
           >
-            <p className="text-muted-foreground px-3 pb-2 text-sm">
-              Conectado como{" "}
-              <span className="text-foreground font-medium">{displayName}</span>
-            </p>
+            <div className="flex items-center justify-between gap-2 px-3 pb-2">
+              <p className="text-muted-foreground text-sm">
+                Conectado como{" "}
+                <span className="text-foreground font-medium">
+                  {displayName}
+                </span>
+              </p>
+              <button
+                type="button"
+                onClick={() => setMaisAberto(false)}
+                aria-label="Fechar"
+                className="text-muted-foreground hover:text-foreground hover:bg-muted -mr-2 flex size-9 shrink-0 items-center justify-center rounded-lg"
+              >
+                <X aria-hidden="true" className="size-5" />
+              </button>
+            </div>
             {NO_MAIS.map(({ href, label, Icon }) => (
               <Link
                 key={href}
@@ -82,7 +95,7 @@ export function BottomNav({ displayName }: { displayName: string }) {
                 onClick={() => setMaisAberto(false)}
                 aria-current={ativo(href) ? "page" : undefined}
                 className={cn(
-                  "flex h-13 items-center gap-3 rounded-lg px-3 text-base font-medium",
+                  "flex h-12 items-center gap-3 rounded-lg px-3 text-base font-medium",
                   ativo(href)
                     ? "text-primary bg-primary/10"
                     : "text-foreground hover:bg-muted",
@@ -103,7 +116,7 @@ export function BottomNav({ displayName }: { displayName: string }) {
         aria-label="Navegação principal"
         className="border-border bg-background fixed inset-x-0 bottom-0 z-40 border-t pb-[env(safe-area-inset-bottom)]"
       >
-        <ul className="grid h-16 grid-cols-5">
+        <ul className="grid h-14 grid-cols-5">
           {PRINCIPAIS.map(({ href, label, Icon }) => (
             <li key={href}>
               <Link

@@ -76,7 +76,7 @@ export function AnalyticsClient({ vendas }: { vendas: VendaAnalytics[] }) {
                 setDe(e.target.value);
                 setAtalho(null);
               }}
-              className="h-12 text-base"
+              className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base"
             />
           </div>
           <div className="flex flex-col gap-2">
@@ -91,7 +91,7 @@ export function AnalyticsClient({ vendas }: { vendas: VendaAnalytics[] }) {
                 setAte(e.target.value);
                 setAtalho(null);
               }}
-              className="h-12 text-base"
+              className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base"
             />
           </div>
         </div>
@@ -107,7 +107,7 @@ export function AnalyticsClient({ vendas }: { vendas: VendaAnalytics[] }) {
                 variant={atalho === valor ? "default" : "outline"}
                 aria-pressed={atalho === valor}
                 onClick={() => aplicarAtalho(valor)}
-                className="h-11 px-4 text-base"
+                className="minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-11 px-4 text-base"
               >
                 {rotulo}
               </Button>
@@ -140,7 +140,7 @@ export function AnalyticsClient({ vendas }: { vendas: VendaAnalytics[] }) {
               ? "Nenhuma venda registrada ainda."
               : "Nenhuma venda no período escolhido."}
           </p>
-          <p className="text-muted-foreground text-base">
+          <p className="minimal:max-sm:text-sm text-muted-foreground text-base">
             Ajuste as datas ou use um dos atalhos acima.
           </p>
         </div>
@@ -206,7 +206,7 @@ export function AnalyticsClient({ vendas }: { vendas: VendaAnalytics[] }) {
               </CardHeader>
               <CardContent className="flex flex-col gap-5">
                 <p className="text-base">
-                  <span className="minimal:max-sm:text-2xl text-3xl font-bold tracking-tight">
+                  <span className="minimal:max-sm:text-xl text-3xl font-bold tracking-tight">
                     {pctRecebido}%
                   </span>{" "}
                   <span className="text-muted-foreground">

@@ -204,7 +204,7 @@ export function VendaForm({
 
   return (
     <form
-      className="flex flex-col gap-8"
+      className="minimal:max-sm:gap-5 flex flex-col gap-8"
       onSubmit={(e) => {
         e.preventDefault();
         salvar();
@@ -221,7 +221,7 @@ export function VendaForm({
 
       {/* ── CLIENTE ─────────────────────────────────────────────────── */}
       <section className="flex flex-col gap-4">
-        <h2 className="text-xl font-semibold tracking-tight">Cliente</h2>
+        <h2 className="minimal:max-sm:text-lg text-xl font-semibold tracking-tight">Cliente</h2>
 
         {clienteSel ? (
           <div className="ring-foreground/10 bg-card flex flex-wrap items-center justify-between gap-3 rounded-xl p-4 ring-1">
@@ -234,7 +234,7 @@ export function VendaForm({
                   </span>
                 ) : null}
               </span>
-              <span className="text-muted-foreground text-base">
+              <span className="minimal:max-sm:text-sm text-muted-foreground text-base">
                 {clienteSel.telefone
                   ? `${formatTelefone(clienteSel.telefone)} · `
                   : ""}
@@ -250,7 +250,7 @@ export function VendaForm({
                 setClienteSel(null);
                 setBusca("");
               }}
-              className="h-11 px-4 text-base"
+              className="minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-11 px-4 text-base"
             >
               <X aria-hidden="true" className="size-4" />
               Trocar cliente
@@ -286,7 +286,7 @@ export function VendaForm({
                     if (e.key === "Escape") setBuscaAberta(false);
                   }}
                   placeholder="Digite o nome ou referência…"
-                  className="h-13 pl-12 text-base"
+                  className="minimal:max-sm:h-11 minimal:max-sm:pl-10 minimal:max-sm:text-sm h-13 pl-12 text-base"
                 />
               </div>
               {buscaAberta && resultadosBusca.length > 0 ? (
@@ -317,7 +317,7 @@ export function VendaForm({
               ) : null}
             </div>
 
-            <p className="text-muted-foreground text-base">
+            <p className="minimal:max-sm:text-sm text-muted-foreground text-base">
               Cliente novo? Preencha os dados abaixo:
             </p>
 
@@ -331,7 +331,7 @@ export function VendaForm({
                   value={novoNome}
                   onChange={(e) => setNovoNome(e.target.value)}
                   placeholder="Nome do cliente"
-                  className="h-12 text-base"
+                  className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base"
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -343,7 +343,7 @@ export function VendaForm({
                   value={novoSobrenome}
                   onChange={(e) => setNovoSobrenome(e.target.value)}
                   placeholder="Sobrenome (opcional)"
-                  className="h-12 text-base"
+                  className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base"
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -355,7 +355,7 @@ export function VendaForm({
                   value={novaReferencia}
                   onChange={(e) => setNovaReferencia(e.target.value)}
                   placeholder="ex.: Filho da Maria, Loja"
-                  className="h-12 text-base"
+                  className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base"
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -369,7 +369,7 @@ export function VendaForm({
                   value={novoTelefone}
                   onChange={(e) => setNovoTelefone(e.target.value)}
                   placeholder="(11) 91234-5678"
-                  className="h-12 text-base"
+                  className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base"
                 />
               </div>
             </div>
@@ -379,7 +379,7 @@ export function VendaForm({
 
       {/* ── DATAS ───────────────────────────────────────────────────── */}
       <section className="flex flex-col gap-4">
-        <h2 className="text-xl font-semibold tracking-tight">Datas</h2>
+        <h2 className="minimal:max-sm:text-lg text-xl font-semibold tracking-tight">Datas</h2>
         <div className="grid max-w-xl gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-2">
             <Label htmlFor="data-compra" className="text-base">
@@ -391,7 +391,7 @@ export function VendaForm({
               required
               value={dataCompra}
               onChange={(e) => mudarDataCompra(e.target.value)}
-              className="h-12 text-base"
+              className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base"
             />
           </div>
           <div className="flex flex-col gap-2">
@@ -403,7 +403,7 @@ export function VendaForm({
               type="date"
               value={dataVencimento}
               onChange={(e) => setDataVencimento(e.target.value)}
-              className="h-12 text-base"
+              className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base"
             />
             <p className="text-muted-foreground text-sm">
               Preenchida sozinha com 30 dias após a compra. Apague para deixar
@@ -415,7 +415,7 @@ export function VendaForm({
 
       {/* ── PRODUTOS ────────────────────────────────────────────────── */}
       <section className="flex flex-col gap-4">
-        <h2 className="text-xl font-semibold tracking-tight">Produtos</h2>
+        <h2 className="minimal:max-sm:text-lg text-xl font-semibold tracking-tight">Produtos</h2>
 
         <ul className="flex flex-col gap-3">
           {itens.map((item, idx) => (
@@ -442,7 +442,7 @@ export function VendaForm({
                     onChange={(e) =>
                       atualizarItem(item.key, { quantidade: e.target.value })
                     }
-                    className="h-12 text-base"
+                    className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base"
                   />
                 </div>
 
@@ -472,7 +472,7 @@ export function VendaForm({
                       })
                     }
                     onFocus={(e) => e.target.select()}
-                    className="h-12 text-base"
+                    className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base"
                   />
                 </div>
 
@@ -500,7 +500,7 @@ export function VendaForm({
           type="button"
           variant="outline"
           onClick={() => setItens((atual) => [...atual, novaLinha()])}
-          className="h-12 self-start px-5 text-base"
+          className="minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 self-start px-5 text-base"
         >
           <Plus aria-hidden="true" className="size-5" />
           Adicionar produto
@@ -616,7 +616,7 @@ function CampoDescricao({
           if (e.key === "Escape") setAberto(false);
         }}
         onBlur={() => setTimeout(() => setAberto(false), 150)}
-        className="h-12 text-base"
+        className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base"
       />
       {mostrar ? (
         <ul

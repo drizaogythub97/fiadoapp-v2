@@ -68,7 +68,7 @@ export default async function AppLayout({
         </div>
         <AppNav />
       </header>
-      <main className="minimal:max-sm:py-6 minimal:max-sm:pb-28 mx-auto w-full max-w-5xl flex-1 px-4 py-8">
+      <main className="minimal:max-sm:py-4 minimal:max-sm:pb-24 mx-auto w-full max-w-5xl flex-1 px-4 py-8">
         {children}
       </main>
       <BottomNav displayName={displayName ?? ""} />

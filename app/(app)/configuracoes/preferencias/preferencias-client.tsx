@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutGrid, Moon, Search, Smartphone, Sun } from "lucide-react";
+import { LayoutGrid, Moon, Search, Smartphone, Sun, X } from "lucide-react";
 import { useMemo, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -50,6 +50,9 @@ export function PreferenciasClient({
   const [tema, setTema] = useState<Tema>(temaInicial);
   const [modoUi, setModoUi] = useState<ModoUi>(modoUiInicial ?? "simples");
   const [busca, setBusca] = useState("");
+  const [clienteLimite, setClienteLimite] = useState<ClienteComSaldo | null>(
+    null,
+  );
   const [salvandoPadrao, startPadrao] = useTransition();
   const limitePadraoRef = useRef<HTMLInputElement>(null);
 
@@ -107,7 +110,7 @@ export function PreferenciasClient({
               variant={tema === "dark" ? "default" : "outline"}
               aria-pressed={tema === "dark"}
               onClick={() => trocarTema("dark")}
-              className="h-12 px-5 text-base"
+              className="minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base"
             >
               <Moon aria-hidden="true" className="size-5" />
               Escuro
@@ -117,7 +120,7 @@ export function PreferenciasClient({
               variant={tema === "light" ? "default" : "outline"}
               aria-pressed={tema === "light"}
               onClick={() => trocarTema("light")}
-              className="h-12 px-5 text-base"
+              className="minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base"
             >
               <Sun aria-hidden="true" className="size-5" />
               Claro
@@ -147,7 +150,7 @@ export function PreferenciasClient({
               variant={modoUi === "simples" ? "default" : "outline"}
               aria-pressed={modoUi === "simples"}
               onClick={() => trocarModoUi("simples")}
-              className="h-12 px-5 text-base"
+              className="minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base"
             >
               <LayoutGrid aria-hidden="true" className="size-5" />
               Simples
@@ -157,7 +160,7 @@ export function PreferenciasClient({
               variant={modoUi === "minimalista" ? "default" : "outline"}
               aria-pressed={modoUi === "minimalista"}
               onClick={() => trocarModoUi("minimalista")}
-              className="h-12 px-5 text-base"
+              className="minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base"
             >
               <Smartphone aria-hidden="true" className="size-5" />
               Minimalista
@@ -196,7 +199,7 @@ export function PreferenciasClient({
                 inputMode="decimal"
                 placeholder="Vazio = sem limite"
                 defaultValue={limiteParaInput(limitePadraoInicial)}
-                className="h-12 text-base"
+                className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base"
               />
             </div>
             <Button
@@ -221,11 +224,13 @@ export function PreferenciasClient({
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           {clientes.length === 0 ? (
-            <p className="text-muted-foreground text-base">
+            <p className="minimal:max-sm:text-sm text-muted-foreground text-base">
               Nenhum cliente cadastrado ainda.
             </p>
           ) : (
             <>
+              {/* Busca com dropdown (pedido do dono, 2026-07-11): nada de
+                  listar todos os clientes na página. */}
               <div className="relative sm:max-w-sm">
                 <Search
                   aria-hidden="true"
@@ -233,24 +238,67 @@ export function PreferenciasClient({
                 />
                 <Input
                   type="search"
+                  role="combobox"
+                  aria-expanded={busca.trim().length > 0}
+                  aria-controls="limite-busca-resultados"
+                  autoComplete="off"
                   value={busca}
                   onChange={(e) => setBusca(e.target.value)}
-                  placeholder="Filtrar cliente pelo nome…"
-                  aria-label="Filtrar cliente pelo nome"
+                  placeholder="Buscar cliente pelo nome…"
+                  aria-label="Buscar cliente pelo nome"
                   className="h-12 pl-10 text-base"
                 />
+                {busca.trim().length > 0 ? (
+                  <ul
+                    id="limite-busca-resultados"
+                    className="border-border bg-card absolute z-10 mt-2 w-full overflow-hidden rounded-xl border shadow-lg"
+                  >
+                    {filtrados.length === 0 ? (
+                      <li className="text-muted-foreground px-4 py-3 text-base">
+                        Nenhum cliente encontrado.
+                      </li>
+                    ) : (
+                      filtrados.slice(0, 6).map((c) => (
+                        <li key={c.id}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setClienteLimite(c);
+                              setBusca("");
+                            }}
+                            className="hover:bg-muted focus-visible:bg-muted flex h-12 w-full items-center gap-2 px-4 text-left text-base outline-none"
+                          >
+                            <span className="font-medium">
+                              {c.sobrenome ? `${c.nome} ${c.sobrenome}` : c.nome}
+                            </span>
+                            {c.referencia ? (
+                              <span className="text-muted-foreground text-sm">
+                                ({c.referencia})
+                              </span>
+                            ) : null}
+                            {c.limite_credito !== null ? (
+                              <span className="text-muted-foreground ml-auto text-sm">
+                                Limite: {formatBRL(c.limite_credito)}
+                              </span>
+                            ) : null}
+                          </button>
+                        </li>
+                      ))
+                    )}
+                  </ul>
+                ) : null}
               </div>
 
-              {filtrados.length === 0 ? (
-                <p className="text-muted-foreground text-base">
-                  Nenhum cliente encontrado com esse nome.
-                </p>
+              {clienteLimite ? (
+                <LinhaLimiteCliente
+                  key={clienteLimite.id}
+                  cliente={clienteLimite}
+                  onFechar={() => setClienteLimite(null)}
+                />
               ) : (
-                <ul className="flex flex-col gap-2">
-                  {filtrados.map((c) => (
-                    <LinhaLimiteCliente key={c.id} cliente={c} />
-                  ))}
-                </ul>
+                <p className="minimal:max-sm:text-sm text-muted-foreground text-base">
+                  Busque um cliente para ver e ajustar o limite dele.
+                </p>
               )}
             </>
           )}
@@ -260,7 +308,13 @@ export function PreferenciasClient({
   );
 }
 
-function LinhaLimiteCliente({ cliente }: { cliente: ClienteComSaldo }) {
+function LinhaLimiteCliente({
+  cliente,
+  onFechar,
+}: {
+  cliente: ClienteComSaldo;
+  onFechar: () => void;
+}) {
   const [salvando, startSalvar] = useTransition();
   // Último valor persistido — evita re-salvar quando nada mudou no blur.
   const salvoRef = useRef(limiteParaInput(cliente.limite_credito));
@@ -283,7 +337,7 @@ function LinhaLimiteCliente({ cliente }: { cliente: ClienteComSaldo }) {
   }
 
   return (
-    <li className="ring-foreground/10 bg-card flex flex-wrap items-center gap-3 rounded-xl px-4 py-3 ring-1">
+    <div className="ring-foreground/10 bg-card flex flex-wrap items-center gap-3 rounded-xl px-4 py-3 ring-1">
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <span className="truncate text-base font-medium">
           {nomeCompleto}
@@ -292,6 +346,11 @@ function LinhaLimiteCliente({ cliente }: { cliente: ClienteComSaldo }) {
               ({cliente.referencia})
             </span>
           ) : null}
+        </span>
+        <span className="text-muted-foreground text-sm">
+          {cliente.limite_credito !== null
+            ? `Limite atual: ${formatBRL(cliente.limite_credito)}`
+            : "Sem limite próprio (vale o padrão)"}
         </span>
         {cliente.saldo_devedor > 0 ? (
           <span className="bg-destructive/10 text-destructive inline-flex w-fit rounded-full px-3 py-1 text-sm font-semibold">
@@ -320,9 +379,17 @@ function LinhaLimiteCliente({ cliente }: { cliente: ClienteComSaldo }) {
               (e.target as HTMLInputElement).blur();
             }
           }}
-          className="h-12 text-base"
+          className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base"
         />
       </div>
-    </li>
+      <button
+        type="button"
+        onClick={onFechar}
+        aria-label={`Fechar ajuste de limite de ${nomeCompleto}`}
+        className="text-muted-foreground hover:text-foreground hover:bg-muted flex size-9 shrink-0 items-center justify-center rounded-lg"
+      >
+        <X aria-hidden="true" className="size-5" />
+      </button>
+    </div>
   );
 }

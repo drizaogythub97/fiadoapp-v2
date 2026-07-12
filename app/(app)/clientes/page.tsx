@@ -21,13 +21,13 @@ export default async function ClientesPage({
   const clientes = (data ?? []) as ClienteComSaldo[];
 
   return (
-    <section className="flex flex-col gap-6">
+    <section className="minimal:max-sm:gap-4 flex flex-col gap-6">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="minimal:max-sm:text-2xl text-3xl font-bold tracking-tight">
+          <h1 className="minimal:max-sm:text-xl text-3xl font-bold tracking-tight">
             Clientes
           </h1>
-          <p className="minimal:max-sm:text-base text-muted-foreground mt-1 text-lg">
+          <p className="minimal:max-sm:text-sm text-muted-foreground mt-1 text-lg">
             Busque, cadastre e acompanhe quem compra fiado.
           </p>
         </div>

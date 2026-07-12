@@ -154,7 +154,7 @@ export function MarcaSection({
           compartilha. Sem personalização, usamos a marca FiadoApp.
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-col gap-6">
+      <CardContent className="minimal:max-sm:gap-4 flex flex-col gap-6">
         {/* ── Nome da loja ─────────────────────────────────────────── */}
         <form
           onSubmit={submeterNome}
@@ -171,7 +171,7 @@ export function MarcaSection({
               maxLength={60}
               placeholder="ex.: Rações Cardoso"
               defaultValue={nomeInicial}
-              className="h-12 text-base"
+              className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base"
             />
           </div>
           <Button
@@ -226,7 +226,7 @@ export function MarcaSection({
                 variant="outline"
                 onClick={removerLogo}
                 disabled={pending}
-                className="h-12 text-base"
+                className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base"
               >
                 <Trash2 aria-hidden="true" className="size-4" />
                 Remover logo atual
@@ -270,7 +270,7 @@ export function MarcaSection({
                   setCompletedCrop(null);
                 }}
                 disabled={pending}
-                className="h-12 px-5 text-base"
+                className="minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base"
               >
                 Cancelar
               </Button>
@@ -279,7 +279,7 @@ export function MarcaSection({
                 onClick={salvarLogo}
                 disabled={pending || !completedCrop}
                 aria-busy={pending}
-                className="h-12 px-5 text-base"
+                className="minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base"
               >
                 {pending ? "Enviando…" : "Salvar logo"}
               </Button>

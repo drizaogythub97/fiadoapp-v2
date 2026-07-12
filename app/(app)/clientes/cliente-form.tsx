@@ -43,7 +43,7 @@ export function ClienteForm({ action, initialValues, submitLabel }: Props) {
         "aria-invalid": erro ? true : undefined,
         "aria-describedby": erro ? `${nome}-erro` : undefined,
         defaultValue: valores[nome] ?? "",
-        className: "h-12 text-base",
+        className: "minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base",
       },
     };
   }

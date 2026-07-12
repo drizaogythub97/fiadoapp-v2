@@ -142,12 +142,14 @@ export function useEmissorComprovante() {
         <div
           aria-hidden="true"
           // Fora da viewport, mas renderizado (display:none quebraria o
-          // html-to-image). 720px = mesma largura do papel do preview.
+          // html-to-image). 420px = proporção RETRATO do comprovante, igual
+          // ao preview aberto num celular (validação do dono, 2026-07-11:
+          // 720px deixava o documento "deitado" e diferente do antigo).
           style={{
             position: "fixed",
             left: "-10000px",
             top: 0,
-            width: "720px",
+            width: "420px",
             pointerEvents: "none",
           }}
         >

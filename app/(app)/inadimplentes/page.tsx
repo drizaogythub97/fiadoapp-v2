@@ -63,12 +63,12 @@ export default async function InadimplentesPage() {
   const totalGeral = inadimplentes.reduce((s, i) => s + i.totalDevido, 0);
 
   return (
-    <section className="flex flex-col gap-6">
+    <section className="minimal:max-sm:gap-4 flex flex-col gap-6">
       <header>
-        <h1 className="minimal:max-sm:text-2xl text-3xl font-bold tracking-tight">
+        <h1 className="minimal:max-sm:text-xl text-3xl font-bold tracking-tight">
           Inadimplentes
         </h1>
-        <p className="minimal:max-sm:text-base text-muted-foreground mt-1 text-lg">
+        <p className="minimal:max-sm:text-sm text-muted-foreground mt-1 text-lg">
           Clientes com vendas vencidas e ainda em aberto.
         </p>
       </header>
@@ -86,7 +86,7 @@ export default async function InadimplentesPage() {
           <p className="text-lg font-medium">
             Nenhuma inadimplência encontrada!
           </p>
-          <p className="text-muted-foreground text-base">
+          <p className="minimal:max-sm:text-sm text-muted-foreground text-base">
             Todos os clientes estão em dia.
           </p>
         </div>
@@ -135,7 +135,7 @@ export default async function InadimplentesPage() {
                             </span>
                           ) : null}
                         </span>
-                        <span className="text-muted-foreground text-base">
+                        <span className="minimal:max-sm:text-sm text-muted-foreground text-base">
                           {vendasVencidas === 1
                             ? "1 venda vencida"
                             : `${vendasVencidas} vendas vencidas`}
@@ -163,7 +163,7 @@ export default async function InadimplentesPage() {
                         rel="noopener noreferrer"
                         className={cn(
                           buttonVariants({ variant: "outline" }),
-                          "h-12 self-start px-5 text-base",
+                          "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 self-start px-5 text-base",
                         )}
                       >
                         <MessageCircle aria-hidden="true" className="size-5" />

@@ -76,7 +76,7 @@ export function DashboardSearch({ clientes }: { clientes: ClienteBusca[] }) {
             if (e.key === "Escape") setAberto(false);
           }}
           placeholder="Digite o nome ou referência…"
-          className="h-13 pl-12 text-base"
+          className="minimal:max-sm:h-11 minimal:max-sm:pl-10 minimal:max-sm:text-sm h-13 pl-12 text-base"
         />
       </div>
       {aberto && resultados.length > 0 ? (

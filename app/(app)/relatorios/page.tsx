@@ -61,12 +61,12 @@ export default async function RelatoriosPage() {
   );
 
   return (
-    <section className="flex flex-col gap-6">
+    <section className="minimal:max-sm:gap-4 flex flex-col gap-6">
       <header className="print:hidden">
-        <h1 className="minimal:max-sm:text-2xl text-3xl font-bold tracking-tight">
+        <h1 className="minimal:max-sm:text-xl text-3xl font-bold tracking-tight">
           Relatórios
         </h1>
-        <p className="minimal:max-sm:text-base text-muted-foreground mt-1 text-lg">
+        <p className="minimal:max-sm:text-sm text-muted-foreground mt-1 text-lg">
           Filtre, imprima e exporte suas vendas.
         </p>
       </header>

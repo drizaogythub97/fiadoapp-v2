@@ -38,17 +38,17 @@ export default async function LoginPage({
       : null;
 
   return (
-    <Card className="p-6">
-      <CardHeader className="items-center gap-4 text-center">
+    <Card className="p-6 max-sm:p-4">
+      <CardHeader className="items-center gap-4 text-center max-sm:gap-3">
         <BrandLockup />
         <div className="flex flex-col gap-1.5">
-          <CardTitle className="text-2xl">Entrar</CardTitle>
-          <CardDescription className="text-base">
+          <CardTitle className="text-2xl max-sm:text-xl">Entrar</CardTitle>
+          <CardDescription className="text-base max-sm:text-sm">
             Acesse sua conta com e-mail e senha.
           </CardDescription>
         </div>
       </CardHeader>
-      <CardContent className="flex flex-col gap-6">
+      <CardContent className="flex flex-col gap-6 max-sm:gap-4">
         {linkError ? <ErrorAlert message={linkError} /> : null}
         <LoginForm />
         <div className="flex flex-col gap-1.5 text-center">

@@ -48,9 +48,9 @@ export default async function HistoricoClientePage({
     : cliente.nome;
 
   return (
-    <section className="flex max-w-2xl flex-col gap-6">
+    <section className="minimal:max-sm:gap-4 flex max-w-2xl flex-col gap-6">
       <header className="flex flex-col gap-2">
-        <h1 className="minimal:max-sm:text-2xl text-3xl font-bold tracking-tight">
+        <h1 className="minimal:max-sm:text-xl text-3xl font-bold tracking-tight">
           Histórico de vendas pagas
         </h1>
         <p className="text-muted-foreground text-lg">
@@ -77,7 +77,7 @@ export default async function HistoricoClientePage({
                 </span>
                 <VendaStatusBadge status="PAGA" />
               </div>
-              <p className="text-muted-foreground text-base">
+              <p className="minimal:max-sm:text-sm text-muted-foreground text-base">
                 Quitada em{" "}
                 {v.quitado_em
                   ? new Date(v.quitado_em).toLocaleDateString("pt-BR", {
@@ -117,7 +117,7 @@ export default async function HistoricoClientePage({
                   href={`/vendas/${v.id}`}
                   className={cn(
                     buttonVariants({ variant: "outline" }),
-                    "h-11 px-4 text-base",
+                    "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-11 px-4 text-base",
                   )}
                 >
                   Detalhar
@@ -131,7 +131,7 @@ export default async function HistoricoClientePage({
       <div className="flex flex-wrap gap-2">
         <Link
           href={`/vendas/nova?cliente=${cliente.id}`}
-          className={cn(buttonVariants(), "h-12 px-5 text-base")}
+          className={cn(buttonVariants(), "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base")}
         >
           <Plus aria-hidden="true" className="size-4" />
           Nova venda
@@ -140,7 +140,7 @@ export default async function HistoricoClientePage({
           href={`/clientes/${cliente.id}`}
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "h-12 px-5 text-base",
+            "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base",
           )}
         >
           <ArrowLeft aria-hidden="true" className="size-4" />

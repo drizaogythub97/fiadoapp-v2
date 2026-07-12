@@ -1,5 +1,7 @@
+import { Clock, Plus, UserPlus } from "lucide-react";
 import Link from "next/link";
 
+import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardDescription,
@@ -80,15 +82,19 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="minimal:max-sm:gap-5 flex flex-col gap-8">
       <div>
-        <h1 className="minimal:max-sm:text-2xl text-3xl font-bold tracking-tight">
+        <h1 className="minimal:max-sm:text-xl text-3xl font-bold tracking-tight">
           Olá{firstName ? `, ${firstName}` : ""}!
         </h1>
-        <p className="minimal:max-sm:text-base text-muted-foreground mt-1 text-lg">
+        <p className="minimal:max-sm:text-sm text-muted-foreground mt-1 text-lg">
           Gerencie suas vendas e acompanhe seus recebimentos.
         </p>
       </div>
+
+      {/* Busca antes dos KPIs (pedido do dono, 2026-07-11): achar o cliente
+          é a ação nº 1 do dia a dia. */}
+      <DashboardSearch clientes={clientes} />
 
       {/* Minimalista (mobile): KPIs em grade 2×2 compacta, sem o texto de
           apoio — mais informação na primeira dobra. */}
@@ -113,7 +119,7 @@ export default async function DashboardPage() {
                 </CardDescription>
                 <CardTitle
                   className={cn(
-                    "minimal:max-sm:text-2xl text-3xl",
+                    "minimal:max-sm:text-xl text-3xl",
                     destaque === "brand" && "text-primary",
                     destaque === "danger" && "text-destructive",
                   )}
@@ -129,7 +135,44 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      <DashboardSearch clientes={clientes} />
+      {/* Atalhos rápidos (pedido do dono, 2026-07-11). */}
+      <section className="flex flex-col gap-3 minimal:max-sm:gap-2">
+        <h2 className="minimal:max-sm:text-lg text-xl font-semibold tracking-tight">
+          Atalhos rápidos
+        </h2>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/vendas/nova"
+            className={cn(
+              buttonVariants(),
+              "minimal:max-sm:h-11 minimal:max-sm:text-sm h-13 flex-1 px-4 text-base font-medium sm:flex-initial sm:px-6",
+            )}
+          >
+            <Plus aria-hidden="true" className="size-5" />
+            Nova venda
+          </Link>
+          <Link
+            href="/clientes/novo"
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "minimal:max-sm:h-11 minimal:max-sm:text-sm h-13 flex-1 px-4 text-base font-medium sm:flex-initial sm:px-6",
+            )}
+          >
+            <UserPlus aria-hidden="true" className="size-5" />
+            Novo cliente
+          </Link>
+          <Link
+            href="/inadimplentes"
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "minimal:max-sm:h-11 minimal:max-sm:text-sm h-13 flex-1 px-4 text-base font-medium sm:flex-initial sm:px-6",
+            )}
+          >
+            <Clock aria-hidden="true" className="size-5" />
+            Cobrar atrasados
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }

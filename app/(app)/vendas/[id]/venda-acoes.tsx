@@ -105,7 +105,7 @@ export function VendaAcoes({
         <Button
           type="button"
           onClick={() => setConfirmando("quitar")}
-          className="h-13 px-6 text-base font-medium"
+          className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-13 px-6 text-base font-medium"
         >
           <CheckCircle2 aria-hidden="true" className="size-5" />
           Quitar esta venda
@@ -115,7 +115,7 @@ export function VendaAcoes({
         type="button"
         variant="destructive"
         onClick={() => setConfirmando("excluir")}
-        className="h-13 px-6 text-base font-medium"
+        className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-13 px-6 text-base font-medium"
       >
         <Trash2 aria-hidden="true" className="size-5" />
         Excluir venda

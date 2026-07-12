@@ -67,7 +67,7 @@ export function VendasClient({
           onChange={(e) => setBusca(e.target.value)}
           placeholder="Buscar pelo nome do cliente…"
           aria-label="Buscar venda pelo cliente"
-          className="h-13 pl-12 text-base"
+          className="minimal:max-sm:h-11 minimal:max-sm:pl-10 minimal:max-sm:text-sm h-13 pl-12 text-base"
         />
       </div>
 
@@ -83,7 +83,7 @@ export function VendasClient({
               variant={filtro === valor ? "default" : "outline"}
               aria-pressed={filtro === valor}
               onClick={() => setFiltro(valor)}
-              className="h-11 px-4 text-base"
+              className="minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-11 px-4 text-base"
             >
               {rotulo}
             </Button>
@@ -91,7 +91,7 @@ export function VendasClient({
         </div>
       </fieldset>
 
-      <p aria-live="polite" className="text-muted-foreground text-base">
+      <p aria-live="polite" className="minimal:max-sm:text-sm text-muted-foreground text-base">
         {filtradas.length === 0
           ? null
           : filtradas.length === 1

@@ -106,7 +106,7 @@ export function ClientesClient({
           onChange={(e) => setBusca(e.target.value)}
           placeholder="Buscar por nome, sobrenome ou referência…"
           aria-label="Buscar cliente"
-          className="h-13 pl-12 text-base"
+          className="minimal:max-sm:h-11 minimal:max-sm:pl-10 minimal:max-sm:text-sm h-13 pl-12 text-base"
         />
       </div>
 
@@ -122,7 +122,7 @@ export function ClientesClient({
               variant={situacao === valor ? "default" : "outline"}
               aria-pressed={situacao === valor}
               onClick={() => setSituacao(valor)}
-              className="h-11 flex-1 px-4 text-base sm:flex-initial"
+              className="minimal:max-sm:h-10 minimal:max-sm:text-sm h-11 flex-1 px-4 text-base sm:flex-initial"
             >
               {rotulo}
             </Button>
@@ -152,7 +152,7 @@ export function ClientesClient({
               aria-pressed={letra === l}
               onClick={() => setLetra(letra === l ? null : l)}
               aria-label={`Clientes com a letra ${l}`}
-              className="h-11 min-w-11 px-0 text-base"
+              className="minimal:max-sm:h-10 minimal:max-sm:min-w-10 minimal:max-sm:text-sm h-11 min-w-11 px-0 text-base"
             >
               {l}
             </Button>
@@ -160,7 +160,7 @@ export function ClientesClient({
         </div>
       </fieldset>
 
-      <p aria-live="polite" className="text-muted-foreground text-base">
+      <p aria-live="polite" className="minimal:max-sm:text-sm text-muted-foreground text-base">
         {filtrados.length === 0
           ? null
           : filtrados.length === 1
@@ -236,7 +236,7 @@ export function ClientesClient({
                   href={`/clientes/${c.id}`}
                   className={cn(
                     buttonVariants(),
-                    "h-12 flex-1 px-2 text-base sm:flex-initial sm:px-4",
+                    "minimal:max-sm:h-10 minimal:max-sm:text-sm h-12 flex-1 px-2 text-base sm:flex-initial sm:px-4",
                   )}
                   aria-label={`Detalhar ${nomeCompleto(c)}`}
                 >
@@ -247,7 +247,7 @@ export function ClientesClient({
                   href={`/clientes/${c.id}/editar`}
                   className={cn(
                     buttonVariants({ variant: "outline" }),
-                    "h-12 flex-1 px-2 text-base sm:flex-initial sm:px-4",
+                    "minimal:max-sm:h-10 minimal:max-sm:text-sm h-12 flex-1 px-2 text-base sm:flex-initial sm:px-4",
                   )}
                   aria-label={`Editar ${nomeCompleto(c)}`}
                 >
@@ -259,7 +259,7 @@ export function ClientesClient({
                   variant="destructive"
                   onClick={() => setExcluindo(c)}
                   aria-label={`Excluir ${nomeCompleto(c)}`}
-                  className="h-12 flex-1 px-2 text-base sm:flex-initial sm:px-4"
+                  className="minimal:max-sm:h-10 minimal:max-sm:text-sm h-12 flex-1 px-2 text-base sm:flex-initial sm:px-4"
                 >
                   <Trash2 aria-hidden="true" className="size-4" />
                   Excluir
