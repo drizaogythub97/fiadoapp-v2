@@ -55,6 +55,53 @@ apenas onde encontrá-los.
 | Fluxos signup/recover/reset + `/privacidade`                              | textos adaptados ao FiadoApp + `ui/checkbox`            | ✅ F4d-4                   |
 | `.github/workflows/backup-db.yml`                                         | NÃO duplicar — o backup do Gaveta já cobre o banco todo | —                          |
 
+## Estado 2026-07-12 (fim do dia): SPRINT ENCERRADA — F6 estágios 1 e 2 em produção; PRÓXIMO = estágio 3
+
+**Onde paramos:** a **F6 (Ecossistema)** começou e entregou, nos DOIS apps
+em produção, a **Descoberta**, o **Estágio 1 (app switcher opt-in)** e o
+**Estágio 2 (marca única, com política de retorno)**. Ver roadmap F6 para
+os PRs/hashes. Working trees limpos, branches apagadas.
+
+**Ponto de partida exato da próxima sessão: F6 Estágio 3 — Clientes
+compartilhados.** É o mais delicado da fase: mexe no caderno real do dono
+(clientes de produção). Antes de codar: desenhar o mapeamento (o Fiado tem
+`fiado_clientes`; o Gaveta tem clientes próprios?) e decidir a direção da
+ponte SEM migração destrutiva. Seguir os "Padrões do ecossistema" do
+roadmap: coluna nova em `ecossistema_prefs` (default false) + `EcoToggle`
+na `/ecossistema` dos dois apps + helper em `lib/ecossistema-server.ts`.
+
+**Arquitetura de pontes já montada (reutilizar):**
+
+- **Tabela `ecossistema_prefs`** (migration 0005): compartilhada pelos dois
+  apps (prefixo próprio `ecossistema_`, RLS por `user_id`). Cada ponte é
+  uma coluna booleana `default false` (`switcher_ativo`, `marca_unica`) +,
+  quando precisa reverter, colunas de backup (`bak_*`, migration 0007).
+- **`EcoToggle`** (`app/(app)/ecossistema/eco-toggle.tsx`, igual nos dois
+  repos): toggle Ativado/Desativado que recebe a server action por prop
+  (`onSalvar`) + mensagens de toast. É o componente-padrão de toda ponte.
+- **`lib/ecossistema-server.ts`**: helpers server-only (`marcaUnicaAtiva`,
+  `removerLogoSeguro`). Novos toggles ganham seu `<ponte>Ativa()` aqui.
+- **Página `/ecossistema`**: um `<Card>` por ponte, cada um com seu
+  `EcoToggle`; as pontes ainda não feitas ficam na lista "Em breve".
+
+**Gotchas novos desta parte:**
+
+- **Opt-in é regra, não sugestão**: qualquer elemento de UI de ponte
+  (inclusive um simples botão/atalho) tem de nascer desligado e atrás de
+  um toggle — um botão fixo "solto" foi rejeitado pelo dono.
+- **Dual-write de arquivo (logo)**: ao sincronizar logos entre apps, o
+  arquivo é ÚNICO no bucket compartilhado. NUNCA apague um logo sem passar
+  pelo guarda `removerLogoSeguro` — ele protege arquivos ainda referenciados
+  (logo atual de qualquer app OU backup), senão o "voltar ao anterior"
+  quebra. Ao remover/trocar logo: zere o ponteiro nas tabelas PRIMEIRO,
+  depois chame o guarda.
+- **Política de retorno**: toda ponte que sobrescreve dado do outro app
+  deve guardar o valor anterior na ativação e restaurar na desativação
+  (o dono espera "desliguei → voltou ao que era", não "congelou").
+- **Migrations** aplicadas ao banco compartilhado ANTES do push (script
+  `.mjs` + `pg --no-save`, apagado depois). Numeração no repo do Fiado:
+  já vamos em 0007.
+
 ## Estado 2026-07-12: SPRINT ENCERRADA — padrão mobile replicado no Gaveta; PRÓXIMO = F6
 
 **Onde paramos:** os DOIS apps do ecossistema estão em produção com o

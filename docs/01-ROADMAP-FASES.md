@@ -187,18 +187,39 @@ AUTÔNOMOS (cada um com todos os seus recursos — ver marca nativa na F4d-3);
 a infra compartilhada (mesmo Supabase/Auth = SSO) é invisível ao usuário;
 toda integração é OPT-IN, com liga/desliga individual e default DESLIGADO.
 
-- [ ] 🤖 Descoberta (nos dois apps): card permanente em Configurações +
-      anúncio único dispensável no Painel + gatilho contextual (ex.: venda
-      a prazo no PDV do Gaveta sugere o Fiado) + página `/ecossistema`
-      (benefícios, "Ativar com a minha conta" em 1 clique, toggles)
-- [ ] 🤖 Estágio 1 — Vínculo básico: app switcher no header + abrir o outro
-      app já logado
-- [ ] 🤖 Estágio 2 — Marca compartilhada: marca ÚNICA do ecossistema,
-      editável de qualquer um dos dois apps (decisão 👤: opção "a")
-- [ ] 🤖 Estágio 3 — Clientes compartilhados
+- [x] 🤖👤 **Descoberta CONCLUÍDA** (2026-07-12): página `/ecossistema` +
+      card permanente em Configurações + anúncio único dispensável no
+      Painel (cookie `fiado_ecossistema_anuncio`). Fiado PR #16 (squash
+      `a6da98c`); Gaveta PR #18 (merge `6dc2771`). Gatilho contextual
+      (venda a prazo no PDV) fica junto do Estágio 4.
+- [x] 🤖👤 **Estágio 1 — Vínculo básico CONCLUÍDO** (2026-07-12): app
+      switcher no header + item no painel "Mais", **opt-in** via toggle
+      "Atalho rápido no menu" (o botão fixo foi retrabalhado por feedback
+      do dono — sem propósito declarado feria o opt-in). Fundação de
+      toggles: tabela `ecossistema_prefs` (migration 0005; RLS por
+      usuário; colunas default false). Fiado PR #17 (squash `5024eb3`);
+      Gaveta PR #19 (merge `4db47fc`).
+- [x] 🤖👤 **Estágio 2 — Marca única CONCLUÍDA** (2026-07-12): toggle
+      "Marca única da loja"; ativar copia a marca do app de origem p/ o
+      outro; com a ponte ON as actions de marca fazem dual-write (nome +
+      logo = mesmo arquivo do bucket compartilhado). **Política de
+      retorno** (pedido do dono): desativar restaura a marca anterior de
+      cada app (migration 0007 = colunas de backup; guarda
+      `removerLogoSeguro` preserva o logo do retorno). Leitura continua
+      nativa (autonomia intacta). Fiado PR #18 (squash `33d9ff3`);
+      Gaveta PR #20 (merge `0f1472b`).
+- [ ] 🤖 Estágio 3 — Clientes compartilhados (PRÓXIMO; toca o caderno real
+      do dono — mapeamento cuidadoso, sem migração destrutiva)
 - [ ] 🤖 Estágio 4 — Fiado no PDV: venda "a prazo" no caixa do Gaveta cria
-      a venda no Fiado (argumento de venda mais forte)
+      a venda no Fiado (argumento de venda mais forte) + gatilho contextual
 - [ ] 🤖 Estágio 5 — Recebíveis do Fiado no resumo financeiro do Gaveta
 
 Nota: a IA de Configurações já foi padronizada nos dois apps (Fiado na
 F4d-3; Gaveta via prompt entregue ao dono em 2026-07-09).
+
+**Padrões do ecossistema (para os estágios 3–5):** toda ponte é uma
+coluna nova em `ecossistema_prefs` (default false) + um `EcoToggle` na
+página `/ecossistema` dos dois apps + helper server-side de leitura da
+flag em `lib/ecossistema-server.ts`. Migrations numeradas no repo do
+Fiado (dono das migrations), aplicadas ao banco compartilhado antes do
+push. Gaveta mescla com `--merge`; Fiado com squash.
