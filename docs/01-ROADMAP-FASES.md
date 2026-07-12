@@ -171,8 +171,14 @@ experiência melhor que a herdada do desktop.
       os PRs empilhados #13/#14 entraram na main por ele)
 - [x] 🤖 Spec de padronização para replicar no Gaveta:
       `docs/05-MOBILE-UI-SPEC.md`
-- [ ] 🤖 **PRÓXIMO PASSO: replicar o padrão mobile no Gaveta**
-      (`../erp-simples`, branch → Preview → validação 👤) antes da F6
+- [x] 🤖👤 **Replicação no Gaveta CONCLUÍDA em 2026-07-12**: PR gaveta#16
+      (Simples organizado + Minimalista opt-in + escala densa + fix do
+      noopener no preview, merge `05745cd`) e PR gaveta#17 (comprovante
+      direto no celular no caixa E no Financeiro, loader único
+      `lib/receipt/data.ts`, rodapé do form de produto padronizado, merge
+      `96437c8`) — ambos validados pelo dono; produção
+      gaveta-erp.vercel.app atualizada. Os dois apps estão pareados no
+      padrão mobile → caminho livre para a F6
 
 ## F6 — Ecossistema Gaveta ⇄ Fiado (estratégia aprovada 👤 2026-07-09)
 

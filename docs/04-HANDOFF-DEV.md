@@ -55,6 +55,37 @@ apenas onde encontrá-los.
 | Fluxos signup/recover/reset + `/privacidade`                              | textos adaptados ao FiadoApp + `ui/checkbox`            | ✅ F4d-4                   |
 | `.github/workflows/backup-db.yml`                                         | NÃO duplicar — o backup do Gaveta já cobre o banco todo | —                          |
 
+## Estado 2026-07-12: SPRINT ENCERRADA — padrão mobile replicado no Gaveta; PRÓXIMO = F6
+
+**Onde paramos:** os DOIS apps do ecossistema estão em produção com o
+padrão mobile F5b (Fiado: fiadoapp.net, PR #15; Gaveta:
+gaveta-erp.vercel.app, PRs gaveta#16 e gaveta#17 — ver roadmap F5b).
+Working trees limpos, branches apagadas.
+
+**Ponto de partida exato da próxima sessão: F6 — Ecossistema** (seção F6
+do roadmap; estratégia aprovada em 2026-07-09, ver memórias). Ordem
+sugerida: Descoberta (página `/ecossistema` + card em Configurações +
+anúncio dispensável no Painel, NOS DOIS apps) e Estágio 1 (app switcher
+no header + abrir o outro app). ⚠️ Decisão de design pendente do Estágio
+1: os apps têm domínios diferentes — "abrir já logado" precisa definir a
+técnica (mesmas credenciais Supabase ≠ sessão compartilhada entre
+domínios; avaliar simplesmente abrir o outro domínio e deixar o login
+dele agir, antes de inventar handoff de sessão).
+
+**Gotchas novos (trabalho no Gaveta):**
+
+- Gaveta mescla com **merge commit** (`--merge`), não squash.
+- O emissor de comprovante portado vive em
+  `components/receipt/emissor-comprovante.tsx` (Gaveta) com
+  `useEmissorComprovante({ onErro })` — o Fiado usa toast interno; no
+  Gaveta o erro sobe pro caller (feedback do caixa / sonner).
+- `lib/receipt/data.ts` (Gaveta) é o loader ÚNICO de comprovante
+  (preview + server action `dadosComprovante`).
+- Regra `react-hooks/immutability` do Gaveta barra `document.cookie =`
+  dentro de componente — içar para função de módulo.
+- O papel do cupom do Gaveta tem largura física própria (80/58 mm) — o
+  emissor NÃO força 420px como no Fiado.
+
 ## Estado 2026-07-11 (noite): SPRINT ENCERRADA — F5b mobile COMPLETA e em produção
 
 **Onde paramos:** working tree limpa, `main` = produção em fiadoapp.net
