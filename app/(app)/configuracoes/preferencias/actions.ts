@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { BUCKET_LOGOS } from "@/lib/marca";
-import { marcaUnicaAtiva } from "@/lib/ecossistema-server";
+import { marcaUnicaAtiva, removerLogoSeguro } from "@/lib/ecossistema-server";
 import { createClient } from "@/lib/supabase/server";
 import {
   limiteClienteSchema,
@@ -215,26 +215,25 @@ export async function uploadLogoMarca(
   }
 
   // Marca única ligada: o MESMO arquivo passa a valer no Gaveta (bucket
-  // compartilhado). O arquivo antigo de lá é removido para não órfã-lo.
+  // compartilhado).
+  let anteriorGaveta: string | null = null;
   if (await marcaUnicaAtiva(supabase, user.id)) {
     const { data: perfil } = await supabase
       .from("profiles")
       .select("brand_logo_path")
       .eq("id", user.id)
       .maybeSingle();
-    const anteriorGaveta = (perfil?.brand_logo_path as string | null) ?? null;
+    anteriorGaveta = (perfil?.brand_logo_path as string | null) ?? null;
     await supabase
       .from("profiles")
       .update({ brand_logo_path: key })
       .eq("id", user.id);
-    if (anteriorGaveta && anteriorGaveta !== key && anteriorGaveta !== anterior) {
-      await supabase.storage.from(BUCKET_LOGOS).remove([anteriorGaveta]);
-    }
   }
 
-  if (anterior && anterior !== key) {
-    await supabase.storage.from(BUCKET_LOGOS).remove([anterior]);
-  }
+  // Apaga os arquivos anteriores só se não estiverem mais em uso (o guarda
+  // protege os que forem backup da marca única, para o "voltar ao anterior").
+  await removerLogoSeguro(supabase, user.id, anterior);
+  await removerLogoSeguro(supabase, user.id, anteriorGaveta);
 
   revalidatePath("/", "layout");
   return { ok: true };
@@ -255,28 +254,33 @@ export async function removerLogoMarca(): Promise<LogoUploadResult> {
   const path = (atual?.brand_logo_path as string | null) ?? null;
   if (!path) return { ok: true };
 
-  await supabase.storage.from(BUCKET_LOGOS).remove([path]);
-  await supabase
-    .from("fiado_preferencias")
-    .update({ brand_logo_path: null, updated_at: new Date().toISOString() })
-    .eq("user_id", user.id);
-
   // Marca única ligada: remover também vale nos dois apps.
-  if (await marcaUnicaAtiva(supabase, user.id)) {
+  let doGaveta: string | null = null;
+  const unica = await marcaUnicaAtiva(supabase, user.id);
+  if (unica) {
     const { data: perfil } = await supabase
       .from("profiles")
       .select("brand_logo_path")
       .eq("id", user.id)
       .maybeSingle();
-    const doGaveta = (perfil?.brand_logo_path as string | null) ?? null;
-    if (doGaveta && doGaveta !== path) {
-      await supabase.storage.from(BUCKET_LOGOS).remove([doGaveta]);
-    }
+    doGaveta = (perfil?.brand_logo_path as string | null) ?? null;
+  }
+
+  // Zera o ponteiro nas tabelas primeiro; depois apaga os arquivos que não
+  // estão mais em uso (o guarda protege backups da marca única).
+  await supabase
+    .from("fiado_preferencias")
+    .update({ brand_logo_path: null, updated_at: new Date().toISOString() })
+    .eq("user_id", user.id);
+  if (unica) {
     await supabase
       .from("profiles")
       .update({ brand_logo_path: null })
       .eq("id", user.id);
   }
+
+  await removerLogoSeguro(supabase, user.id, path);
+  await removerLogoSeguro(supabase, user.id, doGaveta);
 
   revalidatePath("/", "layout");
   return { ok: true };
