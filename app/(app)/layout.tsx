@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { AppNav } from "@/components/app/app-nav";
+import { AppSwitcher } from "@/components/app/app-switcher";
 import { BottomNav } from "@/components/app/bottom-nav";
 import { LogoutButton } from "@/components/app/logout-button";
 import { ModoChooser } from "@/components/app/modo-chooser";
@@ -34,6 +35,15 @@ export default async function AppLayout({
   // renderiza a tela de escolha (que só aparece em viewport mobile).
   const uiMode = await getUiModeFromCookie();
 
+  // Atalho do ecossistema (opt-in, estágio 1): só aparece se o usuário
+  // ligou o toggle em /ecossistema. A pref vale a conta (os dois apps).
+  const { data: ecoPrefs } = await supabase
+    .from("ecossistema_prefs")
+    .select("switcher_ativo")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  const mostrarSwitcher = Boolean(ecoPrefs?.switcher_ativo);
+
   return (
     <div className="flex min-h-screen flex-col">
       {/* No modo Minimalista (só mobile) o header encolhe, o Sair migra para
@@ -63,6 +73,7 @@ export default async function AppLayout({
             >
               {displayName}
             </span>
+            {mostrarSwitcher ? <AppSwitcher /> : null}
             <LogoutButton />
           </div>
         </div>
@@ -71,7 +82,10 @@ export default async function AppLayout({
       <main className="minimal:max-sm:py-4 minimal:max-sm:pb-24 mx-auto w-full max-w-5xl flex-1 px-4 py-8">
         {children}
       </main>
-      <BottomNav displayName={displayName ?? ""} />
+      <BottomNav
+        displayName={displayName ?? ""}
+        mostrarSwitcher={mostrarSwitcher}
+      />
       {uiMode === null ? <ModoChooser /> : null}
       <Toaster />
     </div>
