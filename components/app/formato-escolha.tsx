@@ -31,7 +31,8 @@ export function FormatoEscolha({
   ];
   return (
     <fieldset className="flex flex-col gap-2">
-      <legend className="text-base font-medium">
+      {/* mb-2 na legend: fora do layout flex do fieldset, o gap não conta. */}
+      <legend className="minimal:max-sm:text-sm mb-2 text-base font-medium">
         Comprovante para o cliente
       </legend>
       <div
@@ -47,7 +48,7 @@ export function FormatoEscolha({
             aria-pressed={valor === v}
             disabled={disabled}
             onClick={() => onChange(v)}
-            className="h-12 flex-1 px-3 text-base sm:flex-initial sm:px-4"
+            className="minimal:max-sm:h-10 minimal:max-sm:px-2 minimal:max-sm:text-sm h-12 flex-1 px-3 text-base sm:flex-initial sm:px-4"
           >
             <Icon aria-hidden="true" className="size-4" />
             {rotulo}

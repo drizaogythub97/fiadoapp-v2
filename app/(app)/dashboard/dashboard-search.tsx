@@ -89,7 +89,7 @@ export function DashboardSearch({ clientes }: { clientes: ClienteBusca[] }) {
               <button
                 type="button"
                 onClick={() => irParaCliente(c)}
-                className="hover:bg-muted focus-visible:bg-muted flex h-12 w-full items-center gap-2 px-4 text-left text-base outline-none"
+                className="minimal:max-sm:h-11 minimal:max-sm:text-sm hover:bg-muted focus-visible:bg-muted flex h-12 w-full items-center gap-2 px-4 text-left text-base outline-none"
               >
                 <span className="font-medium">
                   {c.sobrenome ? `${c.nome} ${c.sobrenome}` : c.nome}

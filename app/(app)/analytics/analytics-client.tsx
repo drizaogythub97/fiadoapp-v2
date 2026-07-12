@@ -95,8 +95,9 @@ export function AnalyticsClient({ vendas }: { vendas: VendaAnalytics[] }) {
             />
           </div>
         </div>
+        {/* mb-2 na legend: fora do layout flex do fieldset, o gap não conta. */}
         <fieldset className="flex flex-col gap-2">
-          <legend className="text-muted-foreground text-sm font-medium">
+          <legend className="text-muted-foreground mb-2 text-sm font-medium">
             Atalhos de período
           </legend>
           <div className="flex flex-wrap gap-2">

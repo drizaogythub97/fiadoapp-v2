@@ -303,7 +303,7 @@ export function ContaClient({ nomeInicial, email, criadaEm }: Props) {
             setExcluirErro(null);
             setExcluirAberto(true);
           }}
-          className="h-12 px-5 text-base sm:self-start"
+          className="minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base sm:self-start"
         >
           <Trash2 aria-hidden="true" className="size-4" />
           Excluir minha conta

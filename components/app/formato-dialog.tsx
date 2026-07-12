@@ -86,7 +86,7 @@ export function FormatoDialog({
                 type="button"
                 onClick={() => abrir("pdf")}
                 data-formato-pdf
-                className="h-13 justify-start gap-3 px-5 text-base font-medium"
+                className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-13 justify-start gap-3 px-5 text-base font-medium"
               >
                 <Printer aria-hidden="true" className="size-5" />
                 PDF / Imprimir
@@ -95,7 +95,7 @@ export function FormatoDialog({
                 type="button"
                 variant="outline"
                 onClick={() => abrir("imagem")}
-                className="h-13 justify-start gap-3 px-5 text-base font-medium"
+                className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-13 justify-start gap-3 px-5 text-base font-medium"
               >
                 <ImageIcon aria-hidden="true" className="size-5" />
                 Imagem (foto para enviar)
@@ -105,7 +105,7 @@ export function FormatoDialog({
               type="button"
               variant="outline"
               onClick={onClose}
-              className="h-12 px-5 text-base sm:self-end"
+              className="minimal:max-sm:h-10 minimal:max-sm:text-sm h-12 px-5 text-base sm:self-end"
             >
               Cancelar
             </Button>

@@ -28,7 +28,13 @@ export function BotaoComprovante({
         type="button"
         variant="outline"
         onClick={() => setAberto(true)}
-        className={cn("h-12 px-5 text-base", className)}
+        className={cn(
+          // As classes minimal ficam depois do override: no Minimalista
+          // (mobile) este botão acompanha os irmãos secundários (h-10).
+          "h-12 px-5 text-base",
+          className,
+          "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm",
+        )}
       >
         <FileText aria-hidden="true" className="size-4" />
         {rotulo}

@@ -193,7 +193,7 @@ export function useEmissorComprovante() {
                   setPronto(null);
                   if (alvo) void compartilhar(alvo.file, alvo.titulo);
                 }}
-                className="h-13 justify-start gap-3 px-5 text-base font-medium"
+                className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-13 justify-start gap-3 px-5 text-base font-medium"
               >
                 <Share2 aria-hidden="true" className="size-5" />
                 Compartilhar
@@ -205,7 +205,7 @@ export function useEmissorComprovante() {
                   if (pronto) baixar(pronto.file);
                   setPronto(null);
                 }}
-                className="h-13 justify-start gap-3 px-5 text-base font-medium"
+                className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-13 justify-start gap-3 px-5 text-base font-medium"
               >
                 <Download aria-hidden="true" className="size-5" />
                 Baixar
@@ -214,7 +214,7 @@ export function useEmissorComprovante() {
                 type="button"
                 variant="outline"
                 onClick={() => setPronto(null)}
-                className="h-12 px-5 text-base"
+                className="minimal:max-sm:h-10 minimal:max-sm:text-sm h-12 px-5 text-base"
               >
                 <X aria-hidden="true" className="size-5" />
                 Fechar

@@ -71,8 +71,10 @@ export function VendasClient({
         />
       </div>
 
+      {/* mb-2 na legend: ela fica fora do layout flex do fieldset, então o
+          gap não a afasta dos botões. */}
       <fieldset className="flex flex-col gap-2">
-        <legend className="text-muted-foreground text-sm font-medium">
+        <legend className="text-muted-foreground mb-2 text-sm font-medium">
           Filtrar por situação
         </legend>
         <div className="flex flex-wrap gap-2">
@@ -115,7 +117,7 @@ export function VendasClient({
               href="/vendas/nova"
               className={cn(
                 buttonVariants(),
-                "mt-2 h-13 px-6 text-lg font-medium",
+                "minimal:max-sm:h-11 minimal:max-sm:text-base mt-2 h-13 px-6 text-lg font-medium",
               )}
             >
               Registrar venda

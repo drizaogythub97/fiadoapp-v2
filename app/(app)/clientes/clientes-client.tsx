@@ -111,8 +111,10 @@ export function ClientesClient({
         />
       </div>
 
-      <fieldset className="minimal:max-sm:gap-1.5 flex flex-col gap-2">
-        <legend className="minimal:max-sm:text-xs text-muted-foreground text-sm font-medium">
+      {/* mb-2 na legend: ela fica fora do layout flex do fieldset, então o
+          gap não a afasta dos botões. */}
+      <fieldset className="flex flex-col gap-2">
+        <legend className="minimal:max-sm:text-xs text-muted-foreground mb-2 text-sm font-medium">
           Filtrar por situação
         </legend>
         {/* Minimalista: controle segmentado em terços — uma linha só. */}
@@ -133,20 +135,34 @@ export function ClientesClient({
       </fieldset>
 
       {/* min-w-0: fieldset tem min-inline-size:min-content e estouraria a
-          página com o trilho horizontal do alfabeto. */}
-      <fieldset className="minimal:max-sm:gap-1.5 flex min-w-0 flex-col gap-2">
-        <legend className="minimal:max-sm:text-xs text-muted-foreground text-sm font-medium">
+          página com o conteúdo largo. */}
+      <fieldset className="flex min-w-0 flex-col gap-2">
+        <legend className="minimal:max-sm:text-xs text-muted-foreground mb-2 text-sm font-medium">
           Pesquise pela inicial do nome
         </legend>
-        {/* Minimalista: trilho horizontal rolável em vez de 5 fileiras de
-            botões — o alfabeto ocupava a tela inteira. */}
-        <div className="minimal:max-sm:flex-nowrap minimal:max-sm:overflow-x-auto minimal:max-sm:-mx-4 minimal:max-sm:px-4 minimal:max-sm:pb-1 minimal:max-sm:[scrollbar-width:none] minimal:max-sm:[&::-webkit-scrollbar]:hidden flex flex-wrap gap-1.5">
+        {/* Minimalista: dropdown nativo (pedido do dono, 2026-07-11) —
+            "Todas" é o padrão; escolher a letra filtra na hora. */}
+        <select
+          value={letra ?? ""}
+          onChange={(e) => setLetra(e.target.value || null)}
+          aria-label="Pesquise pela inicial do nome"
+          className="minimal:max-sm:block border-input dark:bg-input/30 focus-visible:border-ring focus-visible:ring-ring/50 hidden h-11 w-full rounded-lg border bg-transparent px-2.5 text-sm transition-colors outline-none focus-visible:ring-3"
+        >
+          <option value="">Todas as letras</option>
+          {LETRAS.map((l) => (
+            <option key={l} value={l}>
+              {l}
+            </option>
+          ))}
+        </select>
+        {/* Modo Simples/desktop: grade de letras como sempre. */}
+        <div className="minimal:max-sm:hidden flex flex-wrap gap-1.5">
           <Button
             type="button"
             variant={letra === null ? "default" : "outline"}
             aria-pressed={letra === null}
             onClick={() => setLetra(null)}
-            className="minimal:max-sm:h-9 minimal:max-sm:shrink-0 minimal:max-sm:text-sm h-11 px-3 text-base"
+            className="h-11 px-3 text-base"
           >
             Todos
           </Button>
@@ -158,7 +174,7 @@ export function ClientesClient({
               aria-pressed={letra === l}
               onClick={() => setLetra(letra === l ? null : l)}
               aria-label={`Clientes com a letra ${l}`}
-              className="minimal:max-sm:size-9 minimal:max-sm:min-w-9 minimal:max-sm:shrink-0 minimal:max-sm:text-sm h-11 min-w-11 px-0 text-base"
+              className="h-11 min-w-11 px-0 text-base"
             >
               {l}
             </Button>

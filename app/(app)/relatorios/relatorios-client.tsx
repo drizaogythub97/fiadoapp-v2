@@ -150,7 +150,7 @@ export function RelatoriosClient({
               value={filtros.inicial}
               onChange={(e) => mudarFiltro("inicial", e.target.value)}
               className={cn(
-                "border-input dark:bg-input/30 focus-visible:border-ring focus-visible:ring-ring/50 h-12 w-full rounded-lg border bg-transparent px-2.5 text-base transition-colors outline-none focus-visible:ring-3",
+                "minimal:max-sm:h-11 minimal:max-sm:text-sm border-input dark:bg-input/30 focus-visible:border-ring focus-visible:ring-ring/50 h-12 w-full rounded-lg border bg-transparent px-2.5 text-base transition-colors outline-none focus-visible:ring-3",
               )}
             >
               <option value="">Todas</option>
@@ -176,14 +176,15 @@ export function RelatoriosClient({
                 value={filtros.busca}
                 onChange={(e) => mudarFiltro("busca", e.target.value)}
                 placeholder="Nome ou referência…"
-                className="h-12 pl-10 text-base"
+                className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 pl-10 text-base"
               />
             </div>
           </div>
         </div>
 
+        {/* mb-2 na legend: fora do layout flex do fieldset, o gap não conta. */}
         <fieldset className="flex flex-col gap-2">
-          <legend className="text-muted-foreground text-sm font-medium">
+          <legend className="text-muted-foreground mb-2 text-sm font-medium">
             Situação
           </legend>
           <div className="flex flex-wrap gap-2">

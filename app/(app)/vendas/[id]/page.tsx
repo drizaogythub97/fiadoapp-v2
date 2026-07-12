@@ -256,7 +256,7 @@ export default async function VendaDetalhePage({
                     rel="noopener noreferrer"
                     className={cn(
                       buttonVariants({ variant: "outline" }),
-                      "minimal:max-sm:h-11 minimal:max-sm:text-sm h-13 px-6 text-base font-medium",
+                      "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-13 px-6 text-base font-medium",
                     )}
                   >
                     <MessageCircle aria-hidden="true" className="size-5" />

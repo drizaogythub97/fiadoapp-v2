@@ -94,7 +94,7 @@ export function ConfirmDialog({
             onClick={onClose}
             disabled={pending}
             data-dialog-cancel
-            className="h-12 px-5 text-base"
+            className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 px-5 text-base"
           >
             {cancelLabel}
           </Button>
@@ -104,7 +104,7 @@ export function ConfirmDialog({
             onClick={onConfirm}
             disabled={pending}
             aria-busy={pending}
-            className="h-12 px-5 text-base"
+            className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 px-5 text-base"
           >
             {pending ? "Aguarde…" : confirmLabel}
           </Button>

@@ -41,7 +41,7 @@ export default async function VendasPage() {
           href="/vendas/nova"
           className={cn(
             buttonVariants(),
-            "h-13 px-6 text-lg font-medium sm:self-start",
+            "minimal:max-sm:h-11 minimal:max-sm:text-base h-13 px-6 text-lg font-medium sm:self-start",
           )}
         >
           <Plus aria-hidden="true" className="size-5" />

@@ -302,7 +302,7 @@ export function VendaForm({
                           setClienteSel(c);
                           setBuscaAberta(false);
                         }}
-                        className="hover:bg-muted focus-visible:bg-muted flex h-12 w-full items-center gap-2 px-4 text-left text-base outline-none"
+                        className="minimal:max-sm:h-11 minimal:max-sm:text-sm hover:bg-muted focus-visible:bg-muted flex h-12 w-full items-center gap-2 px-4 text-left text-base outline-none"
                       >
                         <span className="font-medium">{nomeCompleto(c)}</span>
                         {c.referencia ? (
@@ -554,7 +554,7 @@ export function VendaForm({
           href={clienteInicialId ? `/clientes/${clienteInicialId}` : "/vendas"}
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "h-13 px-6 text-base",
+            "minimal:max-sm:h-11 minimal:max-sm:text-sm h-13 px-6 text-base",
           )}
         >
           Cancelar
@@ -563,7 +563,7 @@ export function VendaForm({
           type="submit"
           disabled={pending}
           aria-busy={pending}
-          className="h-13 px-8 text-lg font-medium"
+          className="minimal:max-sm:h-11 minimal:max-sm:text-base h-13 px-8 text-lg font-medium"
         >
           {pending ? "Salvando…" : "Salvar venda"}
         </Button>
