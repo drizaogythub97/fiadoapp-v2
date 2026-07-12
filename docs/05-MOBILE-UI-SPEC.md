@@ -99,6 +99,63 @@ quando/onde existir fluxo equivalente):
 5. Dados dos comprovantes centralizados em `lib/comprovante-data.ts`
    (rotas de preview e server action usam as mesmas queries).
 
+## Parte D — Refinamentos das rodadas de validação (aprovados 👤 2026-07-11, PR #15)
+
+O dono validou o Minimalista em aparelho real e pediu 3 rodadas de ajuste.
+O resultado abaixo é o contrato FINAL — replicar direto assim:
+
+### Escala tipográfica e de controles (`minimal:max-sm:` em tudo)
+
+| Elemento                       | Minimalista (mobile)          |
+| ------------------------------ | ----------------------------- |
+| h1 da página                   | `text-xl`                     |
+| Subtítulo da página            | `text-sm`                     |
+| Título de card/seção (h2)      | `text-base`/`text-lg`         |
+| Descrição de card              | `text-sm`                     |
+| Corpo/lista (linha principal)  | `text-base` nome, `text-sm` ref |
+| Metadados de lista             | `text-xs`                     |
+| Badge                          | `text-xs px-2/px-2.5`         |
+| CTA primário de página/diálogo | `h-11 text-base`              |
+| Botão secundário/destrutivo    | `h-10 px-3 text-sm`           |
+| Input/select                   | `h-11 text-sm`                |
+| Item de dropdown de busca      | `h-11 text-sm`                |
+| KPI (valor)                    | `text-xl`                     |
+
+- Componente COMPARTILHADO (ex.: botão de comprovante): as classes minimal
+  vão na BASE do componente, DEPOIS do `className` do caller no `cn()`,
+  para vencerem overrides simples (`h-13` etc.).
+- Gaps de página `gap-8→5`, de card `p-4→3.5`, de lista `gap-3→2`.
+
+### Padrões de organização
+
+1. **Listas viram linhas tocáveis**: a linha INTEIRA abre o detalhe (link
+   esticado `after:absolute after:inset-0` + `ChevronRight` à direita);
+   botões de ação da linha somem no minimal (`minimal:max-sm:hidden`) — as
+   ações vivem na tela de detalhe.
+2. **Escolhas de 2–3 opções em configurações/filtros = controle
+   segmentado**: wrapper `minimal:max-sm:grid minimal:max-sm:grid-cols-2`
+   (ou 3), botões de altura igual preenchendo a linha.
+3. **Cards de configurações**: `CardHeader` com
+   `minimal:max-sm:border-b minimal:max-sm:border-border/60
+   minimal:max-sm:pb-3` — separa explicação do controle ("tudo grudado"
+   foi reclamação explícita).
+4. **Blocos de informação empilham em camadas** (identificação → situação
+   → campo com rótulo), nunca texto espremido em coluna ao lado de input.
+5. **Filtro com muitas opções (ex.: inicial A–Z) = `<select>` nativo** no
+   minimal ("Todas" como padrão); Simples/desktop mantém a grade de botões.
+
+### Gotchas de CSS/teste que valem no Gaveta
+
+- `<legend>` fica FORA do layout flex do fieldset → `gap` não afasta a
+  label dos controles; usar **`mb-2` na legend** (todos os filtros).
+- `<fieldset>` tem `min-inline-size: min-content` → conteúdo largo estoura
+  a página; `min-w-0` no fieldset.
+- Papel oculto do comprovante: **420px** de largura (retrato, igual ao
+  preview no celular) — 720px sai "deitado" (reclamação do dono).
+- Playwright NÃO emula `hover`/`pointer` com device → E2E mobile precisa
+  de stub de `matchMedia` via `addInitScript` (+ `navigator.canShare =
+  undefined` p/ testar download); CDP `setEmulatedMedia` não persiste.
+
 ## Checklist de replicação no Gaveta
 
 - [ ] Parte A nas telas equivalentes (nav, listas, formulários com spans)
