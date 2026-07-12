@@ -1,6 +1,8 @@
 import { Clock, Plus, UserPlus } from "lucide-react";
+import { cookies } from "next/headers";
 import Link from "next/link";
 
+import { EcossistemaAnuncio } from "@/components/app/ecossistema-anuncio";
 import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
@@ -20,6 +22,9 @@ export const metadata = {
 };
 
 export default async function DashboardPage() {
+  // Anúncio único do ecossistema: o servidor nem renderiza depois de
+  // dispensado (cookie), então não há flash no carregamento.
+  const mostrarAnuncio = !(await cookies()).get("fiado_ecossistema_anuncio");
   const supabase = await createClient();
   const {
     data: { user },
@@ -173,6 +178,9 @@ export default async function DashboardPage() {
           </Link>
         </div>
       </section>
+
+      {/* Anúncio único do ecossistema (F6): some para sempre ao dispensar. */}
+      {mostrarAnuncio ? <EcossistemaAnuncio /> : null}
     </div>
   );
 }
