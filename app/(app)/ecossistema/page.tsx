@@ -16,11 +16,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { GAVETA_URL } from "@/lib/ecossistema";
 import { cn } from "@/lib/utils";
 
 export const metadata = { title: "Ecossistema" };
-
-const GAVETA_URL = "https://gaveta-erp.vercel.app";
 
 // Pontes dos estágios 2–5 da F6 — apresentadas desde já, entregues aos
 // poucos. Toda ponte nasce DESLIGADA e terá liga/desliga próprio (opt-in).
