@@ -146,6 +146,34 @@ Descoberta: a Hostinger sobrescreve o header CSP no servidor.
 - [ ] 👤 (Depois) Publicar TWA na Play Console (aí entra o assetlinks);
       deixar o plano Hostinger expirar **mantendo o registro do domínio**
 
+## F5b — Experiência mobile ✅ CONCLUÍDA E EM PRODUÇÃO (2026-07-11)
+
+Interlúdio pós-cutover a pedido do dono: o v2 no celular precisava de uma
+experiência melhor que a herdada do desktop.
+
+- [x] 🤖👤 5b-1. Modo **Simples** (atual) organizado no mobile: nav em grid,
+      cards e forms alinhados — **mesclado** (PR #12, squash `fdc7ff7`)
+- [x] 🤖👤 5b-2. Modo **Minimalista** opt-in por aparelho: cookie
+      `fiado_ui_mode` + variant CSS `minimal` + `data-ui-mode` no html;
+      bottom nav; ModoChooser na 1ª visita mobile; escolha em Preferências
+      (PR #13, absorvido na pilha)
+- [x] 🤖👤 5b-3. Comprovantes no celular: formato (PDF/Imagem/Não gerar)
+      dentro do diálogo de quitação; geração fora da tela + share nativo
+      sem aba de preview (`useEmissorComprovante`); desktop mantém preview
+      (PR #14, absorvido na pilha)
+- [x] 🤖👤 5b-4/5/6. Rodadas de validação do dono: login compacto, busca
+      acima dos KPIs + Atalhos rápidos no dashboard, limite POR CLIENTE com
+      busca em Preferências, comprovante PNG em RETRATO (420px);
+      **Minimalista revitalizado** (escala densa h1 xl/título base/corpo
+      sm/meta xs, listas tocáveis com chevron, controles segmentados,
+      filtro A–Z virou dropdown nativo, legends com respiro) — **aprovado
+      sem ressalvas e mesclado em 2026-07-11** (PR #15, squash `87a5f3b`;
+      os PRs empilhados #13/#14 entraram na main por ele)
+- [x] 🤖 Spec de padronização para replicar no Gaveta:
+      `docs/05-MOBILE-UI-SPEC.md`
+- [ ] 🤖 **PRÓXIMO PASSO: replicar o padrão mobile no Gaveta**
+      (`../erp-simples`, branch → Preview → validação 👤) antes da F6
+
 ## F6 — Ecossistema Gaveta ⇄ Fiado (estratégia aprovada 👤 2026-07-09)
 
 **Princípio: uma conta, dois apps completos, pontes opcionais.** Os apps são

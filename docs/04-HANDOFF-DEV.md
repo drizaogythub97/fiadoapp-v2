@@ -55,6 +55,50 @@ apenas onde encontrá-los.
 | Fluxos signup/recover/reset + `/privacidade`                              | textos adaptados ao FiadoApp + `ui/checkbox`            | ✅ F4d-4                   |
 | `.github/workflows/backup-db.yml`                                         | NÃO duplicar — o backup do Gaveta já cobre o banco todo | —                          |
 
+## Estado 2026-07-11 (noite): SPRINT ENCERRADA — F5b mobile COMPLETA e em produção
+
+**Onde paramos:** working tree limpa, `main` = produção em fiadoapp.net
+com a **F5b inteira** (squash `87a5f3b`, PR #15 aprovado sem ressalvas).
+O celular agora tem dois modos por aparelho: **Simples** (o de sempre,
+organizado) e **Minimalista** (opt-in; bottom nav, escala densa, listas
+tocáveis, comprovantes com share nativo). Detalhes por entrega no roadmap
+(seção F5b).
+
+**Ponto de partida exato da próxima sessão:**
+
+1. **Replicar o padrão mobile no Gaveta** — ler `docs/05-MOBILE-UI-SPEC.md`
+   daqui e o `CLAUDE.md` de `../erp-simples`; branch lá → Preview →
+   validação do dono. Incluir os aprendizados das rodadas de validação
+   (escala minimal, legends com `mb-2`, dropdown de iniciais, segmentados).
+2. Só depois da replicação validada: **F6 Ecossistema** (estágios no
+   roadmap; estratégia aprovada em 2026-07-09).
+
+**Técnicas/gotchas novos desta sprint:**
+
+- **PRs empilhados**: o #12 foi squashado na main ANTES de #13/#14 subirem
+  a pilha → main ficou só com F5b-1 e o PR final conflitou. Solução usada:
+  a branch final era superconjunto estrito (`git diff` vazio entre o squash
+  da main e o commit correspondente da branch) → `git merge -s ours
+  origin/main` na branch + squash normal do PR. Evitar pilhas; se usar,
+  mesclar de cima para baixo.
+- **Playwright não emula `hover`/`pointer`** junto com o device (issue
+  antiga) → `isDesktop()` do app retorna true no teste. E2E do fluxo
+  mobile precisa de `addInitScript` com stub de `matchMedia`
+  (`hover: hover` → false) + stub `navigator.canShare = undefined` para o
+  emissor cair no download observável. `Emulation.setEmulatedMedia` via
+  CDP NÃO persiste (o Playwright reaplica o estado dele).
+- **`<legend>` fica fora do layout flex do fieldset** → `gap` não a afasta
+  dos controles; usar `mb-2` na própria legend.
+- **`<fieldset>` tem `min-inline-size: min-content`** → conteúdo largo
+  (trilho horizontal) estoura a página; `min-w-0` resolve.
+- **Escala do Minimalista (mobile)**: h1 `text-xl`, título de card
+  `text-base`, corpo `text-sm`, meta `text-xs`; botão primário `h-11`,
+  secundário `h-10 px-3 text-sm`, diálogos `h-11`/`h-10`. Variantes
+  minimal de componente compartilhado vão na BASE do componente DEPOIS do
+  override do caller (ver `BotaoComprovante`).
+- Comprovante mobile: papel oculto com **420px** de largura = retrato
+  (720px saía "deitado" — validação do dono).
+
 ## Estado 2026-07-10 (noite): SPRINT ENCERRADA — 🚀 CUTOVER FEITO: fiadoapp.net É O V2
 
 **Onde paramos:** working tree limpa, `main` = produção em
