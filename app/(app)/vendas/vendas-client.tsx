@@ -123,7 +123,7 @@ export function VendasClient({
           ) : null}
         </div>
       ) : (
-        <ul className="flex flex-col gap-3">
+        <ul className="minimal:max-sm:gap-2 flex flex-col gap-3">
           {filtradas.map((v) => {
             const restante = v.valor_total - v.valor_pago;
             const vencida =
@@ -134,20 +134,20 @@ export function VendasClient({
               <li key={v.id}>
                 <Link
                   href={`/vendas/${v.id}`}
-                  className="minimal:max-sm:p-3 ring-foreground/10 bg-card hover:ring-primary/40 flex flex-col gap-2 rounded-xl p-4 ring-1 transition-shadow"
+                  className="minimal:max-sm:p-3.5 minimal:max-sm:gap-1.5 ring-foreground/10 bg-card hover:ring-primary/40 flex flex-col gap-2 rounded-xl p-4 ring-1 transition-shadow"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-foreground text-lg font-semibold">
+                    <span className="minimal:max-sm:text-base text-foreground text-lg font-semibold">
                       {nomeCliente(v)}
                       {v.fiado_clientes?.referencia ? (
-                        <span className="text-muted-foreground ml-2 text-base font-normal">
+                        <span className="minimal:max-sm:text-sm text-muted-foreground ml-2 text-base font-normal">
                           ({v.fiado_clientes.referencia})
                         </span>
                       ) : null}
                     </span>
                     <VendaStatusBadge status={v.status} />
                   </div>
-                  <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-base">
+                  <div className="minimal:max-sm:text-xs minimal:max-sm:gap-x-3 text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-base">
                     <span>Compra: {formatDataBR(v.data_compra)}</span>
                     {v.data_vencimento ? (
                       <span className={vencida ? "text-destructive" : ""}>

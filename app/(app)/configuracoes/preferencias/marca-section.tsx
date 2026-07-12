@@ -147,9 +147,11 @@ export function MarcaSection({
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="text-xl">Marca da loja</CardTitle>
-        <CardDescription className="text-base">
+      <CardHeader className="minimal:max-sm:border-b minimal:max-sm:border-border/60 minimal:max-sm:pb-3">
+        <CardTitle className="minimal:max-sm:text-base text-xl">
+          Marca da loja
+        </CardTitle>
+        <CardDescription className="minimal:max-sm:text-sm text-base">
           O nome e a logo aparecem no topo do app e nos comprovantes que você
           compartilha. Sem personalização, usamos a marca FiadoApp.
         </CardDescription>
@@ -160,8 +162,8 @@ export function MarcaSection({
           onSubmit={submeterNome}
           className="flex flex-col gap-3 sm:flex-row sm:items-end"
         >
-          <div className="flex flex-1 flex-col gap-2 sm:max-w-xs">
-            <Label htmlFor="marca-nome" className="text-base">
+          <div className="minimal:max-sm:gap-1.5 flex flex-1 flex-col gap-2 sm:max-w-xs">
+            <Label htmlFor="marca-nome" className="minimal:max-sm:text-sm text-base">
               Nome da loja
             </Label>
             <Input
@@ -177,7 +179,7 @@ export function MarcaSection({
           <Button
             type="submit"
             disabled={salvandoNome}
-            className="h-12 px-6 text-base font-medium"
+            className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 px-6 text-base font-medium"
           >
             {salvandoNome ? "Salvando…" : "Salvar nome"}
           </Button>
@@ -202,7 +204,7 @@ export function MarcaSection({
           </div>
 
           <div className="flex flex-1 flex-col gap-3">
-            <label className="border-border hover:bg-muted flex h-12 cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed px-4 text-base font-medium transition-colors">
+            <label className="minimal:max-sm:h-11 minimal:max-sm:text-sm border-border hover:bg-muted flex h-12 cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed px-4 text-base font-medium transition-colors">
               <Upload aria-hidden="true" className="size-5" />
               Escolher imagem
               <input
@@ -216,7 +218,7 @@ export function MarcaSection({
                 className="sr-only"
               />
             </label>
-            <p className="text-muted-foreground text-sm">
+            <p className="minimal:max-sm:text-xs text-muted-foreground text-sm">
               PNG, JPEG ou WebP até 4 MB. A imagem será recortada em
               quadrado.
             </p>
