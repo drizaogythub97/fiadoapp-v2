@@ -278,6 +278,102 @@ describe("RPC fiado_registrar_pagamento — cascata (decisão F2)", () => {
     expect(denovo.error).not.toBeNull();
   });
 
+  it("valor parcial nas selecionadas: cascata SÓ entre as marcadas (modo 4)", async () => {
+    const aliceApp = userClient(alice.accessToken);
+    const clienteId = await createCliente(
+      alice.accessToken,
+      alice.id,
+      "Valor nas selecionadas",
+    );
+    // A mais antiga (vendaForaSel) NÃO é selecionada — mesmo sendo a mais
+    // velha do cliente, o valor não pode abatê-la.
+    const vendaForaSel = await registrarVenda(
+      alice,
+      clienteId,
+      50,
+      "2026-01-01",
+    );
+    const vendaSelAntiga = await registrarVenda(
+      alice,
+      clienteId,
+      40,
+      "2026-02-01",
+    );
+    const vendaSelNova = await registrarVenda(
+      alice,
+      clienteId,
+      30,
+      "2026-03-01",
+    );
+
+    const { data: resultado, error } = await aliceApp.rpc(
+      "fiado_registrar_pagamento",
+      {
+        p_cliente_id: clienteId,
+        p_valor: 60,
+        p_venda_ids: [vendaSelAntiga, vendaSelNova],
+      },
+    );
+    expect(error).toBeNull();
+    expect(resultado?.total_pago).toBe(60);
+
+    // A não selecionada continua intocada, apesar de ser a mais antiga.
+    const { data: fora } = await aliceApp
+      .from("fiado_vendas")
+      .select("valor_pago, status")
+      .eq("id", vendaForaSel)
+      .single();
+    expect(fora?.valor_pago).toBe(0);
+    expect(fora?.status).toBe("ATIVA");
+
+    // Cascata dentro da seleção: a mais antiga das selecionadas quita 1º.
+    const { data: selAntiga } = await aliceApp
+      .from("fiado_vendas")
+      .select("valor_pago, status")
+      .eq("id", vendaSelAntiga)
+      .single();
+    expect(selAntiga?.valor_pago).toBe(40);
+    expect(selAntiga?.status).toBe("PAGA");
+
+    const { data: selNova } = await aliceApp
+      .from("fiado_vendas")
+      .select("valor_pago, status")
+      .eq("id", vendaSelNova)
+      .single();
+    expect(selNova?.valor_pago).toBe(20);
+    expect(selNova?.status).toBe("PARCIAL");
+  });
+
+  it("modo 4: rejeita valor maior que o total das selecionadas", async () => {
+    const aliceApp = userClient(alice.accessToken);
+    const clienteId = await createCliente(
+      alice.accessToken,
+      alice.id,
+      "Overpay selecionadas",
+    );
+    // Total do cliente = 120, mas o total das SELECIONADAS = 70.
+    await registrarVenda(alice, clienteId, 50, "2026-01-01");
+    const sel1 = await registrarVenda(alice, clienteId, 40, "2026-02-01");
+    const sel2 = await registrarVenda(alice, clienteId, 30, "2026-03-01");
+
+    const { error } = await aliceApp.rpc("fiado_registrar_pagamento", {
+      p_cliente_id: clienteId,
+      p_valor: 100, // < 120 do cliente, mas > 70 das selecionadas
+      p_venda_ids: [sel1, sel2],
+    });
+    expect(error).not.toBeNull();
+    expect(error?.message).toContain(
+      "maior que o total em aberto das vendas selecionadas",
+    );
+
+    // Transação atômica: nada foi gravado.
+    const { data: pagamentos } = await aliceApp
+      .from("fiado_pagamentos")
+      .select("id, fiado_vendas!inner(cliente_id)")
+      .eq("fiado_vendas.cliente_id", clienteId);
+    expect(pagamentos).toHaveLength(0);
+  });
+
   it("Bob nao consegue registrar pagamento em cliente da Alice", async () => {
     const clienteAlice = await createCliente(
       alice.accessToken,

@@ -18,6 +18,7 @@ const ERROS_RPC_CONHECIDOS = new Set([
   "Nenhuma venda selecionada",
   "Venda inválida ou já quitada na seleção",
   "Valor maior que o total em aberto do cliente",
+  "Valor maior que o total em aberto das vendas selecionadas",
   "Valor de pagamento inválido",
   "Informe um valor OU vendas selecionadas, não os dois",
   "Informe o cliente existente OU os dados do cliente novo",
@@ -138,9 +139,17 @@ export async function registrarPagamento(
   }
 
   const dados = parsed.data;
+  // Modo "selecionadas" com valor = abate esse valor só nas selecionadas
+  // (cascata); sem valor = quita cada selecionada por inteiro.
+  const valorRPC =
+    dados.modo === "parcial"
+      ? dados.valor
+      : dados.modo === "selecionadas"
+        ? (dados.valor ?? null)
+        : null;
   const { data, error } = await supabase.rpc("fiado_registrar_pagamento", {
     p_cliente_id: dados.clienteId,
-    p_valor: dados.modo === "parcial" ? dados.valor : null,
+    p_valor: valorRPC,
     p_venda_ids: dados.modo === "selecionadas" ? dados.vendaIds : null,
   });
 
