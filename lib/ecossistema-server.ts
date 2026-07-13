@@ -35,6 +35,47 @@ export async function fiadoPdvAtivo(
   return Boolean(data?.fiado_pdv_ativo);
 }
 
+export type ResumoFiadoPdv = {
+  /** Total de vendas a prazo lançadas no caixa (origem Gaveta). */
+  total: number;
+  /** Quantas já têm pagamento (excluir apagaria o histórico). */
+  comPagamento: number;
+  /** Soma do que ainda falta receber (vendas em aberto). */
+  aReceber: number;
+};
+
+/**
+ * Resumo das vendas a prazo do caixa (origem Gaveta) para o diálogo de
+ * desativação da ponte (F6, Fase 4): quantas existem, quantas já têm
+ * pagamento e quanto ainda há a receber.
+ */
+export async function resumoFiadoPdv(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<ResumoFiadoPdv> {
+  const { data } = await supabase
+    .from("fiado_vendas")
+    .select("valor_total, valor_pago, status")
+    .eq("user_id", userId)
+    .eq("origem", "gaveta");
+  const rows = (data ?? []) as {
+    valor_total: number;
+    valor_pago: number;
+    status: string;
+  }[];
+  let comPagamento = 0;
+  let aReceber = 0;
+  for (const v of rows) {
+    if (Number(v.valor_pago) > 0) comPagamento += 1;
+    if (v.status !== "PAGA") aReceber += Number(v.valor_total) - Number(v.valor_pago);
+  }
+  return {
+    total: rows.length,
+    comPagamento,
+    aReceber: Math.round(aReceber * 100) / 100,
+  };
+}
+
 /**
  * Remove um arquivo de logo do bucket, MAS nunca um que ainda esteja em uso
  * — nem como logo atual de algum dos apps, nem como backup da marca única.
