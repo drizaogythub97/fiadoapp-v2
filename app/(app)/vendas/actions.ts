@@ -200,22 +200,37 @@ export async function excluirVenda(
     return { error: "Sessão expirada. Entre novamente." };
   }
 
-  // on delete cascade leva itens e pagamentos juntos (paridade v1).
-  const { data, error } = await supabase
+  const { data: venda } = await supabase
     .from("fiado_vendas")
-    .delete()
+    .select("cliente_id, origem")
     .eq("id", id)
     .eq("user_id", user.id)
-    .select("cliente_id")
     .maybeSingle();
-
-  if (error) {
-    return { error: "Não foi possível excluir a venda. Tente novamente." };
-  }
-  if (!data) {
+  if (!venda) {
     return { error: "Venda não encontrada." };
   }
 
-  revalidarTelas(data.cliente_id);
-  return { clienteId: data.cliente_id };
+  if (venda.origem === "gaveta") {
+    // Exclusão consistente (F6 Fase 3): a RPC-ponte remove TAMBÉM a venda do
+    // Gaveta e estorna o estoque, numa transação.
+    const { error } = await supabase.rpc("excluir_venda_fiado", {
+      p_venda_id: id,
+    });
+    if (error) {
+      return { error: "Não foi possível excluir a venda. Tente novamente." };
+    }
+  } else {
+    // on delete cascade leva itens e pagamentos juntos (paridade v1).
+    const { error } = await supabase
+      .from("fiado_vendas")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", user.id);
+    if (error) {
+      return { error: "Não foi possível excluir a venda. Tente novamente." };
+    }
+  }
+
+  revalidarTelas(venda.cliente_id);
+  return { clienteId: venda.cliente_id };
 }
