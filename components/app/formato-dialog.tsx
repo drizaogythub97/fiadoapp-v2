@@ -30,13 +30,20 @@ export function FormatoDialog({
   const panelRef = useRef<HTMLDivElement>(null);
   const { emitir, node } = useEmissorComprovante();
 
+  // Foco inicial só na abertura (depende só de `open`) — não a cada
+  // re-render, senão roubaria o foco de um campo do diálogo a cada tecla.
   useEffect(() => {
     if (!open) return;
-    setTimeout(() => {
+    const id = setTimeout(() => {
       panelRef.current
         ?.querySelector<HTMLButtonElement>("[data-formato-pdf]")
         ?.focus();
     }, 0);
+    return () => clearTimeout(id);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
