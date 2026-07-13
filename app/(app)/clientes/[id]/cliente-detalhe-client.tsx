@@ -73,6 +73,9 @@ export function ClienteDetalheClient({
   const [dialogo, setDialogo] = useState<Dialogo>(null);
   const [selecionadas, setSelecionadas] = useState<Set<string>>(new Set());
   const [valorParcial, setValorParcial] = useState("");
+  // Valor opcional no diálogo "selecionadas": vazio = quita as marcadas por
+  // inteiro; preenchido = abate esse valor da mais antiga entre as marcadas.
+  const [valorSelecionadas, setValorSelecionadas] = useState("");
   // Formato do comprovante escolhido DENTRO do diálogo de quitação (fluxo
   // v1 pedido pelo dono): no celular gera e compartilha direto; no desktop
   // o toast abre o preview já no formato escolhido.
@@ -160,6 +163,7 @@ export function ClienteDetalheClient({
     setDialogo(null);
     setSelecionadas(new Set());
     setValorParcial("");
+    setValorSelecionadas("");
     router.refresh();
   }
 
@@ -178,11 +182,29 @@ export function ClienteDetalheClient({
   }
 
   function quitarSelecionadas() {
+    // Valor em branco = quita as selecionadas por inteiro; valor informado =
+    // abate esse valor da mais antiga entre as selecionadas.
+    const bruto = valorSelecionadas.trim();
+    let valor: number | undefined;
+    if (bruto) {
+      valor = parseBRL(valorSelecionadas);
+      if (valor <= 0) {
+        toast.error("Informe um valor maior que zero.");
+        return;
+      }
+      if (valor > somaSelecionadas) {
+        toast.error(
+          `O valor não pode passar do total das selecionadas (${formatBRL(somaSelecionadas)}).`,
+        );
+        return;
+      }
+    }
     startTransition(async () => {
       const result = await registrarPagamento({
         modo: "selecionadas",
         clienteId: cliente.id,
         vendaIds: Array.from(selecionadas),
+        valor,
       });
       if (!result.ok) {
         toast.error(result.error);
@@ -522,7 +544,19 @@ export function ClienteDetalheClient({
         onClose={fecharDialogo}
         title="Quitar vendas selecionadas"
         description={
-          selecionadas.size === 1 ? (
+          valorSelecionadas.trim() ? (
+            <>
+              O valor informado abate primeiro a mais antiga entre as{" "}
+              {selecionadas.size === 1
+                ? "venda selecionada"
+                : `${selecionadas.size} vendas selecionadas`}
+              . Total selecionado:{" "}
+              <strong className="text-foreground">
+                {formatBRL(somaSelecionadas)}
+              </strong>
+              .
+            </>
+          ) : selecionadas.size === 1 ? (
             <>
               A venda selecionada, no valor de{" "}
               <strong className="text-foreground">
@@ -544,11 +578,32 @@ export function ClienteDetalheClient({
         onConfirm={quitarSelecionadas}
         pending={pending}
       >
-        <FormatoEscolha
-          valor={formatoQuitacao}
-          onChange={setFormatoQuitacao}
-          disabled={pending}
-        />
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="valor-selecionadas" className="text-base">
+              Valor a pagar (opcional)
+            </Label>
+            <Input
+              id="valor-selecionadas"
+              inputMode="decimal"
+              autoComplete="off"
+              placeholder="R$ 0,00"
+              value={valorSelecionadas}
+              onChange={(e) => setValorSelecionadas(maskBRL(e.target.value))}
+              onFocus={(e) => e.target.select()}
+              className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base"
+            />
+            <p className="text-muted-foreground text-sm">
+              Deixe em branco para quitar as selecionadas por inteiro. Ou
+              informe um valor menor para abater da mais antiga primeiro.
+            </p>
+          </div>
+          <FormatoEscolha
+            valor={formatoQuitacao}
+            onChange={setFormatoQuitacao}
+            disabled={pending}
+          />
+        </div>
       </ConfirmDialog>
 
       <ConfirmDialog

@@ -64,10 +64,19 @@ export const vendaSchema = z
 
 export type VendaInput = z.infer<typeof vendaSchema>;
 
+const valorPagamento = z
+  .number({ error: "Informe um valor válido." })
+  .positive("Informe um valor maior que zero.")
+  .max(99_999_999, "Valor muito alto.")
+  .transform((v) => Math.round(v * 100) / 100);
+
 /**
- * Quitação (decisão F2): "total" e "selecionadas" quitam vendas inteiras;
- * "parcial" abate um valor em CASCATA das vendas mais antigas. Overpay é
- * rejeitado pela RPC fiado_registrar_pagamento.
+ * Quitação (decisão F2 + F6): "total" quita todas as vendas; "parcial"
+ * abate um valor em CASCATA (mais antiga primeiro) de TODAS as vendas;
+ * "selecionadas" quita as vendas marcadas — por inteiro (valor ausente)
+ * OU distribuindo um valor opcional em cascata SÓ entre elas (F6, para dar
+ * controle manual de para onde o pagamento vai). Overpay é rejeitado pela
+ * RPC fiado_registrar_pagamento.
  */
 export const pagamentoSchema = z.discriminatedUnion(
   "modo",
@@ -83,15 +92,14 @@ export const pagamentoSchema = z.discriminatedUnion(
         .array(z.uuid("Venda inválida."))
         .min(1, "Selecione pelo menos uma venda.")
         .max(500, "Seleção muito grande."),
+      // Ausente/null = quita cada selecionada por inteiro; informado =
+      // abate esse valor das selecionadas, da mais antiga para a mais nova.
+      valor: valorPagamento.nullish(),
     }),
     z.object({
       modo: z.literal("parcial"),
       clienteId: z.uuid("Cliente inválido."),
-      valor: z
-        .number({ error: "Informe um valor válido." })
-        .positive("Informe um valor maior que zero.")
-        .max(99_999_999, "Valor muito alto.")
-        .transform((v) => Math.round(v * 100) / 100),
+      valor: valorPagamento,
     }),
   ],
   { error: "Tipo de quitação inválido." },
