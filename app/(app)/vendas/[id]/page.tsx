@@ -217,6 +217,8 @@ export default async function VendaDetalhePage({
         clienteId={venda.cliente_id}
         status={venda.status}
         restante={restante}
+        origem={venda.origem}
+        temPagamento={venda.valor_pago > 0}
       />
 
       {cliente

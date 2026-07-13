@@ -20,7 +20,7 @@ import {
   type PedidoComprovante,
 } from "@/lib/comprovante";
 import { formatBRL } from "@/lib/format";
-import type { VendaStatus } from "@/lib/types/fiado";
+import type { VendaOrigem, VendaStatus } from "@/lib/types/fiado";
 
 import { excluirVenda, registrarPagamento } from "../actions";
 
@@ -29,11 +29,15 @@ export function VendaAcoes({
   clienteId,
   status,
   restante,
+  origem,
+  temPagamento,
 }: {
   vendaId: string;
   clienteId: string;
   status: VendaStatus;
   restante: number;
+  origem: VendaOrigem;
+  temPagamento: boolean;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -160,6 +164,24 @@ export function VendaAcoes({
             <span className="text-destructive">
               Todos os itens e pagamentos dela serão excluídos permanentemente.
             </span>
+            {temPagamento ? (
+              <>
+                <br />
+                <span className="text-destructive font-medium">
+                  Atenção: esta venda já tem pagamento registrado — o histórico
+                  de recebimento será apagado.
+                </span>
+              </>
+            ) : null}
+            {origem === "gaveta" ? (
+              <>
+                <br />
+                <span className="text-muted-foreground">
+                  Esta venda foi registrada no Gaveta: ela também sai do Gaveta
+                  e o estoque dos itens é devolvido.
+                </span>
+              </>
+            ) : null}
           </>
         }
         confirmLabel="Excluir"

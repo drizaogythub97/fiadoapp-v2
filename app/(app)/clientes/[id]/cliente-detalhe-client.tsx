@@ -665,6 +665,15 @@ export function ClienteDetalheClient({
               Todas as vendas e pagamentos deste cliente serão excluídos
               permanentemente.
             </span>
+            {vendasAbertas.some((v) => v.origem === "gaveta") ? (
+              <>
+                <br />
+                <span className="text-muted-foreground">
+                  Há vendas registradas no Gaveta: elas também saem do Gaveta e
+                  o estoque dos itens é devolvido.
+                </span>
+              </>
+            ) : null}
           </>
         }
         confirmLabel="Excluir"

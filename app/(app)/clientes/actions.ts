@@ -147,8 +147,27 @@ export async function excluirCliente(id: string): Promise<{ error?: string }> {
     return { error: "Sessão expirada. Entre novamente." };
   }
 
-  // on delete cascade no banco leva vendas, itens e pagamentos juntos
-  // (paridade v1: exclusão de cliente é em cascata).
+  // Vendas a prazo deste cliente lançadas no Gaveta precisam remover também
+  // a venda do lado do Gaveta (e estornar o estoque) — o cascade do banco só
+  // apaga o lado FiadoApp. A RPC-ponte remove os dois lados; fazemos isso
+  // antes de apagar o cliente (exclusão consistente, F6 Fase 3).
+  const { data: vendasGaveta } = await supabase
+    .from("fiado_vendas")
+    .select("id")
+    .eq("cliente_id", id)
+    .eq("user_id", user.id)
+    .eq("origem", "gaveta");
+  for (const v of vendasGaveta ?? []) {
+    const { error: rpcError } = await supabase.rpc("excluir_venda_fiado", {
+      p_venda_id: v.id,
+    });
+    if (rpcError) {
+      return { error: "Não foi possível excluir. Tente novamente." };
+    }
+  }
+
+  // on delete cascade no banco leva as vendas restantes (origem fiado), itens
+  // e pagamentos junto com o cliente (paridade v1).
   const { error } = await supabase
     .from("fiado_clientes")
     .delete()
