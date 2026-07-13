@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { BotaoComprovante } from "@/components/app/botao-comprovante";
+import { VendaOrigemBadge } from "@/components/app/origem-badge";
 import { VendaStatusBadge } from "@/components/app/venda-status-badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -32,7 +33,7 @@ export default async function VendaDetalhePage({
       supabase
         .from("fiado_vendas")
         .select(
-          "id, cliente_id, data_compra, data_vencimento, valor_total, valor_pago, status, observacao, quitado_em, created_at, fiado_clientes(id, nome, sobrenome, referencia, telefone)",
+          "id, cliente_id, data_compra, data_vencimento, valor_total, valor_pago, status, observacao, quitado_em, origem, created_at, fiado_clientes(id, nome, sobrenome, referencia, telefone)",
         )
         .eq("id", id)
         .maybeSingle(),
@@ -83,6 +84,7 @@ export default async function VendaDetalhePage({
             ) : null}
           </h1>
           <VendaStatusBadge status={venda.status} className="text-base" />
+          <VendaOrigemBadge origem={venda.origem} />
         </div>
         {cliente?.telefone ? (
           <p className="text-muted-foreground text-lg">

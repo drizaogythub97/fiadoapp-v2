@@ -26,6 +26,9 @@ export type ResumoDashboard = {
 /** Status derivado de valor_pago pelas RPCs (nunca escrito pela aplicação). */
 export type VendaStatus = "ATIVA" | "PARCIAL" | "PAGA";
 
+/** De qual app a venda a prazo nasceu (F6). 'gaveta' = lançada no caixa. */
+export type VendaOrigem = "fiado" | "gaveta";
+
 /** Linha de fiado_vendas. Datas date → "aaaa-mm-dd"; timestamptz → ISO. */
 export type Venda = {
   id: string;
@@ -37,6 +40,7 @@ export type Venda = {
   status: VendaStatus;
   observacao: string | null;
   quitado_em: string | null;
+  origem: VendaOrigem;
   created_at: string;
 };
 

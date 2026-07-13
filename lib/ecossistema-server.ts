@@ -19,6 +19,23 @@ export async function marcaUnicaAtiva(
 }
 
 /**
+ * Ponte "Fiado no PDV" (ecossistema, Fase 1) está ligada para o usuário?
+ * Server-only. O caixa do Gaveta só oferece a venda a prazo com isto true,
+ * e a RPC-ponte confere a flag como guarda de servidor.
+ */
+export async function fiadoPdvAtivo(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<boolean> {
+  const { data } = await supabase
+    .from("ecossistema_prefs")
+    .select("fiado_pdv_ativo")
+    .eq("user_id", userId)
+    .maybeSingle();
+  return Boolean(data?.fiado_pdv_ativo);
+}
+
+/**
  * Remove um arquivo de logo do bucket, MAS nunca um que ainda esteja em uso
  * — nem como logo atual de algum dos apps, nem como backup da marca única.
  * Sem esse guarda, uma troca de logo durante a marca única apagaria o
