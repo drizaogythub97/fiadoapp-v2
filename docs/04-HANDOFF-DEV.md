@@ -55,6 +55,64 @@ apenas onde encontrá-los.
 | Fluxos signup/recover/reset + `/privacidade`                              | textos adaptados ao FiadoApp + `ui/checkbox`            | ✅ F4d-4                   |
 | `.github/workflows/backup-db.yml`                                         | NÃO duplicar — o backup do Gaveta já cobre o banco todo | —                          |
 
+## Estado 2026-07-13: SPRINT ENCERRADA — integração "Fiado no PDV" COMPLETA (Fases 0–4) em produção
+
+**Onde paramos:** a integração **Fiado no PDV** (que fundiu os antigos F6
+Estágios 3+4+5) foi entregue INTEIRA, em 5 fases validadas uma a uma, nos
+DOIS apps em produção. Working trees limpos, branches apagadas, mains
+atualizadas (Fiado `6ebacf0`, Gaveta `74f5a61`). PRs/hashes de cada fase no
+roadmap (seção F6). Fluxo fim-a-fim no ar: **lançar venda a prazo no caixa
+do Gaveta → a-receber no FiadoApp → quitar no Fiado → entra no faturamento
+do Gaveta na data do pagamento**; excluir em qualquer app remove do outro;
+desativar a ponte pede senha e deixa Manter/Excluir as vendas.
+
+**Migrations aplicadas ao banco compartilhado nesta sprint:** Fiado 0008
+(valor parcial nas selecionadas), 0009 (`fiado_vendas.origem` +
+`ecossistema_prefs.fiado_pdv_ativo`); Gaveta 0011 (`'fiado'` no
+`payment_method`, `sales.fiado_venda_id`, RPC-ponte `registrar_venda_fiado`),
+0012 (RPC-ponte `excluir_venda_fiado`). ⚠️ Objetos de produção do Gaveta
+exigem **aprovação do dono** no gate de segurança ao aplicar (aconteceu com
+0011 e 0012).
+
+**Ponto de partida da próxima sessão:** a F6 (Ecossistema) está
+essencialmente **completa** — Descoberta + Estágios 1–2 + integração Fiado
+no PDV, todos em produção. Não há próxima fase de integração pendente. O que
+resta são as **pendências deliberadas** (ver `memory/vercel-project-fiado`):
+sair do Vercel Hobby (uso comercial), TWA + assetlinks, contraste do botão
+coral. Próximo trabalho = o dono define a prioridade.
+
+**Gotchas/técnicas novos desta sprint:**
+
+- **Arquitetura da ponte Fiado⇄Gaveta:** as RPCs que escrevem em tabela do
+  Gaveta (`registrar_venda_fiado`, `excluir_venda_fiado`) vivem nas
+  **migrations do GAVETA** (é lá que o caixa as chama); elas chamam as RPCs
+  do FiadoApp (`fiado_registrar_venda`, `fiado_registrar_pagamento`) e
+  reusam `set_sale_status` do Gaveta para o estoque — sem duplicar lógica.
+  O Fiado é dono de `ecossistema_prefs` e das colunas `fiado_*`.
+- **Contábil (fixado com o dono):** venda a prazo = a receber, nunca
+  faturamento no ato. `sales_summary` passou a receber `CAIXA_PAYMENT_METHODS`
+  (6 métodos, sem `'fiado'`) no financeiro E no dashboard — senão o fiado
+  inflava o faturamento (double-count). O realizado vem da PROJEÇÃO em tempo
+  de leitura de `fiado_pagamentos` (por `pago_em`), somando só vendas
+  `origem='gaveta'`. Fonte única `CAIXA_PAYMENT_METHODS` em `lib/types/sales`.
+- **Quantidade fracionada** (o PDV vende por peso; `fiado_itens_venda.quantidade`
+  é int): a venda a prazo preserva o VALOR — qtd fracionada vira descrição
+  ("1,5 × Tomate"), quantidade 1, valor da linha como unitário.
+- **Bug do ConfirmDialog (os DOIS apps têm cópia própria):** o `useEffect` que
+  foca o Cancelar NÃO pode ter `onClose`/`pending` nas deps (são recriados a
+  cada render do pai) — senão digitar num campo do diálogo devolve o foco ao
+  Cancelar a cada tecla. Corrigido: foco depende só de `[open]`, separado do
+  listener de Escape. Mesmo cuidado vale para qualquer modal com `.focus()` em
+  effect (ver `FormatoDialog`).
+- **Badges de referência** usam a cor+logo do OUTRO app (efeito de integração):
+  FiadoApp = vermelho/coral + logo coral; Gaveta = verde + logo verde. Logo num
+  chip branco p/ contraste em light/dark. Componentes: `VendaOrigemBadge`
+  (Fiado), `FiadoappBadge` (Gaveta). Logos cruzados em `public/` de cada repo.
+- **Trabalho no Gaveta:** lembrar de criar a branch ANTES de commitar (uma vez
+  commitei na `main` local por engano — resolvido com `git reset --hard
+  origin/main` na main + a branch preservando o commit). `pg --no-save` some
+  entre `npm i` — reinstalar. Gaveta mescla com `--merge`.
+
 ## Estado 2026-07-12 (fim do dia): SPRINT ENCERRADA — F6 estágios 1 e 2 em produção; PRÓXIMO = estágio 3
 
 **Onde paramos:** a **F6 (Ecossistema)** começou e entregou, nos DOIS apps

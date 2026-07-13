@@ -208,18 +208,53 @@ toda integração é OPT-IN, com liga/desliga individual e default DESLIGADO.
       `removerLogoSeguro` preserva o logo do retorno). Leitura continua
       nativa (autonomia intacta). Fiado PR #18 (squash `33d9ff3`);
       Gaveta PR #20 (merge `0f1472b`).
-- [ ] 🤖 Estágio 3 — Clientes compartilhados (PRÓXIMO; toca o caderno real
-      do dono — mapeamento cuidadoso, sem migração destrutiva)
-- [ ] 🤖 Estágio 4 — Fiado no PDV: venda "a prazo" no caixa do Gaveta cria
-      a venda no Fiado (argumento de venda mais forte) + gatilho contextual
-- [ ] 🤖 Estágio 5 — Recebíveis do Fiado no resumo financeiro do Gaveta
+- [x] 🤖👤 **Integração "Fiado no PDV" CONCLUÍDA** (2026-07-13) — **fundiu os
+      antigos Estágios 3 + 4 + parte do 5** num único fluxo (decisão do dono:
+      não fazer uma tela de "caderno compartilhado" isolada; o seletor de
+      cliente vive dentro do bloco de venda a prazo do caixa). Entregue em 5
+      fases, validadas uma a uma:
+  - **Fase 0 — pagamento parcial nas vendas selecionadas** (Fiado-only): o
+    modo "selecionadas" passou a aceitar um valor opcional, distribuído em
+    cascata só entre as marcadas (migration 0008 relaxa o guarda da
+    `fiado_registrar_pagamento`). Fiado PR #19 (squash `f3e86d9`).
+  - **Fase 1 — registrar venda a prazo no PDV**: forma de pagamento "Venda a
+    Prazo (Fiado)" no caixa (opt-in via toggle `fiado_pdv_ativo`), com
+    combobox de clientes do FiadoApp + cadastro inline; RPC-ponte atômica
+    `registrar_venda_fiado` cria o a-receber (FiadoApp) + a venda `'fiado'`
+    (Gaveta, com baixa de estoque). Badge "Registrada no Gaveta" no FiadoApp.
+    Migrations: Fiado 0009 (`fiado_vendas.origem`, `fiado_pdv_ativo`), Gaveta
+    0011 (`'fiado'` no `payment_method`, `sales.fiado_venda_id`, RPC-ponte).
+    Fiado PR #20 (squash `4a7a9d9`); Gaveta PR #21 (merge `8e27f36`).
+  - **Fase 2 — financeiro do Gaveta reflete o fiado** (sem migration):
+    faturamento exclui `'fiado'` (via `CAIXA_PAYMENT_METHODS` no financeiro E
+    dashboard — corrige double-count); bloco segregado "A receber via
+    FiadoApp" (badge + link); realização por pagamento (`pago_em`, parcial
+    conta o pago). Gaveta PR #22 (merge `2017e50`).
+  - **Fase 3 — exclusão consistente**: RPC-ponte `excluir_venda_fiado` (Gaveta
+    migration 0012) remove os dois lados e estorna estoque (reusa
+    `set_sale_status`); FiadoApp roteia origem 'gaveta' (venda e cliente) por
+    ela; botão de excluir no bloco a-receber; avisos p/ venda com pagamento.
+    Gaveta PR #23 (merge `0eeaddd`); Fiado PR #22 (squash `da2a7e8`).
+  - **Fase 4 — desativar com senha + Manter/Excluir**: desativar o toggle pede
+    reautenticação por senha + mostra resumo + escolhe Manter (só desliga) ou
+    Excluir (apaga as vendas de origem Gaveta pelos dois lados). Sem migration.
+    Gaveta PR #24 (merge `74f5a61`); Fiado PR #23 (squash `6ebacf0`).
 
 Nota: a IA de Configurações já foi padronizada nos dois apps (Fiado na
 F4d-3; Gaveta via prompt entregue ao dono em 2026-07-09).
 
-**Padrões do ecossistema (para os estágios 3–5):** toda ponte é uma
-coluna nova em `ecossistema_prefs` (default false) + um `EcoToggle` na
-página `/ecossistema` dos dois apps + helper server-side de leitura da
-flag em `lib/ecossistema-server.ts`. Migrations numeradas no repo do
-Fiado (dono das migrations), aplicadas ao banco compartilhado antes do
-push. Gaveta mescla com `--merge`; Fiado com squash.
+**Regras contábeis fixadas (decisões do dono):** venda a prazo é *a receber*,
+nunca faturamento no ato; base caixa (o faturamento recebe o valor **pago**,
+na data do pagamento; parcial conta o que já foi pago); `fiado_vendas` é a
+fonte da verdade e o Gaveta **projeta em tempo de leitura** (sem sync);
+alocação de pagamento parcial = **cascata do mais antigo, cega para origem**;
+quantidade fracionada preserva o valor (qtd embutida na descrição do item).
+
+**Padrões do ecossistema:** ponte = coluna em `ecossistema_prefs` (default
+false) + toggle na `/ecossistema` dos dois apps. **As RPCs-ponte que escrevem
+em tabelas do Gaveta (`registrar_venda_fiado`, `excluir_venda_fiado`) vivem
+nas migrations do GAVETA**; o Fiado é dono de `ecossistema_prefs` e das
+colunas `fiado_*`. Migrations aplicadas ao banco compartilhado antes do push
+(gate de segurança pede aprovação p/ mudar objeto de produção do Gaveta).
+Gaveta mescla com `--merge`; Fiado com squash. Badges de referência usam a
+cor+logo do OUTRO app (FiadoApp = vermelho/coral; Gaveta = verde).
