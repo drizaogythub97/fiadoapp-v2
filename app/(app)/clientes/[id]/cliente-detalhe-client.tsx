@@ -323,7 +323,7 @@ export function ClienteDetalheClient({
                 return (
                   <li
                     key={v.id}
-                    className="ring-foreground/10 bg-card flex flex-wrap items-center gap-3 rounded-xl px-4 py-3 ring-1"
+                    className="ring-foreground/10 bg-card flex items-center gap-3 rounded-xl px-4 py-3 ring-1"
                   >
                     <input
                       type="checkbox"
@@ -357,28 +357,30 @@ export function ClienteDetalheClient({
                         )}
                       </span>
                     </label>
-                    <span className="text-base font-semibold whitespace-nowrap">
-                      {v.status === "PARCIAL" ? (
-                        <>
-                          {formatBRL(restante)}{" "}
-                          <span className="text-muted-foreground text-sm font-normal">
-                            de {formatBRL(v.valor_total)}
-                          </span>
-                        </>
-                      ) : (
-                        formatBRL(v.valor_total)
-                      )}
-                    </span>
-                    <Link
-                      href={`/vendas/${v.id}`}
-                      className={cn(
-                        buttonVariants({ variant: "outline" }),
-                        "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-11 px-4 text-base",
-                      )}
-                      aria-label={`Detalhar venda de ${formatDataBR(v.data_compra)}`}
-                    >
-                      Detalhar
-                    </Link>
+                    <div className="flex shrink-0 flex-col items-end gap-2">
+                      <span className="text-base font-semibold whitespace-nowrap">
+                        {v.status === "PARCIAL" ? (
+                          <>
+                            {formatBRL(restante)}{" "}
+                            <span className="text-muted-foreground text-sm font-normal">
+                              de {formatBRL(v.valor_total)}
+                            </span>
+                          </>
+                        ) : (
+                          formatBRL(v.valor_total)
+                        )}
+                      </span>
+                      <Link
+                        href={`/vendas/${v.id}`}
+                        className={cn(
+                          buttonVariants({ variant: "outline" }),
+                          "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-11 px-4 text-base",
+                        )}
+                        aria-label={`Detalhar venda de ${formatDataBR(v.data_compra)}`}
+                      >
+                        Detalhar
+                      </Link>
+                    </div>
                   </li>
                 );
               })}
