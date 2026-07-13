@@ -30,7 +30,7 @@ export default async function ClienteDetalhePage({
       supabase
         .from("fiado_vendas")
         .select(
-          "id, cliente_id, data_compra, data_vencimento, valor_total, valor_pago, status, observacao, quitado_em, created_at",
+          "id, cliente_id, data_compra, data_vencimento, valor_total, valor_pago, status, observacao, quitado_em, origem, created_at",
         )
         .eq("cliente_id", id)
         // mesma ordem da cascata da RPC: mais antigas primeiro

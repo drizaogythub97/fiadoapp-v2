@@ -42,6 +42,41 @@ export async function salvarSwitcher(
 }
 
 /**
+ * Liga/desliga a ponte "Fiado no PDV" (Fase 1). Preferência da CONTA
+ * (tabela compartilhada), então vale nos dois apps: ligada aqui, o caixa
+ * do Gaveta passa a oferecer a forma de pagamento "Venda a Prazo (Fiado)".
+ * Opt-in: nasce desligada. NÃO tem política de retorno destrutiva — desligar
+ * só esconde a opção; as vendas a prazo já lançadas são a-receber reais e
+ * permanecem (a desativação com escolha Manter/Excluir vem na Fase 4).
+ */
+export async function salvarFiadoPdv(
+  ativo: boolean,
+): Promise<{ error?: string }> {
+  const parsed = ativoSchema.safeParse(ativo);
+  if (!parsed.success) {
+    return { error: "Não foi possível salvar. Tente de novo." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Sessão expirada. Entre de novo." };
+
+  const { error } = await supabase.from("ecossistema_prefs").upsert({
+    user_id: user.id,
+    fiado_pdv_ativo: parsed.data,
+    updated_at: new Date().toISOString(),
+  });
+  if (error) {
+    return { error: "Não foi possível salvar. Tente de novo." };
+  }
+
+  revalidatePath("/ecossistema");
+  return {};
+}
+
+/**
  * Liga/desliga a MARCA ÚNICA (estágio 2), com política de retorno.
  * - ATIVAR: guarda a marca ATUAL de cada app (backup) e faz a marca DESTE
  *   app (FiadoApp) valer nos dois. Com a ponte ligada, salvar a marca em

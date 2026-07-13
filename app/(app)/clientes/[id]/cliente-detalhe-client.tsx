@@ -23,6 +23,7 @@ import {
   FormatoEscolha,
   type FormatoQuitacao,
 } from "@/components/app/formato-escolha";
+import { VendaOrigemBadge } from "@/components/app/origem-badge";
 import { VendaStatusBadge } from "@/components/app/venda-status-badge";
 import {
   isDesktop,
@@ -343,6 +344,7 @@ export function ClienteDetalheClient({
                         {v.status === "PARCIAL" ? (
                           <VendaStatusBadge status="PARCIAL" />
                         ) : null}
+                        <VendaOrigemBadge origem={v.origem} />
                       </span>
                       <span className="text-muted-foreground text-sm">
                         {v.data_vencimento ? (
