@@ -1,10 +1,4 @@
-import {
-  ArrowUpRight,
-  Blocks,
-  KeyRound,
-  Landmark,
-  ShoppingCart,
-} from "lucide-react";
+import { ArrowUpRight, Blocks, KeyRound, ShoppingCart } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -24,17 +18,6 @@ import { EcoToggle } from "./eco-toggle";
 import { FiadoPdvToggle } from "./fiado-pdv-toggle";
 
 export const metadata = { title: "Ecossistema" };
-
-// Pontes dos estágios 2–5 da F6 — apresentadas desde já, entregues aos
-// poucos. Toda ponte nasce DESLIGADA e terá liga/desliga próprio (opt-in).
-const PONTES = [
-  {
-    titulo: "Recebimentos no financeiro",
-    descricao:
-      "O que você tem a receber no fiado aparece no resumo financeiro do Gaveta.",
-    Icon: Landmark,
-  },
-] as const;
 
 export default async function EcossistemaPage() {
   const supabase = await createClient();
@@ -157,48 +140,13 @@ export default async function EcossistemaPage() {
           <CardDescription className="minimal:max-sm:text-sm text-base">
             Libera a forma de pagamento &quot;Venda a Prazo (Fiado)&quot; no
             caixa do Gaveta. No caixa você escolhe o cliente (ou cadastra na
-            hora) e a venda já entra aqui no FiadoApp como fiado a receber.
+            hora) e a venda já entra aqui no FiadoApp como fiado a receber — e
+            o que você tem a receber aparece no resumo financeiro do Gaveta.
             Desativado por padrão.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <FiadoPdvToggle ativoInicial={fiadoPdv} resumo={resumoPdv} />
-        </CardContent>
-      </Card>
-
-      {/* ── PONTES FUTURAS ─────────────────────────────────────────── */}
-      <Card>
-        <CardHeader className="minimal:max-sm:border-b minimal:max-sm:border-border/60 minimal:max-sm:pb-3">
-          <CardTitle className="minimal:max-sm:text-base text-xl">
-            Pontes entre os apps
-          </CardTitle>
-          <CardDescription className="minimal:max-sm:text-sm text-base">
-            Estamos preparando conexões opcionais entre o FiadoApp e o
-            Gaveta. Cada uma terá o próprio botão de ligar e desligar — e
-            nasce desligada.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ul className="flex flex-col gap-4">
-            {PONTES.map(({ titulo, descricao, Icon }) => (
-              <li key={titulo} className="flex items-start gap-3">
-                <span className="bg-muted text-muted-foreground flex size-9 shrink-0 items-center justify-center rounded-lg">
-                  <Icon aria-hidden="true" className="size-4" />
-                </span>
-                <div className="flex min-w-0 flex-col gap-0.5">
-                  <p className="minimal:max-sm:text-sm flex flex-wrap items-center gap-2 text-base font-medium">
-                    {titulo}
-                    <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs font-medium">
-                      Em breve
-                    </span>
-                  </p>
-                  <p className="minimal:max-sm:text-xs text-muted-foreground text-sm">
-                    {descricao}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
         </CardContent>
       </Card>
     </section>
