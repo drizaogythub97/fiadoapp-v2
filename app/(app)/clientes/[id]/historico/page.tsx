@@ -6,7 +6,12 @@ import { BotaoComprovante } from "@/components/app/botao-comprovante";
 import { VendaStatusBadge } from "@/components/app/venda-status-badge";
 import { buttonVariants } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
-import { formatBRL, formatDataBR, formatTelefone } from "@/lib/format";
+import {
+  formatBRL,
+  formatDataBR,
+  formatTelefone,
+  rotuloItemVenda,
+} from "@/lib/format";
 import type { ClienteResumo, ItemVenda, Venda } from "@/lib/types/fiado";
 import { cn } from "@/lib/utils";
 
@@ -92,11 +97,13 @@ export default async function HistoricoClientePage({
                     className="flex flex-wrap items-center justify-between gap-2 text-base"
                   >
                     <span>
-                      {item.quantidade}x {item.descricao}
-                      <span className="text-muted-foreground text-sm">
-                        {" "}
-                        · {formatBRL(item.valor_unitario)} a unidade
-                      </span>
+                      {rotuloItemVenda(item.quantidade, item.descricao)}
+                      {item.quantidade !== 1 ? (
+                        <span className="text-muted-foreground text-sm">
+                          {" "}
+                          · {formatBRL(item.valor_unitario)} a unidade
+                        </span>
+                      ) : null}
                     </span>
                     <span className="font-medium">
                       {formatBRL(item.valor_total)}
@@ -107,17 +114,17 @@ export default async function HistoricoClientePage({
               <p className="flex items-center justify-between border-t pt-2 text-lg font-semibold">
                 Total <span>{formatBRL(v.valor_total)}</span>
               </p>
-              <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 <BotaoComprovante
                   pedido={{ tipo: "venda", vendaId: v.id }}
                   rotulo="Comprovante"
-                  className="h-11 px-4"
+                  className="h-11 w-full px-4"
                 />
                 <Link
                   href={`/vendas/${v.id}`}
                   className={cn(
                     buttonVariants({ variant: "outline" }),
-                    "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-11 px-4 text-base",
+                    "minimal:max-sm:h-10 minimal:max-sm:text-sm h-11 w-full px-4 text-base",
                   )}
                 >
                   Detalhar
@@ -128,10 +135,13 @@ export default async function HistoricoClientePage({
         </ul>
       )}
 
-      <div className="flex flex-wrap gap-2">
+      <div className="grid grid-cols-2 gap-2">
         <Link
           href={`/vendas/nova?cliente=${cliente.id}`}
-          className={cn(buttonVariants(), "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base")}
+          className={cn(
+            buttonVariants(),
+            "minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 w-full text-base font-medium",
+          )}
         >
           <Plus aria-hidden="true" className="size-4" />
           Nova venda
@@ -140,7 +150,7 @@ export default async function HistoricoClientePage({
           href={`/clientes/${cliente.id}`}
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base",
+            "minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 w-full text-base",
           )}
         >
           <ArrowLeft aria-hidden="true" className="size-4" />
