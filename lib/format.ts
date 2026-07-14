@@ -58,6 +58,16 @@ export function somarDias(iso: string, dias: number): string {
   return d.toISOString().slice(0, 10);
 }
 
+/**
+ * Rótulo de um item de venda. Quando a quantidade é 1, mostra só a descrição
+ * — evita o "1x" redundante. Itens vindos do PDV (venda a prazo no caixa)
+ * já embutem a quantidade real na descrição ("3 × Refrigerante") e ficam com
+ * quantidade 1, então sem esta regra apareceria o confuso "1x 3 × Refrigerante".
+ */
+export function rotuloItemVenda(quantidade: number, descricao: string): string {
+  return quantidade === 1 ? descricao : `${quantidade}x ${descricao}`;
+}
+
 /** Exibe telefone armazenado como dígitos: (11) 91234-5678 / (11) 1234-5678. */
 export function formatTelefone(digits: string | null): string {
   if (!digits) return "";

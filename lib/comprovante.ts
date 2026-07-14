@@ -1,4 +1,4 @@
-import { formatBRL, formatDataBR } from "@/lib/format";
+import { formatBRL, formatDataBR, rotuloItemVenda } from "@/lib/format";
 import type { VendaStatus } from "@/lib/types/fiado";
 
 /** Dados apresentacionais dos comprovantes (rotas /comprovante/*). */
@@ -109,7 +109,7 @@ export function textoComprovanteVenda(data: ComprovanteVendaData): string {
   linhas.push("", "Itens:");
   for (const item of data.itens) {
     linhas.push(
-      `- ${item.quantidade}x ${item.descricao} — ${formatBRL(item.valorTotal)}`,
+      `- ${rotuloItemVenda(item.quantidade, item.descricao)} — ${formatBRL(item.valorTotal)}`,
     );
   }
   linhas.push("", `*Total: ${formatBRL(data.valorTotal)}*`);
@@ -146,7 +146,7 @@ export function textoEspelhoCliente(data: EspelhoClienteData): string {
     }
     for (const item of venda.itens) {
       linhas.push(
-        `- ${item.quantidade}x ${item.descricao} — ${formatBRL(item.valorTotal)}`,
+        `- ${rotuloItemVenda(item.quantidade, item.descricao)} — ${formatBRL(item.valorTotal)}`,
       );
     }
     if (venda.valorPago > 0) {

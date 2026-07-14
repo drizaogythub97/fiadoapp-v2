@@ -10,7 +10,12 @@ import {
   type ComprovanteVendaData,
   type EspelhoClienteData,
 } from "@/lib/comprovante";
-import { formatBRL, formatDataBR, formatTelefone } from "@/lib/format";
+import {
+  formatBRL,
+  formatDataBR,
+  formatTelefone,
+  rotuloItemVenda,
+} from "@/lib/format";
 import { MARCA_PADRAO, type MarcaComprovante } from "@/lib/marca";
 
 import styles from "./receipt.module.css";
@@ -117,11 +122,13 @@ export function ComprovanteVenda({
         {data.itens.map((item, i) => (
           <div key={i} className={styles.row}>
             <span>
-              {item.quantidade}x {item.descricao}
-              <span className={styles.itemDetail}>
-                {" "}
-                · {formatBRL(item.valorUnitario)} a unidade
-              </span>
+              {rotuloItemVenda(item.quantidade, item.descricao)}
+              {item.quantidade !== 1 ? (
+                <span className={styles.itemDetail}>
+                  {" "}
+                  · {formatBRL(item.valorUnitario)} a unidade
+                </span>
+              ) : null}
             </span>
             <span className={styles.tabular}>{formatBRL(item.valorTotal)}</span>
           </div>
@@ -195,11 +202,13 @@ export function EspelhoCliente({
             {venda.itens.map((item, j) => (
               <div key={j} className={styles.row}>
                 <span>
-                  {item.quantidade}x {item.descricao}
-                  <span className={styles.itemDetail}>
-                    {" "}
-                    · {formatBRL(item.valorUnitario)} a unidade
-                  </span>
+                  {rotuloItemVenda(item.quantidade, item.descricao)}
+                  {item.quantidade !== 1 ? (
+                    <span className={styles.itemDetail}>
+                      {" "}
+                      · {formatBRL(item.valorUnitario)} a unidade
+                    </span>
+                  ) : null}
                 </span>
                 <span className={styles.tabular}>
                   {formatBRL(item.valorTotal)}

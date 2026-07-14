@@ -11,7 +11,13 @@ import {
   tituloComprovanteVenda,
 } from "@/lib/comprovante";
 import { createClient } from "@/lib/supabase/server";
-import { formatBRL, formatDataBR, formatTelefone, hojeISO } from "@/lib/format";
+import {
+  formatBRL,
+  formatDataBR,
+  formatTelefone,
+  hojeISO,
+  rotuloItemVenda,
+} from "@/lib/format";
 import type { ItemVenda, Pagamento, VendaComCliente } from "@/lib/types/fiado";
 import { cn } from "@/lib/utils";
 import { linkWhatsAppTexto } from "@/lib/whatsapp";
@@ -175,11 +181,13 @@ export default async function VendaDetalhePage({
             >
               <div className="flex flex-col">
                 <span className="text-base font-medium">
-                  {item.quantidade}x {item.descricao}
+                  {rotuloItemVenda(item.quantidade, item.descricao)}
                 </span>
-                <span className="text-muted-foreground text-sm">
-                  {formatBRL(item.valor_unitario)} a unidade
-                </span>
+                {item.quantidade !== 1 ? (
+                  <span className="text-muted-foreground text-sm">
+                    {formatBRL(item.valor_unitario)} a unidade
+                  </span>
+                ) : null}
               </div>
               <span className="text-base font-semibold">
                 {formatBRL(item.valor_total)}

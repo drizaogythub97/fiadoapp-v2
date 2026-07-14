@@ -8,7 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { STATUS_LABEL } from "@/lib/comprovante";
-import { formatBRL, formatDataBR, hojeISO } from "@/lib/format";
+import {
+  formatBRL,
+  formatDataBR,
+  hojeISO,
+  rotuloItemVenda,
+} from "@/lib/format";
 import {
   FILTROS_INICIAIS,
   SITUACAO_FILTRO_LABEL,
@@ -425,8 +430,10 @@ function RelatorioPrintLinhas({
         <tr key={j} className="border-b border-[#f3f4f6] text-[#6b7280]">
           <td />
           <td className="py-0.5 pr-2" colSpan={3}>
-            › {item.quantidade}x {item.descricao} —{" "}
-            {formatBRL(item.valorUnitario)} a unidade
+            › {rotuloItemVenda(item.quantidade, item.descricao)}
+            {item.quantidade !== 1
+              ? ` — ${formatBRL(item.valorUnitario)} a unidade`
+              : ""}
           </td>
           <td className="py-0.5 pr-2 text-right whitespace-nowrap">
             {formatBRL(item.valorTotal)}
