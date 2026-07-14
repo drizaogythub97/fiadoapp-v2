@@ -437,60 +437,72 @@ export function ClienteDetalheClient({
         )}
       </div>
 
-      {/* ── OUTRAS AÇÕES ────────────────────────────────────────────── */}
-      <div className="flex flex-wrap gap-2">
+      {/* ── OUTRAS AÇÕES ────────────────────────────────────────────────
+          CTA primária em largura total; ações secundárias em grade de 2 que
+          preenche a linha (item ímpar estica); destrutiva e navegação
+          separadas em largura total — layout simétrico que aproveita a
+          largura em vez de botões soltos de tamanhos diferentes. */}
+      <div className="flex flex-col gap-2">
         <Link
           href={`/vendas/nova?cliente=${cliente.id}`}
-          className={cn(buttonVariants(), "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base")}
+          className={cn(
+            buttonVariants(),
+            "minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 w-full text-base font-medium",
+          )}
         >
           <Plus aria-hidden="true" className="size-4" />
           Nova venda
         </Link>
-        {vendasAbertas.length > 0 ? (
-          <BotaoComprovante
-            pedido={{ tipo: "espelho-cliente", clienteId: cliente.id }}
-            rotulo="Espelho das vendas"
-          />
-        ) : null}
-        <Link
-          href={`/clientes/${cliente.id}/historico`}
-          className={cn(
-            buttonVariants({ variant: "outline" }),
-            "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base",
-          )}
-        >
-          <History aria-hidden="true" className="size-4" />
-          Ver histórico
-        </Link>
-        <Link
-          href={`/clientes/${cliente.id}/editar`}
-          className={cn(
-            buttonVariants({ variant: "outline" }),
-            "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base",
-          )}
-        >
-          <Pencil aria-hidden="true" className="size-4" />
-          Editar cliente
-        </Link>
-        {whatsapp ? (
-          <a
-            href={whatsapp}
-            target="_blank"
-            rel="noopener noreferrer"
+
+        <div className="flex flex-wrap gap-2">
+          {vendasAbertas.length > 0 ? (
+            <BotaoComprovante
+              pedido={{ tipo: "espelho-cliente", clienteId: cliente.id }}
+              rotulo="Espelho das vendas"
+              className="flex-1 basis-[calc(50%-0.25rem)]"
+            />
+          ) : null}
+          <Link
+            href={`/clientes/${cliente.id}/historico`}
             className={cn(
               buttonVariants({ variant: "outline" }),
-              "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base",
+              "minimal:max-sm:h-10 minimal:max-sm:text-sm h-12 flex-1 basis-[calc(50%-0.25rem)] text-base",
             )}
           >
-            <MessageCircle aria-hidden="true" className="size-4" />
-            Cobrar pelo WhatsApp
-          </a>
-        ) : null}
+            <History aria-hidden="true" className="size-4" />
+            Ver histórico
+          </Link>
+          <Link
+            href={`/clientes/${cliente.id}/editar`}
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "minimal:max-sm:h-10 minimal:max-sm:text-sm h-12 flex-1 basis-[calc(50%-0.25rem)] text-base",
+            )}
+          >
+            <Pencil aria-hidden="true" className="size-4" />
+            Editar cliente
+          </Link>
+          {whatsapp ? (
+            <a
+              href={whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(
+                buttonVariants({ variant: "outline" }),
+                "minimal:max-sm:h-10 minimal:max-sm:text-sm h-12 flex-1 basis-[calc(50%-0.25rem)] text-base",
+              )}
+            >
+              <MessageCircle aria-hidden="true" className="size-4" />
+              Cobrar pelo WhatsApp
+            </a>
+          ) : null}
+        </div>
+
         <Button
           type="button"
           variant="destructive"
           onClick={() => setDialogo("excluir")}
-          className="minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 px-5 text-base"
+          className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 w-full text-base"
         >
           <Trash2 aria-hidden="true" className="size-4" />
           Excluir cliente
@@ -501,7 +513,7 @@ export function ClienteDetalheClient({
         href="/clientes"
         className={cn(
           buttonVariants({ variant: "outline" }),
-          "minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 self-start px-5 text-base",
+          "minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 w-full text-base",
         )}
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
