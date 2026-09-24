@@ -35,6 +35,19 @@ export async function updateSession(
     publicEnv.supabaseUrl,
     publicEnv.supabaseAnonKey,
     {
+      // Travas do cookie de sessão. NÃO são o padrão da biblioteca: medido
+      // no Gaveta (PR #56), sem isto o cookie chega ao navegador sem
+      // `httpOnly` e sem `secure` — legível por qualquer script da página e
+      // trafegável em HTTP.
+      //
+      // Tem de estar nos DOIS clientes (aqui e em `server.ts`). Se ficar só
+      // num, o refresh do outro reescreve o cookie sem as travas.
+      //
+      // `secure` só em produção porque o desenvolvimento roda em HTTP.
+      cookieOptions: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+      },
       cookies: {
         getAll() {
           return request.cookies.getAll();
