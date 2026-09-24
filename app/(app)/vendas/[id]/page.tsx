@@ -11,13 +11,7 @@ import {
   tituloComprovanteVenda,
 } from "@/lib/comprovante";
 import { createClient } from "@/lib/supabase/server";
-import {
-  formatBRL,
-  formatDataBR,
-  formatTelefone,
-  hojeISO,
-  rotuloItemVenda,
-} from "@/lib/format";
+import { formatBRL, formatDataBR, formatInstanteBR, formatTelefone, hojeISO, rotuloItemVenda } from "@/lib/format";
 import type { ItemVenda, Pagamento, VendaComCliente } from "@/lib/types/fiado";
 import { cn } from "@/lib/utils";
 import { linkWhatsAppTexto } from "@/lib/whatsapp";
@@ -153,9 +147,7 @@ export default async function VendaDetalhePage({
               Quitada em
             </dt>
             <dd className="text-lg font-semibold">
-              {new Date(venda.quitado_em).toLocaleDateString("pt-BR", {
-                timeZone: "America/Sao_Paulo",
-              })}
+              {formatInstanteBR(venda.quitado_em)}
             </dd>
           </div>
         ) : null}
@@ -207,9 +199,7 @@ export default async function VendaDetalhePage({
                 className="ring-foreground/10 bg-card flex items-center justify-between rounded-xl px-4 py-3 ring-1"
               >
                 <span className="minimal:max-sm:text-sm text-muted-foreground text-base">
-                  {new Date(p.pago_em).toLocaleDateString("pt-BR", {
-                    timeZone: "America/Sao_Paulo",
-                  })}
+                  {formatInstanteBR(p.pago_em)}
                 </span>
                 <span className="text-base font-semibold">
                   {formatBRL(p.valor_pago)}

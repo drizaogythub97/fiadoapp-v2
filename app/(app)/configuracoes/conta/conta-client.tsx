@@ -1,6 +1,7 @@
 "use client";
 
 import { Pencil, Trash2 } from "lucide-react";
+import { formatInstanteBR } from "@/lib/format";
 import { useState, useTransition } from "react";
 
 import { ConfirmDialog } from "@/components/app/confirm-dialog";
@@ -23,12 +24,6 @@ type Props = {
   email: string;
   criadaEm: string | null;
 };
-
-const DATA_FMT = new Intl.DateTimeFormat("pt-BR", {
-  day: "2-digit",
-  month: "2-digit",
-  year: "numeric",
-});
 
 type Aviso = { kind: "success" | "error"; message: string } | null;
 
@@ -268,7 +263,7 @@ export function ContaClient({ nomeInicial, email, criadaEm }: Props) {
             <p>
               Conta criada em{" "}
               <strong className="text-foreground font-medium">
-                {DATA_FMT.format(new Date(criadaEm))}
+                {formatInstanteBR(criadaEm)}
               </strong>
               .
             </p>

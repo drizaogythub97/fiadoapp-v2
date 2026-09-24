@@ -6,12 +6,7 @@ import { BotaoComprovante } from "@/components/app/botao-comprovante";
 import { VendaStatusBadge } from "@/components/app/venda-status-badge";
 import { buttonVariants } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
-import {
-  formatBRL,
-  formatDataBR,
-  formatTelefone,
-  rotuloItemVenda,
-} from "@/lib/format";
+import { formatBRL, formatDataBR, formatInstanteBR, formatTelefone, rotuloItemVenda } from "@/lib/format";
 import type { ClienteResumo, ItemVenda, Venda } from "@/lib/types/fiado";
 import { cn } from "@/lib/utils";
 
@@ -85,9 +80,7 @@ export default async function HistoricoClientePage({
               <p className="minimal:max-sm:text-sm text-muted-foreground text-base">
                 Quitada em{" "}
                 {v.quitado_em
-                  ? new Date(v.quitado_em).toLocaleDateString("pt-BR", {
-                      timeZone: "America/Sao_Paulo",
-                    })
+                  ? formatInstanteBR(v.quitado_em)
                   : "—"}
               </p>
               <ul className="flex flex-col gap-1">

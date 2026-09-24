@@ -13,6 +13,7 @@ import {
 import {
   formatBRL,
   formatDataBR,
+  formatDataHoraBR,
   formatTelefone,
   rotuloItemVenda,
 } from "@/lib/format";
@@ -20,13 +21,7 @@ import { MARCA_PADRAO, type MarcaComprovante } from "@/lib/marca";
 
 import styles from "./receipt.module.css";
 
-function dataHoraBR(iso: string): string {
-  return new Intl.DateTimeFormat("pt-BR", {
-    dateStyle: "short",
-    timeStyle: "short",
-    timeZone: "America/Sao_Paulo",
-  }).format(new Date(iso));
-}
+const dataHoraBR = formatDataHoraBR;
 
 function Frame({
   titulo,

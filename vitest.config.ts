@@ -10,6 +10,10 @@ export default defineConfig({
     },
   },
   test: {
+    // A suíte roda em UTC, como o servidor da Vercel -- NÃO no fuso da
+    // máquina de quem desenvolve. Sem isto, um teste de data passa em
+    // Brasília e concorda com o bug que só aparece em produção.
+    env: { TZ: "UTC" },
     environment: "jsdom",
     globals: true,
     setupFiles: ["./tests/setup.ts"],
