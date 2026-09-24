@@ -14,7 +14,7 @@ import {
   carregarEspelhoCliente,
 } from "@/lib/comprovante-data";
 import type { MarcaComprovante } from "@/lib/marca";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, obterUsuario } from "@/lib/supabase/server";
 import { pedidoComprovanteSchema } from "@/lib/validations/comprovante";
 
 export type ResultadoComprovante =
@@ -48,9 +48,7 @@ export async function dadosComprovante(
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (!user) {
     return { ok: false, error: "Sessão expirada. Entre de novo." };
   }

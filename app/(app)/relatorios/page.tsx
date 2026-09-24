@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, obterUsuario } from "@/lib/supabase/server";
 import type { VendaRelatorio } from "@/lib/relatorio";
 import type { ItemVenda, VendaStatus } from "@/lib/types/fiado";
 
@@ -23,9 +23,7 @@ type Linha = {
 
 export default async function RelatoriosPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   const emitidoPor =
     (user?.user_metadata?.full_name as string | undefined) ?? user?.email ?? "";
 

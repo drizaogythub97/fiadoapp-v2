@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { createClient } from "@/lib/supabase/server";
+import { obterUsuario } from "@/lib/supabase/server";
 
 import { LoginForm } from "./login-form";
 
@@ -23,10 +23,7 @@ export default async function LoginPage({
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (user) redirect("/dashboard");
 
   // O callback de e-mail (confirmação/recuperação) redireciona para cá com um

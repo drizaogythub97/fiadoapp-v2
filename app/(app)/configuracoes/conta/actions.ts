@@ -8,7 +8,7 @@ import { z } from "zod";
 import { getServiceRoleKey, publicEnv } from "@/lib/env";
 import { BUCKET_LOGOS } from "@/lib/marca";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, obterUsuario } from "@/lib/supabase/server";
 import {
   PASSWORD_MAX,
   PASSWORD_MIN,
@@ -39,9 +39,7 @@ export async function atualizarNome(fullName: string): Promise<ActionResult> {
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (!user) return { ok: false, error: "Sessão expirada. Entre novamente." };
 
   // Fonte do Fiado: user_metadata. O nome é identidade (a conta é a mesma
@@ -79,9 +77,7 @@ async function reautenticar(
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (!user || !user.email) {
     return { ok: false, error: "Sessão expirada. Entre novamente." };
   }
@@ -204,9 +200,7 @@ export async function excluirConta(
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (!user || !user.email) {
     return { ok: false, error: "Sessão expirada. Entre novamente." };
   }

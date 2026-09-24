@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { createClient } from "@/lib/supabase/server";
+import { obterUsuario } from "@/lib/supabase/server";
 
 import { SignupForm } from "./signup-form";
 
@@ -17,10 +17,7 @@ export const metadata = {
 };
 
 export default async function SignupPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (user) redirect("/dashboard");
 
   return (

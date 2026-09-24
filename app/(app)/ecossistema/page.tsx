@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { GAVETA_URL } from "@/lib/ecossistema";
 import { resumoFiadoPdv } from "@/lib/ecossistema-server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, obterUsuario } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 
 import { salvarMarcaUnica, salvarSwitcher } from "./actions";
@@ -21,9 +21,7 @@ export const metadata = { title: "Ecossistema" };
 
 export default async function EcossistemaPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   const { data: prefs } = await supabase
     .from("ecossistema_prefs")
     .select("switcher_ativo, marca_unica, fiado_pdv_ativo")

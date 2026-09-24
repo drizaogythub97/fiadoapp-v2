@@ -7,7 +7,7 @@ import {
   tituloComprovanteVenda,
 } from "@/lib/comprovante";
 import { carregarComprovanteVenda } from "@/lib/comprovante-data";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, obterUsuario } from "@/lib/supabase/server";
 import { linkWhatsAppTexto } from "@/lib/whatsapp";
 
 export const metadata = {
@@ -30,9 +30,7 @@ export default async function ComprovanteVendaPage({
   if (!UUID_RE.test(vendaId)) notFound();
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (!user) redirect("/login");
 
   // RLS garante que só a venda do próprio usuário é retornada.
