@@ -1,4 +1,4 @@
-import { formatBRL, formatDataBR, rotuloItemVenda } from "@/lib/format";
+import { formatBRL, formatDataBR, formatDataHoraBR, rotuloItemVenda } from "@/lib/format";
 import type { VendaStatus } from "@/lib/types/fiado";
 
 /** Dados apresentacionais dos comprovantes (rotas /comprovante/*). */
@@ -82,13 +82,7 @@ export const STATUS_LABEL: Record<VendaStatus, string> = {
   PAGA: "Paga",
 };
 
-function dataHoraBR(iso: string): string {
-  return new Intl.DateTimeFormat("pt-BR", {
-    dateStyle: "short",
-    timeStyle: "short",
-    timeZone: "America/Sao_Paulo",
-  }).format(new Date(iso));
-}
+const dataHoraBR = formatDataHoraBR;
 
 /**
  * Texto plano do espelho/comprovante de venda — usado no Web Share (caixa

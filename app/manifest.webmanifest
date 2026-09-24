@@ -1,8 +1,9 @@
 {
+  "id": "/",
   "name": "FiadoApp",
   "short_name": "FiadoApp",
   "description": "Controle simples de vendas fiado: clientes, vendas a prazo, quitações e cobrança — fácil de usar.",
-  "start_url": "/",
+  "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#13131a",
   "theme_color": "#13131a",

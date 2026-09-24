@@ -36,6 +36,36 @@ export function parseBRL(masked: string): number {
   return Number.isNaN(n) ? 0 : n;
 }
 
+/**
+ * O relógio do comércio. Fixo de propósito: o servidor da Vercel roda em
+ * UTC e, sem isto, uma venda registrada às 21h de 16/09 aparece como 17/09
+ * para o lojista. Quem decide o dia é a loja, não o servidor.
+ */
+export const FUSO_LOJA = "America/Sao_Paulo";
+
+const DATA_HORA_FMT = new Intl.DateTimeFormat("pt-BR", {
+  dateStyle: "short",
+  timeStyle: "short",
+  timeZone: FUSO_LOJA,
+});
+
+const DATA_FMT = new Intl.DateTimeFormat("pt-BR", {
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+  timeZone: FUSO_LOJA,
+});
+
+/** Instante ISO → "16/09/2026, 21:17" no fuso da loja. */
+export function formatDataHoraBR(iso: string): string {
+  return DATA_HORA_FMT.format(new Date(iso));
+}
+
+/** Instante ISO → "16/09/2026" no fuso da loja. */
+export function formatInstanteBR(iso: string): string {
+  return DATA_FMT.format(new Date(iso));
+}
+
 /** "2026-07-07" → "07/07/2026" (sem Date para não sofrer com fuso). */
 export function formatDataBR(iso: string | null): string {
   if (!iso) return "";

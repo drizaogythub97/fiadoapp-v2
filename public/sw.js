@@ -17,7 +17,8 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(self.clients.claim());
 });
 
-self.addEventListener("fetch", (event) => {
-  // Passagem direta para a rede (sem cache).
-  event.respondWith(fetch(event.request));
-});
+// O handler PRECISA existir -- é o que mantém o app instalável no Chrome --
+// mas NÃO deve chamar respondWith: isso faz toda requisição dar uma volta
+// pelo service worker para no fim fazer o que o navegador já faria sozinho.
+// Sem respondWith, o navegador segue direto para a rede.
+self.addEventListener("fetch", () => {});

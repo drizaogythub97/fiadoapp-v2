@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   formatDataBR,
+  formatDataHoraBR,
+  formatInstanteBR,
   maskBRL,
   parseBRL,
   somarDias,
@@ -60,5 +62,27 @@ describe("somarDias", () => {
 
   it("respeita ano bissexto", () => {
     expect(somarDias("2028-01-31", 30)).toBe("2028-03-01");
+  });
+});
+
+describe("fuso da loja (o servidor roda em UTC, a loja não)", () => {
+  // Esta suíte roda com TZ=UTC (ver vitest.config.ts), como a Vercel. Sem
+  // isso, na máquina de quem desenvolve — em Brasília — estes testes
+  // passariam mesmo com o fuso solto, concordando com o bug.
+
+  it("uma venda da noite não pula para o dia seguinte", () => {
+    // 16/09 00:17 UTC é 15/09 21:17 em São Paulo. Quem decide o dia é a
+    // loja: para o lojista, essa venda é de segunda, não de terça.
+    expect(formatInstanteBR("2026-09-16T00:17:00Z")).toBe("15/09/2026");
+    expect(formatDataHoraBR("2026-09-16T00:17:00Z")).toBe("15/09/2026, 21:17");
+  });
+
+  it("mantém o dia quando o horário não cruza a virada", () => {
+    expect(formatInstanteBR("2026-09-16T15:39:41Z")).toBe("16/09/2026");
+    expect(formatDataHoraBR("2026-09-16T15:39:41Z")).toBe("16/09/2026, 12:39");
+  });
+
+  it("o primeiro minuto do dia em São Paulo já é o dia novo", () => {
+    expect(formatInstanteBR("2026-01-01T03:00:00Z")).toBe("01/01/2026");
   });
 });
