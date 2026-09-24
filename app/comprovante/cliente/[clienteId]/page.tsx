@@ -4,7 +4,7 @@ import { ComprovanteShell } from "@/components/receipt/comprovante-shell";
 import { EspelhoCliente } from "@/components/receipt/fiado-receipt";
 import { TITULO_ESPELHO_CLIENTE, textoEspelhoCliente } from "@/lib/comprovante";
 import { carregarEspelhoCliente } from "@/lib/comprovante-data";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, obterUsuario } from "@/lib/supabase/server";
 import { linkWhatsAppTexto } from "@/lib/whatsapp";
 
 export const metadata = {
@@ -27,9 +27,7 @@ export default async function EspelhoClientePage({
   if (!UUID_RE.test(clienteId)) notFound();
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (!user) redirect("/login");
 
   // RLS garante que só clientes/vendas do próprio usuário são retornados.

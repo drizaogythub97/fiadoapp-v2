@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 import type { ZodIssue } from "zod";
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient, obterUsuario } from "@/lib/supabase/server";
 import { clienteSchema } from "@/lib/validations/cliente";
 
 export type ClienteFormState = {
@@ -68,9 +68,7 @@ export async function criarCliente(
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (!user) {
     return { error: "Sessão expirada. Entre novamente." };
   }
@@ -108,9 +106,7 @@ export async function atualizarCliente(
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (!user) {
     return { error: "Sessão expirada. Entre novamente." };
   }
@@ -140,9 +136,7 @@ export async function excluirCliente(id: string): Promise<{ error?: string }> {
   if (!id) return { error: "Cliente inválido." };
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (!user) {
     return { error: "Sessão expirada. Entre novamente." };
   }

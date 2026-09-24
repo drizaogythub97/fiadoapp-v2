@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 
 import { toPortugueseAuthError } from "@/lib/auth/errors";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, obterUsuario } from "@/lib/supabase/server";
 import { resetSchema } from "@/lib/validations/auth";
 
 export type ResetState = {
@@ -39,9 +39,7 @@ export async function reset(
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (!user) {
     return {
       error: "Sua sessão de recuperação expirou. Solicite um novo link.",

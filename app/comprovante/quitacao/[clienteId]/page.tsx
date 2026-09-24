@@ -4,7 +4,7 @@ import { ComprovanteShell } from "@/components/receipt/comprovante-shell";
 import { ComprovanteQuitacao } from "@/components/receipt/fiado-receipt";
 import { textoComprovanteQuitacao } from "@/lib/comprovante";
 import { carregarComprovanteQuitacao } from "@/lib/comprovante-data";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, obterUsuario } from "@/lib/supabase/server";
 import { linkWhatsAppTexto } from "@/lib/whatsapp";
 
 export const metadata = {
@@ -29,9 +29,7 @@ export default async function ComprovanteQuitacaoPage({
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (!user) redirect("/login");
 
   const res = await carregarComprovanteQuitacao(

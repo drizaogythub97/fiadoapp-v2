@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { formatBRL } from "@/lib/format";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, obterUsuario } from "@/lib/supabase/server";
 import type { ClienteComSaldo, ResumoDashboard } from "@/lib/types/fiado";
 import { cn } from "@/lib/utils";
 
@@ -26,9 +26,7 @@ export default async function DashboardPage() {
   // dispensado (cookie), então não há flash no carregamento.
   const mostrarAnuncio = !(await cookies()).get("fiado_ecossistema_anuncio");
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
 
   const [{ data: resumoData }, { data: clientesData }] = await Promise.all([
     supabase.rpc("fiado_resumo_dashboard"),

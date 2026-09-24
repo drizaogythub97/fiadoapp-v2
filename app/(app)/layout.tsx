@@ -8,7 +8,7 @@ import { LogoutButton } from "@/components/app/logout-button";
 import { ModoChooser } from "@/components/app/modo-chooser";
 import { Toaster } from "@/components/ui/sonner";
 import { marcaDoUsuario } from "@/lib/marca";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, obterUsuario } from "@/lib/supabase/server";
 import { getUiModeFromCookie } from "@/lib/ui-mode/cookie";
 
 export default async function AppLayout({
@@ -17,9 +17,7 @@ export default async function AppLayout({
   children: React.ReactNode;
 }) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
 
   if (!user) {
     redirect("/login");
@@ -28,20 +26,23 @@ export default async function AppLayout({
   const displayName =
     (user.user_metadata?.full_name as string | undefined) ?? user.email;
 
-  // Marca da loja configurada no Gaveta (decisão F4d: profiles, só leitura).
-  const marca = await marcaDoUsuario(supabase, user.id);
-
-  // Modo de exibição do celular (cookie por aparelho). null = nunca escolheu:
-  // renderiza a tela de escolha (que só aparece em viewport mobile).
-  const uiMode = await getUiModeFromCookie();
-
-  // Atalho do ecossistema (opt-in, estágio 1): só aparece se o usuário
-  // ligou o toggle em /ecossistema. A pref vale a conta (os dois apps).
-  const { data: ecoPrefs } = await supabase
-    .from("ecossistema_prefs")
-    .select("switcher_ativo")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  // As três não dependem uma da outra: vão JUNTAS. Em série, cada ida ao
+  // banco é tempo que a pessoa espera com a tela em branco — e com a função
+  // e o banco em continentes diferentes isso custava caro.
+  //
+  // - marca: a marca da loja (decisão F4d: profiles, só leitura).
+  // - uiMode: modo de exibição do celular (cookie por aparelho). null =
+  //   nunca escolheu, e aí renderiza a tela de escolha.
+  // - ecoPrefs: atalho do ecossistema (opt-in), vale a conta nos dois apps.
+  const [marca, uiMode, { data: ecoPrefs }] = await Promise.all([
+    marcaDoUsuario(supabase, user.id),
+    getUiModeFromCookie(),
+    supabase
+      .from("ecossistema_prefs")
+      .select("switcher_ativo")
+      .eq("user_id", user.id)
+      .maybeSingle(),
+  ]);
   const mostrarSwitcher = Boolean(ecoPrefs?.switcher_ativo);
 
   return (

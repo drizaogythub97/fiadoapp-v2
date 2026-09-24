@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { BUCKET_LOGOS } from "@/lib/marca";
 import { marcaUnicaAtiva, removerLogoSeguro } from "@/lib/ecossistema-server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, obterUsuario } from "@/lib/supabase/server";
 import {
   limiteClienteSchema,
   limitePadraoSchema,
@@ -27,9 +27,7 @@ export async function salvarLimitePadrao(
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (!user) {
     return { error: "Sessão expirada. Entre novamente." };
   }
@@ -57,9 +55,7 @@ export async function salvarLimiteCliente(
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (!user) {
     return { error: "Sessão expirada. Entre novamente." };
   }
@@ -127,9 +123,7 @@ export async function salvarNomeMarca(
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (!user) return { error: "Sessão expirada. Entre novamente." };
 
   const { error } = await supabase.from("fiado_preferencias").upsert({
@@ -177,9 +171,7 @@ export async function uploadLogoMarca(
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (!user) return { ok: false, error: "Sessão expirada. Entre novamente." };
 
   const ext = tipo === "jpeg" ? "jpg" : tipo;
@@ -241,9 +233,7 @@ export async function uploadLogoMarca(
 
 export async function removerLogoMarca(): Promise<LogoUploadResult> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (!user) return { ok: false, error: "Sessão expirada. Entre novamente." };
 
   const { data: atual } = await supabase

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient, obterUsuario } from "@/lib/supabase/server";
 import { pagamentoSchema, vendaSchema } from "@/lib/validations/venda";
 
 /**
@@ -52,9 +52,7 @@ export async function registrarVenda(
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (!user) {
     return { ok: false, error: "Sessão expirada. Entre novamente." };
   }
@@ -131,9 +129,7 @@ export async function registrarPagamento(
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (!user) {
     return { ok: false, error: "Sessão expirada. Entre novamente." };
   }
@@ -193,9 +189,7 @@ export async function excluirVenda(
   if (!id) return { error: "Venda inválida." };
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (!user) {
     return { error: "Sessão expirada. Entre novamente." };
   }

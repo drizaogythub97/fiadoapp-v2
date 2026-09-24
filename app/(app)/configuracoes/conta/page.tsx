@@ -1,14 +1,11 @@
-import { createClient } from "@/lib/supabase/server";
+import { obterUsuario } from "@/lib/supabase/server";
 
 import { ContaClient } from "./conta-client";
 
 export const metadata = { title: "Minha conta" };
 
 export default async function ContaPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
 
   const nome = (user?.user_metadata?.full_name as string | undefined) ?? "";
   const email = user?.email ?? "";

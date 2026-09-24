@@ -5,7 +5,7 @@ import { z } from "zod";
 
 import { removerLogoSeguro } from "@/lib/ecossistema-server";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, obterUsuario } from "@/lib/supabase/server";
 
 const ativoSchema = z.boolean();
 
@@ -23,9 +23,7 @@ export async function salvarSwitcher(
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (!user) return { error: "Sessão expirada. Entre de novo." };
 
   const { error } = await supabase.from("ecossistema_prefs").upsert({
@@ -59,9 +57,7 @@ export async function salvarFiadoPdv(
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (!user) return { error: "Sessão expirada. Entre de novo." };
 
   const { error } = await supabase.from("ecossistema_prefs").upsert({
@@ -99,9 +95,7 @@ export async function desativarFiadoPdv(
   if (!rate.ok) return { ok: false, error: rate.message };
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (!user || !user.email) {
     return { ok: false, error: "Sessão expirada. Entre de novo." };
   }
@@ -164,9 +158,7 @@ export async function salvarMarcaUnica(
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await obterUsuario();
   if (!user) return { error: "Sessão expirada. Entre de novo." };
 
   const now = new Date().toISOString();
