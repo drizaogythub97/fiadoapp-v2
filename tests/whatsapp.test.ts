@@ -168,7 +168,7 @@ describe("textoEspelhoCliente", () => {
     expect(texto).toContain("- 2x Ração 15kg —");
     expect(texto).toContain("Obs.: Combinou pagar na sexta");
     expect(texto).toContain("*Venda de 05/07/2026*");
-    expect(texto).toContain("- 1x Milho 25kg —");
+    expect(texto).toContain("- Milho 25kg —");
     // formatBRL usa espaço não separável — comparar só o número
     expect(texto).toContain("185,50");
   });
