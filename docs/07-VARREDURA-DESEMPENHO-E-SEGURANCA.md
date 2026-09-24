@@ -1,5 +1,52 @@
 # Varredura de desempenho e segurança — FiadoApp (24/09/2026)
 
+> ## ✅ Situação: 9 dos 10 achados CORRIGIDOS e em produção
+>
+> | PR | O que | Estado |
+> | --- | --- | --- |
+> | [#25](https://github.com/drizaogythub97/fiadoapp-v2/pull/25) | região `gru1` + teste desatualizado | mesclado |
+> | [#26](https://github.com/drizaogythub97/fiadoapp-v2/pull/26) | Next 16.3.6, zero vulnerabilidades | mesclado |
+> | [#27](https://github.com/drizaogythub97/fiadoapp-v2/pull/27) | cookie com `httpOnly`/`secure` + cliente morto | mesclado |
+> | [#28](https://github.com/drizaogythub97/fiadoapp-v2/pull/28) | migration `revoke` | ⏳ **espera autorização do dono** |
+> | [#29](https://github.com/drizaogythub97/fiadoapp-v2/pull/29) | uma chamada ao Auth por tela | mesclado |
+> | [#30](https://github.com/drizaogythub97/fiadoapp-v2/pull/30) | fuso num lugar só + abertura do PWA | mesclado |
+>
+> ### O ganho, medido em produção na mesma página
+>
+> | | Região | TTFB |
+> | --- | --- | --- |
+> | antes | `gru1::iad1` | ~205 ms |
+> | **depois** | `gru1::gru1` | **~88 ms** |
+>
+> ### O que ficou de guarda no repositório
+>
+> - `npm run test:sessao-revogada` — cria conta descartável, revoga a
+>   sessão no Auth mantendo o cookie e segue os redirecionamentos com teto.
+>   **Verificado mordendo**: sem a conferência com estado, o laço
+>   `/dashboard → /login → /dashboard` aparece e estoura o teto.
+> - **Regra de ESLint** proibindo formatador de data fora de
+>   `lib/format.ts`. **Verificada mordendo**: dois erros ao inserir
+>   violação.
+> - **Suíte unitária em `TZ=UTC`**, como a Vercel, mais três testes de
+>   regressão de fuso. **Verificados mordendo**: sem o fuso fixo, saem
+>   `expected '16/09/2026' to be '15/09/2026'` e
+>   `expected '16/09/2026, 15:39' to be '16/09/2026, 12:39'`.
+>
+> ### ⏳ O único item pendente, e depende de você
+>
+> A migration `0010_execucao_so_com_sessao.sql` está escrita e conferida
+> mas **não foi aplicada** — escrever no banco compartilhado exige sua
+> autorização. Enquanto não for, as quatro RPCs do Fiado continuam
+> executando sem login (sem vazar dados, mas gastando CPU do banco).
+>
+> ### Uma coisa a fazer à mão
+>
+> O `CLAUDE.md` deveria ganhar a regra **"RPC nova nasce sem o papel
+> anônimo"**, como a regra 5.1 do Gaveta. Não mexi nele porque você tem
+> alterações não commitadas ali e eu não ia levar o seu trabalho junto no
+> meu commit.
+
+
 Mesma varredura que foi feita no Gaveta em 16–18/09/2026. O Gaveta serve de
 **referência medida**: os dois apps dividem stack, banco e conta na Vercel,
 então o que lá foi provado vale como precedente aqui.
