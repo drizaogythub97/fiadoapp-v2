@@ -258,3 +258,37 @@ colunas `fiado_*`. Migrations aplicadas ao banco compartilhado antes do push
 (gate de segurança pede aprovação p/ mudar objeto de produção do Gaveta).
 Gaveta mescla com `--merge`; Fiado com squash. Badges de referência usam a
 cor+logo do OUTRO app (FiadoApp = vermelho/coral; Gaveta = verde).
+
+## Busca e sugestões da Nova venda (2026-11-16/18) ✅ PR #32
+
+Pedido do dono, feito junto com o Gaveta (`gaveta#62`), que segue a mesma
+regra no caixa.
+
+- [x] 🤖 **Busca** (`lib/busca.ts`, nas 7 telas que pesquisam): cada palavra
+      no nome, no sobrenome ou na referência, em qualquer ordem e sem acento;
+      e **erro de digitação** — distância de edição com troca de vizinhas
+      (1 erro até 7 letras, 2 depois) e grafias que soam igual (s/z, ph/f,
+      th/t, y/i, k/c, ce/se, letra dobrada). "maira" acha Maria, "sousa"
+      acha Souza, "alpste" acha Alpiste. Listas (Clientes, Vendas) caem nos
+      parecidos só quando nada bate, e avisam; sugestões completam com eles;
+      o Relatório continua exato, porque vira planilha.
+- [x] 🤖 **Nova venda**: sugestão sem repetição — a mesma descrição em caixa
+      ou acento diferente, e o "2 × " que o caixa do Gaveta põe na frente
+      (72 dos 203 itens vindos de lá, medido em 18/11); sem o teto calado de
+      1000 itens; no celular, opção com altura mínima (nome comprido invadia a
+      de baixo) e lista na largura da linha; contador de linhas fora do
+      módulo (o servidor gerava `item-8`, o navegador esperava `item-1`).
+- [x] 🤖 **Varredura das 16 telas** no celular (Simples e Minimalista) e no
+      computador, com nomes compridos: detalhe do cliente (valor parcial por
+      cima da etiqueta), Relatórios (nome por cima do valor), detalhe da
+      venda, histórico e comprovante (nome sem espaço), logo do topo com 44px.
+- [x] 🤖 **Migration 0010** (RPC só com sessão) aplicada em 16/11 com
+      autorização do dono, PR #28 mesclado; regra no `CLAUDE.md`.
+
+Decisões: a busca roda sobre a lista que a tela já tem — **sem migration no
+Fiado**; o Relatório não traz parecido; na sugestão, vence a grafia mais
+usada (no empate, a que não é toda maiúscula).
+
+Testes: 100 unitários e 11 e2e com conta descartável (`tests/e2e/
+busca-e-sugestoes.spec.ts`; os 8 novos reprovam no código antigo). O
+Playwright aceita `BASE_URL` para provar o deploy em `fiadoapp.net`.
