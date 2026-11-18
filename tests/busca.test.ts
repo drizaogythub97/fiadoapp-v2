@@ -154,6 +154,16 @@ describe("sugestoesSemRepeticao", () => {
     ).toEqual(["MILHO 5KG"]);
   });
 
+  it("tira a quantidade que a venda a prazo do Gaveta põe na frente", () => {
+    // "2 × ALPISTE 500G" é o Alpiste, não um produto chamado "2 × ...": a
+    // quantidade tem campo próprio na Nova venda.
+    expect(
+      sugestoesSemRepeticao(["2 × ALPISTE 500G", "3 x Alpiste 500g", "Alpiste 500g"]),
+    ).toEqual(["Alpiste 500g"]);
+    // Nome que só COMEÇA com número continua inteiro.
+    expect(sugestoesSemRepeticao(["2 Coelhos Ração"])).toEqual(["2 Coelhos Ração"]);
+  });
+
   it("no empate, fica a que não é toda maiúscula", () => {
     expect(sugestoesSemRepeticao(["FUMO", "Fumo"])).toEqual(["Fumo"]);
   });

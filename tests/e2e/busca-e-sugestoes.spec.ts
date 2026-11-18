@@ -99,6 +99,8 @@ test.beforeAll(async ({ browser }, testInfo) => {
   expect(daqui.error).toBeNull();
   const doGaveta = await vender(idDe(MARIA.nome), [
     "ALPISTE 500G",
+    // Como o caixa do Gaveta grava quando vende mais de uma unidade.
+    "2 × ALPISTE 500G",
     "RAÇÃO MIX",
     ...LONGOS,
   ]);
@@ -195,7 +197,8 @@ test.describe("computador", () => {
       page.locator("#cliente-busca-resultados").getByRole("button"),
     ).toHaveText([/Maria Aparecida Souza/]);
 
-    // "Alpiste 500g" (daqui) e "ALPISTE 500G" (do Gaveta) viram uma opção.
+    // "Alpiste 500g" (daqui), "ALPISTE 500G" e "2 × ALPISTE 500G" (do Gaveta)
+    // viram uma opção só.
     await descricao(page).fill("alpiste");
     await expect(sugestoesDoProduto(page).getByRole("button")).toHaveCount(1);
   });
@@ -244,8 +247,9 @@ test.describe("computador", () => {
       page.locator("#cliente-busca-resultados").getByRole("button"),
     ).toHaveText([/José Carlos/]);
     await descricao(page).fill("alpste");
+    // Uma opção só; a grafia é a mais usada (aqui, a que veio do Gaveta).
     await expect(sugestoesDoProduto(page).getByRole("button")).toHaveText([
-      "Alpiste 500g",
+      /^alpiste 500g$/i,
     ]);
   });
 });

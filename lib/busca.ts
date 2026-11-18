@@ -298,19 +298,31 @@ function todaMaiuscula(texto: string): boolean {
 }
 
 /**
+ * A quantidade que a venda a prazo do Gaveta põe na frente da descrição
+ * ("3 × Refrigerante", com o item em quantidade 1 — ver `rotuloItemVenda`).
+ * Na sugestão ela não serve: a quantidade tem campo próprio, e escolher
+ * "3 × ALPISTE" gravaria o "3 ×" como nome do produto. Medido em 18/11: 72
+ * dos 203 itens vindos do Gaveta tinham o prefixo.
+ */
+const QUANTIDADE_NA_FRENTE = /^\d+(?:[.,]\d+)?\s*[×xX]\s+/;
+
+/**
  * As descrições já vendidas, cada produto UMA vez só.
  *
  * O mesmo produto chega escrito de jeitos diferentes: "Alpiste 500g"
- * digitado aqui e "ALPISTE 500G" vindo do cadastro do Gaveta, pela venda a
- * prazo do caixa. A lista de sugestões mostrava os dois, um embaixo do
- * outro. Agora a grafia é agrupada sem caixa, sem acento e sem espaço
- * repetido, e fica a MAIS USADA; no empate, a que não é toda maiúscula,
- * que lê melhor.
+ * digitado aqui e "ALPISTE 500G" — ou "2 × ALPISTE 500G" — vindo do
+ * cadastro do Gaveta, pela venda a prazo do caixa. A lista de sugestões
+ * mostrava todos, um embaixo do outro. Agora sai a quantidade da frente, a
+ * grafia é agrupada sem caixa, sem acento e sem espaço repetido, e fica a
+ * MAIS USADA; no empate, a que não é toda maiúscula, que lê melhor.
  */
 export function sugestoesSemRepeticao(descricoes: readonly string[]): string[] {
   const grupos = new Map<string, Map<string, number>>();
   for (const bruta of descricoes) {
-    const descricao = bruta.trim().replace(/\s+/g, " ");
+    const descricao = bruta
+      .trim()
+      .replace(QUANTIDADE_NA_FRENTE, "")
+      .replace(/\s+/g, " ");
     if (descricao === "") continue;
     const chave = normalizarBusca(descricao);
     const grafias = grupos.get(chave) ?? new Map<string, number>();

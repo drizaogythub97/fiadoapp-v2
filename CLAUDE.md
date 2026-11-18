@@ -61,6 +61,12 @@ npm run test:e2e   # Playwright
 - Server Components por padrão; `"use client"` só com interatividade.
 - Nomes de variáveis/commits em inglês; **textos de interface em português** (claros e simples — público com pouca destreza tecnológica, mesmo perfil do Gaveta).
 - Conventional Commits. Acessibilidade: contraste AA, alvos ≥44px, fontes grandes, aria.
+- **Busca por nome passa por `lib/busca.ts`.** Nunca `includes()` com o texto
+  inteiro: ele não acha com as palavras fora de ordem nem com erro de
+  digitação. Lista que filtra: `filtrarComParecidos` (avisa quando são
+  parecidos); sugestão: `sugerirPorBusca`; relatório e planilha:
+  `filtrarPorBusca` (só exato). O Gaveta segue a mesma regra em
+  `lib/db/busca.ts`.
 
 ## Fluxo de trabalho (idêntico ao Gaveta)
 
