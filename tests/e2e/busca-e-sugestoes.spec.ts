@@ -224,6 +224,30 @@ test.describe("computador", () => {
       .evaluateAll((campos) => campos.map((c) => c.id));
     expect(new Set(ids).size).toBe(ids.length);
   });
+
+  test("com erro de digitação, a busca traz o parecido e avisa", async ({
+    page,
+  }) => {
+    // Lista: nada escrito assim — "maira" (letras invertidas), "sousa" (com
+    // s) —, então vêm os parecidos, com o aviso de que não são iguais.
+    await page.goto("/clientes");
+    await page.getByLabel("Buscar cliente").fill("maira sousa");
+    await expect(page.getByText(/escrito assim/)).toBeVisible();
+    const encontrados = page.getByRole("link", { name: /^Detalhar / });
+    await expect(encontrados).toHaveCount(1);
+    await expect(encontrados.first()).toHaveAccessibleName(/Maria Aparecida/);
+
+    // Nova venda: cliente e produto, cada um com uma letra fora do lugar.
+    await page.goto("/vendas/nova");
+    await page.getByLabel("Buscar cliente já cadastrado").fill("jose conseisao");
+    await expect(
+      page.locator("#cliente-busca-resultados").getByRole("button"),
+    ).toHaveText([/José Carlos/]);
+    await descricao(page).fill("alpste");
+    await expect(sugestoesDoProduto(page).getByRole("button")).toHaveText([
+      "Alpiste 500g",
+    ]);
+  });
 });
 
 for (const modo of ["simples", "minimalista"] as const) {

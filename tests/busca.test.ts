@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  filtrarComParecidos,
   filtrarPorBusca,
   normalizarBusca,
+  parecidos,
   sugerirPorBusca,
   sugestoesSemRepeticao,
   termosDaBusca,
@@ -13,6 +15,55 @@ const JOSE = { nome: "José Carlos", sobrenome: "da Conceição", referencia: "Z
 const MARIA = { nome: "Maria Aparecida", sobrenome: "Souza", referencia: "Cida" };
 const JOANA = { nome: "Joana", sobrenome: null, referencia: null };
 const CLIENTES = [JOSE, MARIA, JOANA];
+
+describe("parecidos (erro de digitação)", () => {
+  const nome = (s: string) => s;
+  const achar = (itens: string[], busca: string) => parecidos(itens, busca, nome);
+
+  it("perdoa uma letra trocada, faltando, sobrando ou invertida", () => {
+    expect(achar(["Maria Aparecida", "Mario", "Marta"], "maira")).toEqual([
+      "Maria Aparecida",
+    ]);
+    expect(achar(["Alpiste 500g", "Capa de Gaiola"], "alpste")).toEqual([
+      "Alpiste 500g",
+    ]);
+  });
+
+  it("junta grafias que soam igual", () => {
+    expect(achar(["Maria Souza"], "sousa")).toEqual(["Maria Souza"]);
+    expect(achar(["Rafael Santos"], "raphael")).toEqual(["Rafael Santos"]);
+    expect(achar(["José da Conceição"], "conseissao")).toEqual([
+      "José da Conceição",
+    ]);
+  });
+
+  it("não inventa parentesco", () => {
+    expect(achar(["Marcos"], "carlos")).toEqual([]);
+    expect(achar(["Maria Souza"], "maira lima")).toEqual([]);
+    // Palavra curta só casa inteira, e número repetido não encolhe.
+    expect(achar(["Ração 500g"], "50")).toEqual([]);
+  });
+});
+
+describe("filtrarComParecidos (listas)", () => {
+  const buscar = (termo: string) => {
+    const r = filtrarComParecidos(CLIENTES, termo, textoDoCliente);
+    return { nomes: r.itens.map((c) => c.nome), aproximado: r.aproximado };
+  };
+
+  it("com algo igual, devolve só o igual", () => {
+    expect(buscar("souza")).toEqual({ nomes: ["Maria Aparecida"], aproximado: false });
+  });
+
+  it("sem nada igual, devolve os parecidos e avisa", () => {
+    expect(buscar("maira sousa")).toEqual({ nomes: ["Maria Aparecida"], aproximado: true });
+    expect(buscar("jose conseisao")).toEqual({ nomes: ["José Carlos"], aproximado: true });
+  });
+
+  it("sem igual nem parecido, a lista fica vazia — sem aviso de parecido", () => {
+    expect(buscar("xyzw")).toEqual({ nomes: [], aproximado: false });
+  });
+});
 
 describe("normalizarBusca", () => {
   it("tira acento, til e cedilha e ignora a caixa", () => {
@@ -111,5 +162,14 @@ describe("sugestoesSemRepeticao", () => {
     expect(
       sugestoesSemRepeticao(["  Fumo ", "Capa  de Gaiola", "Capa de Gaiola", "  "]),
     ).toEqual(["Capa de Gaiola", "Fumo"]);
+  });
+});
+
+describe("sugerirPorBusca com erro de digitação", () => {
+  it("completa com os parecidos quando o exato não enche a lista", () => {
+    const sugestoes = ["Alpiste 500g", "Capa de Gaiola", "Ração Mix"];
+    expect(sugerirPorBusca(sugestoes, "alpste", (s) => s, 8)).toEqual([
+      "Alpiste 500g",
+    ]);
   });
 });

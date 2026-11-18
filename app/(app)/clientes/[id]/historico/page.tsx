@@ -89,7 +89,7 @@ export default async function HistoricoClientePage({
                     key={item.id}
                     className="flex flex-wrap items-center justify-between gap-2 text-base"
                   >
-                    <span>
+                    <span className="min-w-0 wrap-anywhere">
                       {rotuloItemVenda(item.quantidade, item.descricao)}
                       {item.quantidade !== 1 ? (
                         <span className="text-muted-foreground text-sm">

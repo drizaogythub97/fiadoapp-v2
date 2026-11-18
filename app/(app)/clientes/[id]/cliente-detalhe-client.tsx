@@ -357,17 +357,25 @@ export function ClienteDetalheClient({
                         )}
                       </span>
                     </label>
-                    <div className="flex shrink-0 flex-col items-end gap-2">
-                      <span className="text-base font-semibold whitespace-nowrap">
+                    {/* No celular, o "de R$ total" da venda parcial desce
+                        para a linha de baixo: numa linha só, a coluna do
+                        valor tomava a largura e espremia a data e a etiqueta
+                        "Parcial" até uma passar por cima da outra. */}
+                    <div className="flex shrink-0 flex-col items-end gap-2 text-right">
+                      <span className="text-base font-semibold">
                         {v.status === "PARCIAL" ? (
                           <>
-                            {formatBRL(restante)}{" "}
-                            <span className="text-muted-foreground text-sm font-normal">
+                            <span className="whitespace-nowrap">
+                              {formatBRL(restante)}
+                            </span>{" "}
+                            <span className="text-muted-foreground block text-sm font-normal whitespace-nowrap sm:inline">
                               de {formatBRL(v.valor_total)}
                             </span>
                           </>
                         ) : (
-                          formatBRL(v.valor_total)
+                          <span className="whitespace-nowrap">
+                            {formatBRL(v.valor_total)}
+                          </span>
                         )}
                       </span>
                       <Link
