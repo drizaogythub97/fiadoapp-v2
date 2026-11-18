@@ -310,11 +310,15 @@ export function RelatoriosClient({
                     aria-label={`Selecionar venda de ${nomeClienteRelatorio(v)} em ${formatDataBR(v.dataCompra)}`}
                     className="accent-primary size-6 shrink-0 cursor-pointer"
                   />
+                  {/* Base de 12rem: sem ela o rótulo encolhia até 59px no
+                      celular, o nome comprido virava uma palavra por linha e
+                      passava por cima do valor. Com ela, valor e situação
+                      descem para a linha de baixo quando não cabem. */}
                   <label
                     htmlFor={`rel-${v.id}`}
-                    className="flex min-w-0 flex-1 cursor-pointer flex-col gap-0.5"
+                    className="flex min-w-0 flex-[1_1_12rem] cursor-pointer flex-col gap-0.5"
                   >
-                    <span className="text-base font-semibold">
+                    <span className="text-base font-semibold wrap-anywhere">
                       {nomeClienteRelatorio(v)}
                       {v.referencia ? (
                         <span className="text-muted-foreground ml-1.5 font-normal">
@@ -429,7 +433,7 @@ function RelatorioPrintLinhas({
       {venda.itens.map((item, j) => (
         <tr key={j} className="border-b border-[#f3f4f6] text-[#6b7280]">
           <td />
-          <td className="py-0.5 pr-2" colSpan={3}>
+          <td className="py-0.5 pr-2 wrap-anywhere" colSpan={3}>
             › {rotuloItemVenda(item.quantidade, item.descricao)}
             {item.quantidade !== 1
               ? ` — ${formatBRL(item.valorUnitario)} a unidade`

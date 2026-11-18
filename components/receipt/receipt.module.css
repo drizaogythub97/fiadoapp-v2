@@ -55,6 +55,14 @@
   padding: 3px 0;
 }
 
+/* A descrição quebra a linha mesmo sem espaço (nome de nota fiscal como
+   "KITLIMPEZAMULTIUSO5EM1"): sem isto, ela empurrava o valor para fora da
+   bobina de 58 mm. */
+.row > :first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .rowLabel {
   color: #6b7280;
 }

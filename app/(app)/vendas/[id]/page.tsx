@@ -171,8 +171,8 @@ export default async function VendaDetalhePage({
               key={item.id}
               className="ring-foreground/10 bg-card flex flex-wrap items-center justify-between gap-2 rounded-xl px-4 py-3 ring-1"
             >
-              <div className="flex flex-col">
-                <span className="text-base font-medium">
+              <div className="flex min-w-0 flex-col">
+                <span className="text-base font-medium wrap-anywhere">
                   {rotuloItemVenda(item.quantidade, item.descricao)}
                 </span>
                 {item.quantidade !== 1 ? (

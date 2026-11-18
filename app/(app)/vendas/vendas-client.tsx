@@ -7,6 +7,7 @@ import { useMemo, useState } from "react";
 import { VendaStatusBadge } from "@/components/app/venda-status-badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { filtrarComParecidos, textoDoCliente } from "@/lib/busca";
 import { formatBRL, formatDataBR } from "@/lib/format";
 import type { VendaComCliente } from "@/lib/types/fiado";
 import { cn } from "@/lib/utils";
@@ -18,9 +19,6 @@ const FILTROS: { valor: Filtro; rotulo: string }[] = [
   { valor: "abertas", rotulo: "Em aberto" },
   { valor: "pagas", rotulo: "Pagas" },
 ];
-
-const norm = (s: string) =>
-  s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
 function nomeCliente(v: VendaComCliente): string {
   const c = v.fiado_clientes;
@@ -38,20 +36,15 @@ export function VendasClient({
   const [busca, setBusca] = useState("");
   const [filtro, setFiltro] = useState<Filtro>("todas");
 
-  const filtradas = useMemo(() => {
+  const { itens: filtradas, aproximado } = useMemo(() => {
     let lista = vendas;
     if (filtro === "abertas") lista = lista.filter((v) => v.status !== "PAGA");
     if (filtro === "pagas") lista = lista.filter((v) => v.status === "PAGA");
-    const termo = norm(busca.trim());
-    if (termo) {
-      lista = lista.filter((v) => {
-        const c = v.fiado_clientes;
-        return norm(
-          `${c?.nome ?? ""} ${c?.sobrenome ?? ""} ${c?.referencia ?? ""}`,
-        ).includes(termo);
-      });
-    }
-    return lista;
+    // Cada palavra em qualquer lugar do nome, sobrenome ou referência; sem
+    // nenhum igual, os parecidos por erro de digitação (`lib/busca.ts`).
+    return filtrarComParecidos(lista, busca, (v) =>
+      v.fiado_clientes ? textoDoCliente(v.fiado_clientes) : "",
+    );
   }, [vendas, filtro, busca]);
 
   return (
@@ -96,9 +89,11 @@ export function VendasClient({
       <p aria-live="polite" className="minimal:max-sm:text-sm text-muted-foreground text-base">
         {filtradas.length === 0
           ? null
-          : filtradas.length === 1
-            ? "1 venda encontrada"
-            : `${filtradas.length} vendas encontradas`}
+          : aproximado
+            ? `Nenhum cliente com “${busca.trim()}” escrito assim. Vendas de nome parecido:`
+            : filtradas.length === 1
+              ? "1 venda encontrada"
+              : `${filtradas.length} vendas encontradas`}
       </p>
 
       {filtradas.length === 0 ? (

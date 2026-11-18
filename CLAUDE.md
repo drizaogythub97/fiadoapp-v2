@@ -37,6 +37,12 @@ Este projeto usa **o mesmo projeto Supabase do Gaveta** (ref `jipavekxqsbzslcqpx
 5. Nunca commitar `.env*`. Segredos só em `.env.local` (dev) e no painel da Vercel.
 6. Mensagens de erro ao usuário são genéricas; não vazar SQL/stack/segredos.
 7. CSP com nonce + strict-dynamic, headers de segurança e rate limiting (Upstash) — portar de `../erp-simples/lib/security/` e `next.config.ts` do Gaveta.
+8. **RPC nova nasce sem o papel anônimo.** Toda função criada em migration
+   termina com `revoke execute on function public.<nome>(<args>) from public,
+   anon;` — revogar só de `anon` não basta, porque o privilégio padrão do
+   schema concede a `PUBLIC`. O privilégio PADRÃO não foi alterado de
+   propósito: vale para o papel `postgres` inteiro e afetaria também as
+   funções do Gaveta, que divide este banco. Ver a migration `0010`.
 
 ## Comandos
 
@@ -55,6 +61,12 @@ npm run test:e2e   # Playwright
 - Server Components por padrão; `"use client"` só com interatividade.
 - Nomes de variáveis/commits em inglês; **textos de interface em português** (claros e simples — público com pouca destreza tecnológica, mesmo perfil do Gaveta).
 - Conventional Commits. Acessibilidade: contraste AA, alvos ≥44px, fontes grandes, aria.
+- **Busca por nome passa por `lib/busca.ts`.** Nunca `includes()` com o texto
+  inteiro: ele não acha com as palavras fora de ordem nem com erro de
+  digitação. Lista que filtra: `filtrarComParecidos` (avisa quando são
+  parecidos); sugestão: `sugerirPorBusca`; relatório e planilha:
+  `filtrarPorBusca` (só exato). O Gaveta segue a mesma regra em
+  `lib/db/busca.ts`.
 
 ## Fluxo de trabalho (idêntico ao Gaveta)
 

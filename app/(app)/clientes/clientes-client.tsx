@@ -18,6 +18,11 @@ import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/app/confirm-dialog";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  filtrarComParecidos,
+  normalizarBusca,
+  textoDoCliente,
+} from "@/lib/busca";
 import { formatBRL, formatTelefone } from "@/lib/format";
 import type { ClienteComSaldo } from "@/lib/types/fiado";
 import { cn } from "@/lib/utils";
@@ -35,9 +40,6 @@ const SITUACOES: { valor: Situacao; rotulo: string }[] = [
   { valor: "devedor", rotulo: "Com débito" },
   { valor: "ok", rotulo: "Sem débito" },
 ];
-
-const norm = (s: string) =>
-  s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
 export function nomeCompleto(c: {
   nome: string;
@@ -60,23 +62,21 @@ export function ClientesClient({
   const [excluindo, setExcluindo] = useState<ClienteComSaldo | null>(null);
   const [pending, startTransition] = useTransition();
 
-  const filtrados = useMemo(() => {
+  const { filtrados, aproximado } = useMemo(() => {
     let lista = clientes;
     if (letra) {
-      lista = lista.filter((c) => norm(c.nome).startsWith(norm(letra)));
-    }
-    const termo = norm(busca.trim());
-    if (termo) {
       lista = lista.filter((c) =>
-        norm(`${c.nome} ${c.sobrenome ?? ""} ${c.referencia ?? ""}`).includes(
-          termo,
-        ),
+        normalizarBusca(c.nome).startsWith(normalizarBusca(letra)),
       );
     }
+    // Cada palavra em qualquer lugar do nome, sobrenome ou referência; sem
+    // nenhum igual, os parecidos por erro de digitação (`lib/busca.ts`).
+    const resultado = filtrarComParecidos(lista, busca, textoDoCliente);
+    lista = resultado.itens;
     if (situacao === "devedor")
       lista = lista.filter((c) => c.saldo_devedor > 0);
     if (situacao === "ok") lista = lista.filter((c) => c.saldo_devedor <= 0);
-    return lista;
+    return { filtrados: lista, aproximado: resultado.aproximado };
   }, [clientes, letra, busca, situacao]);
 
   function confirmarExclusao() {
@@ -185,9 +185,11 @@ export function ClientesClient({
       <p aria-live="polite" className="minimal:max-sm:text-xs text-muted-foreground text-base">
         {filtrados.length === 0
           ? null
-          : filtrados.length === 1
-            ? "1 cliente encontrado"
-            : `${filtrados.length} clientes encontrados`}
+          : aproximado
+            ? `Nenhum cliente com “${busca.trim()}” escrito assim. ${filtrados.length === 1 ? "Este tem o nome parecido:" : "Estes têm o nome parecido:"}`
+            : filtrados.length === 1
+              ? "1 cliente encontrado"
+              : `${filtrados.length} clientes encontrados`}
       </p>
 
       {filtrados.length === 0 ? (

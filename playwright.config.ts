@@ -1,7 +1,17 @@
+import path from "node:path";
+
 import { defineConfig, devices } from "@playwright/test";
+import { config as loadEnv } from "dotenv";
+
+// As specs que semeiam dados criam uma conta DESCARTÁVEL com as chaves do
+// .env.local (o mesmo de `npm run test:rls`). Sem o arquivo, elas se pulam
+// e as de rota pública rodam normalmente.
+loadEnv({ path: path.resolve(__dirname, ".env.local"), quiet: true });
 
 const port = Number(process.env.PORT ?? 3000);
-const baseURL = `http://localhost:${port}`;
+// Com BASE_URL (ex.: https://fiadoapp.net) a suíte roda contra o ambiente
+// publicado e não sobe servidor local — é como se prova um deploy.
+const baseURL = process.env.BASE_URL ?? `http://localhost:${port}`;
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -20,10 +30,12 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
     },
   ],
-  webServer: {
-    command: "npm run dev",
-    url: baseURL,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-  },
+  webServer: process.env.BASE_URL
+    ? undefined
+    : {
+        command: "npm run dev",
+        url: baseURL,
+        reuseExistingServer: !process.env.CI,
+        timeout: 120_000,
+      },
 });

@@ -1,3 +1,4 @@
+import { filtrarPorBusca, normalizarBusca, textoDoCliente } from "@/lib/busca";
 import { formatDataBR } from "@/lib/format";
 import { STATUS_LABEL } from "@/lib/comprovante";
 import type { VendaStatus } from "@/lib/types/fiado";
@@ -51,12 +52,6 @@ export const SITUACAO_FILTRO_LABEL: Record<SituacaoFiltro, string> = {
   pagas: "Somente pagas",
 };
 
-const norm = (s: string) =>
-  s
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase();
-
 export function nomeClienteRelatorio(v: VendaRelatorio): string {
   return v.sobrenome ? `${v.nome} ${v.sobrenome}` : v.nome;
 }
@@ -75,18 +70,11 @@ export function filtrarVendasRelatorio(
     lista = lista.filter((v) => v.status === "PAGA");
   }
   if (filtros.inicial) {
-    const inicial = norm(filtros.inicial);
-    lista = lista.filter((v) => norm(v.nome).startsWith(inicial));
+    const inicial = normalizarBusca(filtros.inicial);
+    lista = lista.filter((v) => normalizarBusca(v.nome).startsWith(inicial));
   }
-  const termo = norm(filtros.busca.trim());
-  if (termo) {
-    lista = lista.filter((v) =>
-      norm(`${v.nome} ${v.sobrenome ?? ""} ${v.referencia ?? ""}`).includes(
-        termo,
-      ),
-    );
-  }
-  return lista;
+  // Cada palavra em qualquer lugar do nome, sobrenome ou referência.
+  return filtrarPorBusca(lista, filtros.busca, textoDoCliente);
 }
 
 export type ResumoRelatorio = {

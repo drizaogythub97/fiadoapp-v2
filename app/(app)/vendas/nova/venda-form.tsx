@@ -10,6 +10,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { sugerirPorBusca, textoDoCliente } from "@/lib/busca";
 import {
   formatBRL,
   formatTelefone,
@@ -30,16 +31,12 @@ type ItemRow = {
   valorUnitario: string; // mascarado ("R$ 12,34")
 };
 
-const norm = (s: string) =>
-  s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
-
 function nomeCompleto(c: { nome: string; sobrenome: string | null }): string {
   return c.sobrenome ? `${c.nome} ${c.sobrenome}` : c.nome;
 }
 
-let proximaKey = 1;
-function novaLinha(): ItemRow {
-  return { key: proximaKey++, quantidade: "", descricao: "", valorUnitario: "" };
+function novaLinha(key: number): ItemRow {
+  return { key, quantidade: "", descricao: "", valorUnitario: "" };
 }
 
 export function VendaForm({
@@ -70,16 +67,10 @@ export function VendaForm({
   const [novaReferencia, setNovaReferencia] = useState("");
   const [novoTelefone, setNovoTelefone] = useState("");
 
+  // Os mais parecidos com o que se digitou vêm primeiro (`lib/busca.ts`).
   const resultadosBusca = useMemo(() => {
-    const q = norm(busca.trim());
-    if (q.length < 2) return [];
-    return clientes
-      .filter((c) =>
-        norm(`${c.nome} ${c.sobrenome ?? ""} ${c.referencia ?? ""}`).includes(
-          q,
-        ),
-      )
-      .slice(0, 6);
+    if (busca.trim().length < 2) return [];
+    return sugerirPorBusca(clientes, busca, textoDoCliente, 6);
   }, [clientes, busca]);
 
   useEffect(() => {
@@ -102,7 +93,14 @@ export function VendaForm({
   }
 
   // ── Itens ──────────────────────────────────────────────────────────────
-  const [itens, setItens] = useState<ItemRow[]>(() => [novaLinha()]);
+  // A chave da linha vira o `id` dos campos (e o `htmlFor` dos rótulos), então
+  // servidor e navegador precisam contar igual: começa em 1 a cada tela. Era
+  // um contador do MÓDULO, que no servidor seguia contando entre um acesso e
+  // outro — a tela saía com "item-8" e o navegador esperava "item-1", o React
+  // não corrige atributo na hidratação, e a lista de sugestões perdia o
+  // vínculo com o campo (e a linha nova podia repetir o id da primeira).
+  const proximaKey = useRef(2);
+  const [itens, setItens] = useState<ItemRow[]>(() => [novaLinha(1)]);
   const [observacao, setObservacao] = useState("");
 
   function atualizarItem(key: number, patch: Partial<ItemRow>) {
@@ -296,13 +294,15 @@ export function VendaForm({
                 >
                   {resultadosBusca.map((c) => (
                     <li key={c.id}>
+                      {/* Altura MÍNIMA, não fixa: nome comprido quebra a
+                          linha em vez de invadir a opção de baixo. */}
                       <button
                         type="button"
                         onClick={() => {
                           setClienteSel(c);
                           setBuscaAberta(false);
                         }}
-                        className="minimal:max-sm:h-11 minimal:max-sm:text-sm hover:bg-muted focus-visible:bg-muted flex h-12 w-full items-center gap-2 px-4 text-left text-base outline-none"
+                        className="minimal:max-sm:min-h-11 minimal:max-sm:text-sm hover:bg-muted focus-visible:bg-muted flex min-h-12 w-full flex-wrap items-center gap-x-2 px-4 py-2 text-left text-base leading-snug outline-none"
                       >
                         <span className="font-medium">{nomeCompleto(c)}</span>
                         {c.referencia ? (
@@ -479,13 +479,14 @@ export function VendaForm({
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() =>
+                  onClick={() => {
+                    const key = proximaKey.current++;
                     setItens((atual) =>
                       atual.length > 1
                         ? atual.filter((i) => i.key !== item.key)
-                        : [novaLinha()],
-                    )
-                  }
+                        : [novaLinha(key)],
+                    );
+                  }}
                   aria-label={`Remover produto ${idx + 1}`}
                   className="text-destructive col-span-2 h-12 w-12 justify-self-end px-0"
                 >
@@ -499,7 +500,10 @@ export function VendaForm({
         <Button
           type="button"
           variant="outline"
-          onClick={() => setItens((atual) => [...atual, novaLinha()])}
+          onClick={() => {
+            const key = proximaKey.current++;
+            setItens((atual) => [...atual, novaLinha(key)]);
+          }}
           className="minimal:max-sm:h-10 minimal:max-sm:px-3 minimal:max-sm:text-sm h-12 self-start px-5 text-base"
         >
           <Plus aria-hidden="true" className="size-5" />
@@ -586,11 +590,12 @@ function CampoDescricao({
 }) {
   const [aberto, setAberto] = useState(false);
 
-  const resultados = useMemo(() => {
-    const q = norm(value.trim());
-    if (!q) return [];
-    return sugestoes.filter((s) => norm(s).includes(q)).slice(0, 8);
-  }, [sugestoes, value]);
+  // Cada palavra em qualquer lugar da descrição, sem acento; as que começam
+  // com o que se digitou vêm primeiro (`lib/busca.ts`).
+  const resultados = useMemo(
+    () => sugerirPorBusca(sugestoes, value, (s) => s, 8),
+    [sugestoes, value],
+  );
 
   const mostrar =
     aberto && resultados.length > 0 && resultados[0] !== value.trim();
@@ -619,12 +624,20 @@ function CampoDescricao({
         className="minimal:max-sm:h-11 minimal:max-sm:text-sm h-12 text-base"
       />
       {mostrar ? (
+        // Celular: o campo ocupa só 4 das 6 colunas da linha e o nome que vem
+        // do Gaveta é comprido ("RACAO GOLDEN FORMULA CAES ADULTOS 15KG").
+        // A lista se alinha à direita do campo e cresce para a esquerda até
+        // a largura da linha inteira: 150% do campo + meio espaço da grade
+        // (gap-3) = as 6 colunas.
         <ul
           id={`${id}-sugestoes`}
-          className="border-border bg-card absolute top-full z-10 mt-1 w-full overflow-hidden rounded-xl border shadow-lg"
+          className="border-border bg-card absolute top-full right-0 z-10 mt-1 w-full overflow-hidden rounded-xl border shadow-lg max-sm:w-[calc(150%+0.375rem)]"
         >
           {resultados.map((s) => (
             <li key={s}>
+              {/* Altura MÍNIMA, não fixa: com `h-11` o nome comprido quebrava
+                  em duas ou três linhas dentro de 44px e invadia a opção de
+                  baixo — as sugestões apareciam umas por cima das outras. */}
               <button
                 type="button"
                 onMouseDown={(e) => {
@@ -632,7 +645,7 @@ function CampoDescricao({
                   onChange(s);
                   setAberto(false);
                 }}
-                className="hover:bg-muted focus-visible:bg-muted flex h-11 w-full items-center px-4 text-left text-base outline-none"
+                className="hover:bg-muted focus-visible:bg-muted flex min-h-11 w-full items-center px-4 py-2 text-left text-base leading-snug outline-none"
               >
                 {s}
               </button>
