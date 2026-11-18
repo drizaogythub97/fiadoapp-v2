@@ -37,6 +37,12 @@ Este projeto usa **o mesmo projeto Supabase do Gaveta** (ref `jipavekxqsbzslcqpx
 5. Nunca commitar `.env*`. Segredos só em `.env.local` (dev) e no painel da Vercel.
 6. Mensagens de erro ao usuário são genéricas; não vazar SQL/stack/segredos.
 7. CSP com nonce + strict-dynamic, headers de segurança e rate limiting (Upstash) — portar de `../erp-simples/lib/security/` e `next.config.ts` do Gaveta.
+8. **RPC nova nasce sem o papel anônimo.** Toda função criada em migration
+   termina com `revoke execute on function public.<nome>(<args>) from public,
+   anon;` — revogar só de `anon` não basta, porque o privilégio padrão do
+   schema concede a `PUBLIC`. O privilégio PADRÃO não foi alterado de
+   propósito: vale para o papel `postgres` inteiro e afetaria também as
+   funções do Gaveta, que divide este banco. Ver a migration `0010`.
 
 ## Comandos
 
