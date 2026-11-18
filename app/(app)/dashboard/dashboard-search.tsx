@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Input } from "@/components/ui/input";
+import { sugerirPorBusca, textoDoCliente } from "@/lib/busca";
 
 type ClienteBusca = {
   id: string;
@@ -13,25 +14,16 @@ type ClienteBusca = {
   referencia: string | null;
 };
 
-const norm = (s: string) =>
-  s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
-
 export function DashboardSearch({ clientes }: { clientes: ClienteBusca[] }) {
   const router = useRouter();
   const [termo, setTermo] = useState("");
   const [aberto, setAberto] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
+  // Os mais parecidos com o que se digitou vêm primeiro (`lib/busca.ts`).
   const resultados = useMemo(() => {
-    const q = norm(termo.trim());
-    if (q.length < 2) return [];
-    return clientes
-      .filter((c) =>
-        norm(`${c.nome} ${c.sobrenome ?? ""} ${c.referencia ?? ""}`).includes(
-          q,
-        ),
-      )
-      .slice(0, 6);
+    if (termo.trim().length < 2) return [];
+    return sugerirPorBusca(clientes, termo, textoDoCliente, 6);
   }, [clientes, termo]);
 
   useEffect(() => {
@@ -86,10 +78,12 @@ export function DashboardSearch({ clientes }: { clientes: ClienteBusca[] }) {
         >
           {resultados.map((c) => (
             <li key={c.id}>
+              {/* Altura MÍNIMA, não fixa: nome comprido quebra a linha em
+                  vez de invadir a opção de baixo. */}
               <button
                 type="button"
                 onClick={() => irParaCliente(c)}
-                className="minimal:max-sm:h-11 minimal:max-sm:text-sm hover:bg-muted focus-visible:bg-muted flex h-12 w-full items-center gap-2 px-4 text-left text-base outline-none"
+                className="minimal:max-sm:min-h-11 minimal:max-sm:text-sm hover:bg-muted focus-visible:bg-muted flex min-h-12 w-full flex-wrap items-center gap-x-2 px-4 py-2 text-left text-base leading-snug outline-none"
               >
                 <span className="font-medium">
                   {c.sobrenome ? `${c.nome} ${c.sobrenome}` : c.nome}

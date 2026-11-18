@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/app/confirm-dialog";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { filtrarPorBusca, normalizarBusca, textoDoCliente } from "@/lib/busca";
 import { formatBRL, formatTelefone } from "@/lib/format";
 import type { ClienteComSaldo } from "@/lib/types/fiado";
 import { cn } from "@/lib/utils";
@@ -35,9 +36,6 @@ const SITUACOES: { valor: Situacao; rotulo: string }[] = [
   { valor: "devedor", rotulo: "Com débito" },
   { valor: "ok", rotulo: "Sem débito" },
 ];
-
-const norm = (s: string) =>
-  s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
 export function nomeCompleto(c: {
   nome: string;
@@ -63,16 +61,12 @@ export function ClientesClient({
   const filtrados = useMemo(() => {
     let lista = clientes;
     if (letra) {
-      lista = lista.filter((c) => norm(c.nome).startsWith(norm(letra)));
-    }
-    const termo = norm(busca.trim());
-    if (termo) {
       lista = lista.filter((c) =>
-        norm(`${c.nome} ${c.sobrenome ?? ""} ${c.referencia ?? ""}`).includes(
-          termo,
-        ),
+        normalizarBusca(c.nome).startsWith(normalizarBusca(letra)),
       );
     }
+    // Cada palavra em qualquer lugar do nome, sobrenome ou referência.
+    lista = filtrarPorBusca(lista, busca, textoDoCliente);
     if (situacao === "devedor")
       lista = lista.filter((c) => c.saldo_devedor > 0);
     if (situacao === "ok") lista = lista.filter((c) => c.saldo_devedor <= 0);

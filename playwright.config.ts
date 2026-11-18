@@ -1,4 +1,12 @@
+import path from "node:path";
+
 import { defineConfig, devices } from "@playwright/test";
+import { config as loadEnv } from "dotenv";
+
+// As specs que semeiam dados criam uma conta DESCARTÁVEL com as chaves do
+// .env.local (o mesmo de `npm run test:rls`). Sem o arquivo, elas se pulam
+// e as de rota pública rodam normalmente.
+loadEnv({ path: path.resolve(__dirname, ".env.local"), quiet: true });
 
 const port = Number(process.env.PORT ?? 3000);
 const baseURL = `http://localhost:${port}`;

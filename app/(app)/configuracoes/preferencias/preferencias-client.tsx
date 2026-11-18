@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { sugerirPorBusca, textoDoCliente } from "@/lib/busca";
 import { formatBRL } from "@/lib/format";
 import type { ClienteComSaldo } from "@/lib/types/fiado";
 
@@ -23,9 +24,6 @@ import { MarcaSection } from "./marca-section";
 type Tema = "light" | "dark";
 // Mesmo valor de lib/ui-mode/cookie.ts (não importável aqui: next/headers).
 type ModoUi = "simples" | "minimalista";
-
-const norm = (s: string) =>
-  s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
 /** Valor inicial dos inputs de limite: número → "500.00"-like sem R$. */
 const limiteParaInput = (v: number | null) => (v === null ? "" : String(v));
@@ -83,15 +81,11 @@ export function PreferenciasClient({
     });
   }
 
-  const filtrados = useMemo(() => {
-    const termo = norm(busca.trim());
-    if (!termo) return clientes;
-    return clientes.filter((c) =>
-      norm(`${c.nome} ${c.sobrenome ?? ""} ${c.referencia ?? ""}`).includes(
-        termo,
-      ),
-    );
-  }, [clientes, busca]);
+  // Os mais parecidos com o que se digitou vêm primeiro (`lib/busca.ts`).
+  const filtrados = useMemo(
+    () => sugerirPorBusca(clientes, busca, textoDoCliente, 6),
+    [clientes, busca],
+  );
 
   return (
     <div className="flex flex-col gap-5">
@@ -274,15 +268,17 @@ export function PreferenciasClient({
                         Nenhum cliente encontrado.
                       </li>
                     ) : (
-                      filtrados.slice(0, 6).map((c) => (
+                      filtrados.map((c) => (
                         <li key={c.id}>
+                          {/* Altura MÍNIMA, não fixa: nome comprido quebra a
+                              linha em vez de invadir a opção de baixo. */}
                           <button
                             type="button"
                             onClick={() => {
                               setClienteLimite(c);
                               setBusca("");
                             }}
-                            className="minimal:max-sm:h-11 minimal:max-sm:text-sm hover:bg-muted focus-visible:bg-muted flex h-12 w-full items-center gap-2 px-4 text-left text-base outline-none"
+                            className="minimal:max-sm:min-h-11 minimal:max-sm:text-sm hover:bg-muted focus-visible:bg-muted flex min-h-12 w-full flex-wrap items-center gap-x-2 px-4 py-2 text-left text-base leading-snug outline-none"
                           >
                             <span className="font-medium">
                               {c.sobrenome ? `${c.nome} ${c.sobrenome}` : c.nome}
